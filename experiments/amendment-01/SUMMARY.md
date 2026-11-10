@@ -49,7 +49,7 @@ generator.version inside exported documents is now "0.5.1", so every exported do
 ## Predictions vs observed (AMENDMENT-01.md)
 
 1. Pattern-mode ok >= 98% and CLOSURE_TANGENT incidence < 2%: CONFIRMED (100% and 0.0% in all three modes).
-2. Auto ok between 23.5% and 33.5%; Auto CLOSURE_TANGENT incidence falls by less than 25% relative (new >= 46%): CONFIRMED (31.21%; 47.3%, a relative fall of 23.0%, close to the limit).
+2. Auto ok between 23.5% and 33.5%; Auto CLOSURE_TANGENT incidence falls by less than 25% relative (new >= 46%): CONFIRMED (31.21%; 47.3%, a relative fall of 23.4%, close to the limit).
 3. B1 in [14.7%, 48.2%], B2 in [9.0%, 17.1%], TL-Auto0 in [66.2%, 89.3%]; CLOSURE_TANGENT B1 < 30%, B2 < 20%: CONFIRMED (B1 48.15%, B2 17.11%, TL-Auto0 89.26%, at the upper bounds; B1 1.3%, B2 8.9%).
 4. E4 order TL-Auto0 > B1 > B2: CONFIRMED (89.3% > 48.2% > 17.1%).
 5. E1b still 0 disagreements; legacy Auto and extreme 0/400 ok; legacy pattern modes >= 598 of 600: CONFIRMED (0; 0/400; 600/600).
