@@ -1,0 +1,268 @@
+{
+ "reference": "node22",
+ "primaryFields": [
+  "throw",
+  "nPoints",
+  "inserted",
+  "attempts",
+  "scale",
+  "straightSegments",
+  "straightCount",
+  "propCount",
+  "propKinds",
+  "obstacleCount",
+  "ok",
+  "codes"
+ ],
+ "engines": [
+  {
+   "label": "node22",
+   "name": "Node 22 (reference)",
+   "available": true,
+   "version": "node v22.23.4 V8 12.4.254.21-node.57",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 0,
+    "maxRelativeLengthDifference": 0
+   },
+   "rawSha256": "8609a734bea23b8cd5deadcd102241c6edf60f60df565e5b74bbc387d2a43e31",
+   "selfRef": true
+  },
+  {
+   "label": "node22-repeat",
+   "name": "Node 22 (repeat run)",
+   "available": true,
+   "version": "node v22.23.4 V8 12.4.254.21-node.57",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 0,
+    "maxRelativeLengthDifference": 0
+   },
+   "rawSha256": "8609a734bea23b8cd5deadcd102241c6edf60f60df565e5b74bbc387d2a43e31",
+   "selfRef": false
+  },
+  {
+   "label": "node20",
+   "name": "Node 20",
+   "available": true,
+   "version": "node v20.20.2 V8 11.3.244.8-node.38",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 0,
+    "maxRelativeLengthDifference": 0
+   },
+   "rawSha256": "4a6c3404e19e5826fec0047f2061246b994a3e634172682455c1a75c18222c79",
+   "selfRef": false
+  },
+  {
+   "label": "node24",
+   "name": "Node 24",
+   "available": true,
+   "version": "node v24.22.2 V8 13.6.233.17-node.63",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 317,
+    "maxRelativeLengthDifference": 9.9943794124927e-16
+   },
+   "rawSha256": "46f0ba417694ff277b31a96104df5b0b513ad1a8faf3cc1d06b81004e7ea1292",
+   "selfRef": false
+  },
+  {
+   "label": "deno",
+   "name": "Deno",
+   "available": true,
+   "version": "deno 2.9.6 V8 15.0.245.2-rusty",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 657,
+    "maxRelativeLengthDifference": 2.112488513600908e-15
+   },
+   "rawSha256": "bd73f2ccf5a1ea4483cf1603565b9c5c211152b3696330bec230fa4400c89ce9",
+   "selfRef": false
+  },
+  {
+   "label": "bun",
+   "name": "Bun (JavaScriptCore)",
+   "available": true,
+   "version": "bun 1.4.4",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 691,
+    "maxRelativeLengthDifference": 2.3407183442018887e-15
+   },
+   "rawSha256": "befd425a164acceee3c2cb9f5ef7dce8447b42d95f52ed5078e30a190d6c2748",
+   "selfRef": false
+  },
+  {
+   "label": "chrome",
+   "name": "Chrome headless (V8)",
+   "available": true,
+   "version": "browser Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36 (chrome 153.0.8010.12 via playwright-core)",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 657,
+    "maxRelativeLengthDifference": 2.112488513600908e-15
+   },
+   "rawSha256": "4ade3058a6e6d8483a87ff63aebe782e4bedddfc81b06f01b57c38ee3835ff35",
+   "selfRef": false
+  },
+  {
+   "label": "firefox",
+   "name": "Firefox (SpiderMonkey)",
+   "available": true,
+   "version": "browser Mozilla/5.0 (X11; Linux x86_64; rv:157.0) Gecko/20100101 Firefox/157.0 (firefox 157.0 via playwright-core)",
+   "casesWithAnyDiscreteDisagreement": 0,
+   "ofCases": 1000,
+   "perField": {
+    "throw": 0,
+    "nPoints": 0,
+    "inserted": 0,
+    "attempts": 0,
+    "scale": 0,
+    "straightSegments": 0,
+    "straightCount": 0,
+    "propCount": 0,
+    "propKinds": 0,
+    "obstacleCount": 0,
+    "ok": 0,
+    "codes": 0
+   },
+   "firstIds": [],
+   "clopperPearsonUpper95": 0.00368,
+   "secondary": {
+    "casesWithDifferentCheckFailures": 0,
+    "casesWithDifferentLength": 599,
+    "maxRelativeLengthDifference": 2.291686929772902e-15
+   },
+   "rawSha256": "3db7a9f8ca25e3640000a7af34c60d52c9b7a1f100334e68b15b035b3f9f9281",
+   "selfRef": false
+  }
+ ],
+ "bundleSha256": "975f0820a6672fa54546a9e035f4101a36df18cb8985f97822b6c178d11813cf"
+}
