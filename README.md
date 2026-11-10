@@ -94,7 +94,7 @@ v0.4의 적용 성공률과 최신 검증은 [V04_REPORT.md](V04_REPORT.md)를 �
 - `'digest'`(기본): 구조와 SHA-256 무결성만 확인합니다. 우연한 손상과 단순 변조를 잡지만, digest를 다시 계산해 넣은 위조는 통과합니다.
 - `'regenerate'`: 위 검사에 더해 `generateTrack(doc.params)`로 트랙을 다시 생성해 digest가 동일한지 확인합니다. 파라미터가 저장된 형상을 완전히 결정함을 증명하며, 재계산된 위조도 잡아냅니다.
 
-생성 경로(`core.ts`, `patterns.ts`, `coins.ts`)는 엔진마다 결과가 다를 수 있는 `Math.sin/cos/atan2/hypot/exp` 대신 `src/detmath.ts`의 결정적 구현을 사용하므로, 같은 시드는 JavaScript 엔진·OS와 무관하게 비트 단위로 같은 문서와 digest를 만듭니다. (`Math.sqrt`가 IEEE-754 정확 반올림이라는 가정을 둡니다.)
+설계 목표: 생성 경로(`core.ts`, `patterns.ts`, `coins.ts`)는 엔진마다 결과가 다를 수 있는 `Math.sin/cos/atan2/hypot/exp` 대신 `src/detmath.ts`의 결정적 구현만 사용하고(IEEE-754 기본 연산과 정확 반올림 `Math.sqrt`만 의존; 이 가정은 명세가 아닌 주요 엔진의 공통 동작입니다), 같은 시드가 JavaScript 엔진·OS와 무관하게 비트 단위로 같은 문서와 digest를 만들도록 설계했습니다. 현재 검증 증거는 Node 22(Linux)에서의 실행뿐이며, 엔진·OS 간 일치 여부는 계획된 결정성 실험(E1)에서 검증할 예정이고 아직 검증되지 않았습니다. 또한 `src/vehicle.ts`의 주행 런타임은 여전히 `Math.*`를 사용하므로 이 결정성 보장의 범위에 포함되지 않습니다.
 
 ## 구성과 원본 차이
 
