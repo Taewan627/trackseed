@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+title: "TrackLab: a reproducible procedural racing-track generator with validation and metrics"
+version: 0.5.1
+type: software
+license: MIT
+authors:
+  - family-names: "Kim"
+    given-names: "Taewan"
+    orcid: "https://orcid.org/0009-0006-2478-4884"
+    affiliation: "Graduate School of Virtual Convergence, Sogang University"
+  - family-names: "Kim"
+    given-names: "Taehoon"
+    orcid: "https://orcid.org/0000-0003-4788-4651"
+    affiliation: "Graduate School of Virtual Convergence, Sogang University"
+# TODO(PI): confirm repository name before release
+repository-code: "https://github.com/Taewan627/tracklab"
+keywords:
+  - procedural content generation
+  - racing games
+  - level generation
+  - reproducibility
+  - validation
+  - three.js
