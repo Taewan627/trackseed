@@ -1,0 +1,15 @@
+TrackLab 1.0.0 release checks, run on a clean 'git clone --branch s5b' of commit 01929f9 (README rewrite) unless stated.
+Machine: Linux 6.18.44-fc-v338 x86_64, node v22.23.4, 2 vCPU shared VM (see experiments/e2/results/environment.txt).
+
+npm ci                       : ok, 0 vulnerabilities reported
+npm test                     : tests 76, pass 76, fail 0, cancelled 0, skipped 0   (includes the unchanged golden geometry tests)
+npm run build                : ok (tsc --noEmit and vite build)
+npm run build:cli            : ok
+CLI smoke (from ci.yml)      : generate --seed 42; validate --verify regenerate exit code 1 (seed 42 Auto track has error violations; test requires <= 1): pass
+PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright test (after npm run build): 40 passed (5.8 min)
+python3 -I experiments/make-figures.py : 'figures ok'; git status afterwards: 0 changed files (all committed PNGs regenerate byte-identically)
+python3 experiments/e3/analyze.py and analyze_amendment01.py : git status afterwards: 0 changed files
+
+E2 validity run at 1.0.0 (working tree at commit 01929f9, bundle built by experiments/amendment-01/build.sh):
+  default (ratio)            : sha256 66a6af63b5fbb8f9fb7c70d34a0b4ec0ed431ee98bd79acf83342d728dd3df0a (equals experiments/e2/results/amendment-01/validity.csv.gz), 256 s
+  CLOSURE_TANGENT_MODE=absolute : sha256 812f416cc413dded87889c83652a42c47569b4118d5364b0a0571e47a8d65312 (equals experiments/e2/results/validity.csv.gz), 232 s
