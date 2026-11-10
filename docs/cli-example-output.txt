@@ -1,0 +1,41 @@
+$ tracklab generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json
+exit 0; track.json: 98075 bytes
+
+$ tracklab validate track.json --verify regenerate
+{
+  "file": "track.json",
+  "verify": "regenerate",
+  "digest": "05a1389a3ad57baa5dac5dc9c552ae171e0b38cc3825f0dcf2b460710b2a6e91",
+  "ok": true,
+  "violations": [
+    {
+      "code": "MAX_SLOPE",
+      "severity": "warning",
+      "index": 0,
+      "value": 0.6901827792120803,
+      "limit": 0.3,
+      "message": "slope 0.6901827792120803 of segment 0 exceeds 0.3"
+    },
+  ... (violations list trimmed)
+checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: false, 154
+exit 0
+
+$ tracklab metrics track.json
+{
+  "sampleCount": 325,
+  "length": 2747.0916760838677,
+  "boundingBoxArea": 613608.2703178154,
+  "straightLengthFraction": 0.051442653460416966,
+  "meanAbsCurvature": 0.004773621320203996,
+  "maxAbsCurvature": 0.012862566780115327,
+  "p95AbsCurvature": 0.012821392731430762,
+  "curvatureEntropyBits": 2.437248407324069,
+  "curvatureHistogram": [
+    19,
+    36,
+  ... (output trimmed)
+
+$ tracklab batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
+tracklab batch: 48 cases, 48 generated, 0 generation failures, 42 ok
+first JSONL line (cut to 520 characters):
+{"case":0,"seed":1,"params":{"curves":6,"straight":0,"width":40,"size":2,"height":80,"obstacles":3,"density":10,"scene":"mixed","seed":1,"cornerPattern":"auto","cornerCount":1,"cornerStrength":60},"file":"case-0000-seed1.json","generated":true,"digest":"30076e7bbd9b8de4ac64be1a0af26a4d0e4608a49566dd1f2b86d07ae9cbcaa9","ok":true,"violationCodes":["MAX_SLOPE"],"checkFailures":{"max-slope":181},"metrics":{"sampleCount":360,"length":2622.6201087624545,"boundingBoxArea":638642.2681548327,"straightLengthFraction":0,"mean
