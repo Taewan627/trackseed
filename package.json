@@ -1,7 +1,7 @@
 {
   "name": "tracklab-lite",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "bin": { "tracklab": "cli-dist/cli.js" },
   "scripts": {

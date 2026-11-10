@@ -19,7 +19,7 @@ const rejects = (fn: () => unknown, pathPattern: RegExp) =>
 
 test('version.ts matches package.json and is what exportTrack stamps', () => {
   const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: string };
-  assert.equal(VERSION, pkg.version); assert.equal(VERSION, '0.5.0');
+  assert.equal(VERSION, pkg.version); assert.equal(VERSION, '0.5.1');
   assert.deepEqual(exportTrack(generateTrack({ obstacles: 0, density: 0 })).generator, { name: 'tracklab', version: pkg.version });
 });
 

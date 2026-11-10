@@ -47,8 +47,18 @@ export interface ValidateOptions {
   closureTolerance?: number;
   /** Max |y_first - y_last|. Default 1e-6. */
   heightTolerance?: number;
-  /** Max heading difference (degrees, x/z plane) between the segment entering and leaving the seam. Default 5. */
+  /**
+   * Absolute floor (degrees, x/z plane) of the seam-tangent test. Default 5. In mode 'ratio' (default) the seam
+   * fails only if its turn also exceeds seamRatio x the largest per-vertex turn within seamWindow vertices of it.
+   */
   tangentToleranceDegrees?: number;
+  /** Seam-continuity outlier factor of closureTangentMode 'ratio'. Default 2. */
+  seamRatio?: number;
+  /**
+   * 'ratio' (default since 0.5.1): CLOSURE_TANGENT iff theta0 > max(tangentToleranceDegrees, seamRatio x max neighbourhood turn).
+   * 'absolute' (0.5.0 behaviour): iff theta0 > tangentToleranceDegrees. Library option only (the CLI --limit takes numbers).
+   */
+  closureTangentMode?: 'ratio' | 'absolute';
   /** A ribbon triangle whose x/z cross product is <= this (units^2) counts as flipped or degenerate. Default 1e-5. */
   foldEpsilon?: number;
   /** Warn when the local radius 1/|kappa| < factor * (width / 2). Default 1. */
@@ -59,11 +69,13 @@ export interface ValidateOptions {
   maxViolationsPerCheck?: number;
 }
 export const DEFAULT_VALIDATE_OPTIONS: Required<ValidateOptions> = {
-  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, foldEpsilon: 1e-5,
+  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'ratio', foldEpsilon: 1e-5,
   minRadiusToHalfWidth: 1, maxSlope: 0.3, maxViolationsPerCheck: 20,
 };
 
 const RAD_TO_DEG = 180 / Math.PI;
+/** Vertices on each side of the seam whose turns form the neighbourhood of the 'ratio' seam test. */
+const SEAM_WINDOW = 3;
 const cross = (a: Point, b: Point, c: Point) => (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
 
 interface Segment { a: Point; b: Point; ring: number; index: number; minX: number; maxX: number; minZ: number; maxZ: number }
@@ -168,16 +180,30 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
     const heightGap = Math.abs(pts[n].y - pts[0].y);
     const ux = pts[n].x - pts[n - 1].x, uz = pts[n].z - pts[n - 1].z, vx = pts[1].x - pts[0].x, vz = pts[1].z - pts[0].z;
     const tangent = Math.abs(datan2(ux * vz - uz * vx, ux * vx + uz * vz)) * RAD_TO_DEG;
+    // per-vertex heading change (degrees) at vertex i of the closed loop of n distinct vertices
+    const turnAt = (i: number) => {
+      const a = pts[(i - 1 + n) % n], b = pts[i], c = pts[(i + 1) % n];
+      const ax = b.x - a.x, az = b.z - a.z, bx = c.x - b.x, bz = c.z - b.z;
+      return Math.abs(datan2(ax * bz - az * bx, ax * bx + az * bz)) * RAD_TO_DEG;
+    };
+    const near = new Set<number>();
+    for (let k = 1; k <= SEAM_WINDOW; k++) { near.add((n - k) % n); near.add(k % n); }
+    near.delete(0);
+    let neighbourhood = 0;
+    for (const i of near) neighbourhood = Math.max(neighbourhood, turnAt(i));
+    const tangentLimit = o.closureTangentMode === 'absolute' ? o.tangentToleranceDegrees
+      : Math.max(o.tangentToleranceDegrees, o.seamRatio * neighbourhood);
     if (gap > o.closureTolerance) { failures++; add({ code: 'CLOSURE_POSITION', severity: 'error', index: n, value: gap, limit: o.closureTolerance,
       message: `last point is ${gap} units from the first point (limit ${o.closureTolerance})` }); }
     if (edgeGap > o.closureTolerance) { failures++; add({ code: 'CLOSURE_EDGE', severity: 'error', index: n, value: edgeGap, limit: o.closureTolerance,
       message: `a road edge's last point is ${edgeGap} units from its first point (limit ${o.closureTolerance})` }); }
     if (heightGap > o.heightTolerance) { failures++; add({ code: 'CLOSURE_HEIGHT', severity: 'error', index: n, value: heightGap, limit: o.heightTolerance,
       message: `height differs by ${heightGap} across the seam (limit ${o.heightTolerance})` }); }
-    if (tangent > o.tangentToleranceDegrees) { failures++; add({ code: 'CLOSURE_TANGENT', severity: 'error', index: 0, value: tangent, limit: o.tangentToleranceDegrees,
-      message: `heading changes by ${tangent} degrees across the seam (limit ${o.tangentToleranceDegrees})` }); }
+    if (tangent > tangentLimit) { failures++; add({ code: 'CLOSURE_TANGENT', severity: 'error', index: 0, value: tangent, limit: tangentLimit,
+      message: `heading changes by ${tangent} degrees across the seam (limit ${tangentLimit}; neighbourhood maximum ${neighbourhood} degrees, mode ${o.closureTangentMode})` }); }
     record({ id: 'closure', severity: 'error', checked: 4, failures,
-      stats: { positionGap: gap, edgeGap, heightGap, tangentDegrees: tangent } });
+      stats: { positionGap: gap, edgeGap, heightGap, tangentDegrees: tangent, neighbourhoodMaxDegrees: neighbourhood,
+        ...(neighbourhood > 0 ? { tangentRatio: tangent / neighbourhood } : {}) } });
   }
 
   // 3. self-intersection (centerline, each edge, edge vs edge) -------------

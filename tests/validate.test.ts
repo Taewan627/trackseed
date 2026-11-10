@@ -59,8 +59,55 @@ test('validator: an open polyline is a closure error; a broken seam height and t
   // a corner at the seam: 90 degree turn between the segment entering and leaving point 0
   const square = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 400 }, { x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }];
   const sq = validateTrack(build(square, 20));
-  assert.ok(codes(sq).includes('CLOSURE_TANGENT')); assert.ok(Math.abs(check(sq, 'closure').stats.tangentDegrees - 90) < 1e-9);
-  assert.equal(validateTrack(build(square, 20), { tangentToleranceDegrees: 91 }).violations.some(v => v.code === 'CLOSURE_TANGENT'), false);
+  // v0.5.0 behaviour (closureTangentMode 'absolute'): every 90 degree corner, including the one at the seam, fails
+  const abs = { closureTangentMode: 'absolute' as const };
+  const sqAbs = validateTrack(build(square, 20), abs);
+  assert.ok(codes(sqAbs).includes('CLOSURE_TANGENT')); assert.ok(Math.abs(check(sqAbs, 'closure').stats.tangentDegrees - 90) < 1e-9);
+  assert.equal(validateTrack(build(square, 20), { ...abs, tangentToleranceDegrees: 91 }).violations.some(v => v.code === 'CLOSURE_TANGENT'), false);
+  // default 'ratio' mode: the seam of a square turns exactly as much as its neighbouring corners, so it is not an outlier
+  assert.equal(codes(sq).includes('CLOSURE_TANGENT'), false);
+  assert.ok(Math.abs(check(sq, 'closure').stats.tangentRatio - 1) < 1e-9);
+});
+
+test('validator: CLOSURE_TANGENT is a seam-continuity outlier test (v0.5.1)', () => {
+  assert.equal(DEFAULT_VALIDATE_OPTIONS.closureTangentMode, 'ratio'); assert.equal(DEFAULT_VALIDATE_OPTIONS.seamRatio, 2);
+  // smooth circle sampled coarsely: 12 points, 30 degrees per vertex everywhere. Old rule fails it, new rule passes it.
+  const coarse = build(circle(400, 12), 40);
+  const r = validateTrack(coarse);
+  assert.equal(r.ok, true, codes(r).join());
+  assert.ok(Math.abs(check(r, 'closure').stats.tangentDegrees - 30) < 1e-6);
+  assert.ok(Math.abs(check(r, 'closure').stats.neighbourhoodMaxDegrees - 30) < 1e-6);
+  assert.ok(Math.abs(check(r, 'closure').stats.tangentRatio - 1) < 1e-6);
+  assert.ok(codes(validateTrack(coarse, { closureTangentMode: 'absolute' })).includes('CLOSURE_TANGENT'));
+  // D shape: a fine 1-degree arc (R = 300) closed by a straight chord. Its only two corners (about 90 degrees each) are the arc ends;
+  // starting the loop at one of them puts a heading discontinuity exactly at the seam while the seam's neighbours turn by about 1 degree.
+  const R = 300, d: Point[] = [];
+  for (let a = -90; a <= 90; a++) d.push({ x: R * Math.cos(a * Math.PI / 180), y: 0, z: R * Math.sin(a * Math.PI / 180) });
+  for (let z = R - 8; z > -R + 4; z -= 8) d.push({ x: 0, y: 0, z });
+  const kinked = d; // d[0] = (0, -R) is a corner
+  const k = validateTrack(build([...kinked, { ...kinked[0] }], 20));
+  assert.ok(codes(k).includes('CLOSURE_TANGENT'), codes(k).join());
+  const ks = check(k, 'closure').stats;
+  assert.ok(ks.tangentDegrees > 85 && ks.neighbourhoodMaxDegrees < 2 && ks.tangentRatio > 40);
+  assert.ok(codes(validateTrack(build([...kinked, { ...kinked[0] }], 20), { closureTangentMode: 'absolute' })).includes('CLOSURE_TANGENT'));
+  // the same loop started 40 vertices later has a smooth seam (the corners are now interior): no CLOSURE_TANGENT
+  const away = [...d.slice(40), ...d.slice(0, 40)];
+  const aw = validateTrack(build([...away, { ...away[0] }], 20));
+  assert.equal(codes(aw).includes('CLOSURE_TANGENT'), false, codes(aw).join());
+  assert.ok(check(aw, 'closure').stats.tangentDegrees < 2);
+  // options: a huge seamRatio or tangentToleranceDegrees disables the failure; the limit reported is the effective one
+  assert.equal(codes(validateTrack(build([...kinked, { ...kinked[0] }], 20), { seamRatio: 1000, tangentToleranceDegrees: 5 })).includes('CLOSURE_TANGENT'), false);
+  const lim = k.violations.find(v => v.code === 'CLOSURE_TANGENT')!;
+  assert.ok(Math.abs(lim.limit! - Math.max(5, 2 * ks.neighbourhoodMaxDegrees)) < 1e-9 && lim.value === ks.tangentDegrees);
+});
+
+test("validator: 'absolute' mode reproduces the v0.5.0 CLOSURE_TANGENT verdict on a fixed generated case", () => {
+  // S3b E2 case (hairpin, curves 3, width 20, seed 42): v0.5.0 reported CLOSURE_TANGENT only if the seam turn exceeded 5 degrees
+  const t = generateTrack({ cornerPattern: 'hairpin', cornerCount: 1, cornerStrength: 80, curves: 3, width: 20, seed: 42 });
+  const a = validateTrack(t, { closureTangentMode: 'absolute' }), s = check(a, 'closure').stats;
+  assert.equal(codes(a).includes('CLOSURE_TANGENT'), s.tangentDegrees > 5);
+  const r = validateTrack(t); // ratio mode never fails where absolute passes
+  if (!codes(a).includes('CLOSURE_TANGENT')) assert.equal(codes(r).includes('CLOSURE_TANGENT'), false);
 });
 
 test('validator: NaN and Infinity are finite errors and dependent checks are skipped, not crashed', () => {
