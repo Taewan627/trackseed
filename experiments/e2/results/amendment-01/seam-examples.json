@@ -1,0 +1,96 @@
+{
+ "A_autoStillFailing": [
+  {
+   "index": 1350,
+   "mode": "auto",
+   "curves": 3,
+   "straight": 0.3,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 0,
+   "theta0": 57.257,
+   "neighbourhoodMax": 6.275,
+   "ratio": 9.125,
+   "failsRatio": true,
+   "failsAbsolute": true
+  },
+  {
+   "index": 1351,
+   "mode": "auto",
+   "curves": 3,
+   "straight": 0.3,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 1,
+   "theta0": 65.26,
+   "neighbourhoodMax": 8.589,
+   "ratio": 7.598,
+   "failsRatio": true,
+   "failsAbsolute": true
+  },
+  {
+   "index": 1352,
+   "mode": "auto",
+   "curves": 3,
+   "straight": 0.3,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 2,
+   "theta0": 62.12,
+   "neighbourhoodMax": 7.31,
+   "ratio": 8.498,
+   "failsRatio": true,
+   "failsAbsolute": true
+  }
+ ],
+ "B_patternRescued": [
+  {
+   "index": 12150,
+   "mode": "right-angle",
+   "curves": 3,
+   "straight": 0,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 0,
+   "theta0": 5.135,
+   "neighbourhoodMax": 4.447,
+   "ratio": 1.155,
+   "failsRatio": false,
+   "failsAbsolute": true
+  },
+  {
+   "index": 12151,
+   "mode": "right-angle",
+   "curves": 3,
+   "straight": 0,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 1,
+   "theta0": 7.122,
+   "neighbourhoodMax": 6.023,
+   "ratio": 1.182,
+   "failsRatio": false,
+   "failsAbsolute": true
+  },
+  {
+   "index": 12152,
+   "mode": "right-angle",
+   "curves": 3,
+   "straight": 0,
+   "width": 20,
+   "size": 1,
+   "height": 0,
+   "seed": 2,
+   "theta0": 5.793,
+   "neighbourhoodMax": 4.935,
+   "ratio": 1.174,
+   "failsRatio": false,
+   "failsAbsolute": true
+  }
+ ]
+}

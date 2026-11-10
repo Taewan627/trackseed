@@ -105,4 +105,29 @@ for ax, mt in zip(axs.flat, ['straightLengthFraction', 'curvatureEntropyBits', '
     for patch, k in zip(bp['boxes'], NAMES): patch.set_facecolor(GEN_COL[k]); patch.set_alpha(0.8)
     ax.set_title(mt, fontsize=8); ax.tick_params(axis='x', labelrotation=60, labelsize=6)
 fig.suptitle('E4: metric distributions of generated tracks (box: IQR, whiskers 1.5 IQR, no outliers drawn)', fontsize=8); fig.tight_layout(); save(fig, out('e4', 'e4_metric_distributions.png'))
+
+# ---------------- AMENDMENT-01 (validator v0.5.1) ----------------
+def amend_dir(exp):
+    d = os.path.join(ROOT, exp, 'results', 'amendment-01', 'figures'); os.makedirs(d, exist_ok=True); return d
+def grouped(ax, names, old, new, ylab):
+    x = np.arange(len(names)); w = 0.38
+    for off, vals, col, lab in [(-w / 2, old, '#999999', 'S3b rule (v0.5.0, absolute 5 deg)'), (w / 2, new, '#0072B2', 'amended rule (v0.5.1, seam outlier)')]:
+        p = [100 * v[0] for v in vals]; ax.bar(x + off, p, w, color=col, label=lab)
+        ax.errorbar(x + off, p, yerr=[[max(0, 100 * (v[0] - v[1])) for v in vals], [max(0, 100 * (v[2] - v[0])) for v in vals]], fmt='none', color='k', lw=0.7, capsize=1.5)
+    ax.set_xticks(x); ax.set_xticklabels(names, fontsize=6.5); ax.set_ylabel(ylab); ax.legend(frameon=False, fontsize=7, loc='lower right')
+A2 = os.path.join(ROOT, 'e2/results/amendment-01/SUMMARY.json'); A4 = os.path.join(ROOT, 'e4/results/amendment-01/SUMMARY.json')
+if os.path.exists(A2) and os.path.exists(A4):
+    a2 = json.load(open(A2)); a4 = json.load(open(A4))
+    fig, ax = plt.subplots(figsize=(6.2, 2.9)); grouped(ax, MODES, [a2['modes'][m]['okOld'] for m in MODES], [a2['modes'][m]['okNew'] for m in MODES], '% ok among generated')
+    ax.set_title('E2 validator ok rate (amended validator v0.5.1), Wilson 95% CI', fontsize=8); save(fig, os.path.join(amend_dir('e2'), 'e2_validity_by_mode_amended.png'))
+    fig, axs = plt.subplots(1, 5, figsize=(8, 2.4), sharey=True)
+    for ax, f in zip(axs, ['curves', 'straight', 'width', 'size', 'height']):
+        d = a2['drivers'][f]; lv = [k for k in d if k not in ('spread', 'spreadS3b')]; x = np.arange(len(lv))
+        ax.bar(x - 0.2, [100 * d[k]['rateS3b'] for k in lv], 0.38, color='#999999', label='S3b rule (v0.5.0)'); ax.bar(x + 0.2, [100 * d[k]['rate'] for k in lv], 0.38, color='#0072B2', label='amended (v0.5.1)')
+        ax.set_xticks(x); ax.set_xticklabels([str(float(k)).rstrip('0').rstrip('.') for k in lv]); ax.set_xlabel(f)
+    axs[0].set_ylabel('invalid, % (Auto)'); axs[0].legend(frameon=False, fontsize=6, loc='lower left'); fig.suptitle('E2 Auto-mode invalidity by level (amended validator v0.5.1)', fontsize=8)
+    save(fig, os.path.join(amend_dir('e2'), 'e2_auto_invalidity_by_level_amended.png'))
+    fig, ax = plt.subplots(figsize=(6.6, 2.9)); names = list(a4['validity'])
+    grouped(ax, names, [a4['validity'][k]['okOld'] for k in names], [a4['validity'][k]['okNew'] for k in names], '% ok among generated')
+    ax.legend(frameon=False, fontsize=7, loc='upper left'); ax.set_title('E4 validity under the same validator (amended validator v0.5.1), Wilson 95% CI', fontsize=8); save(fig, os.path.join(amend_dir('e4'), 'e4_validity_amended.png'))
 print('figures ok')

@@ -1,0 +1,14 @@
+{
+ "e2": {
+  "amended_noOkCodes": "f2acea554e64a7479ca1dc9dd5dbd2720faa36276ae36f872839f03495f82ed1",
+  "identical": true,
+  "s3bFileSha256": "812f416cc413dded87889c83652a42c47569b4118d5364b0a0571e47a8d65312",
+  "s3b_noOkCodes": "f2acea554e64a7479ca1dc9dd5dbd2720faa36276ae36f872839f03495f82ed1"
+ },
+ "e4": {
+  "amended_noOkCodes": "4b05c503c977e9006f4fa0d3fa01388c2c4db077f44e3e99afae86617dff7f36",
+  "identical": true,
+  "s3bFileSha256": "14cdc254a3f038ebff0f9bd86b0929f5f972576e4ef684db8e0bf0724cbd4888",
+  "s3b_noOkCodes": "4b05c503c977e9006f4fa0d3fa01388c2c4db077f44e3e99afae86617dff7f36"
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "auto": {
+  "n": 200,
+  "okOld": 0,
+  "okNew": 0,
+  "codeOldCT": 123,
+  "codeNewCT": 123,
+  "otherChanged": 0
+ },
+ "right-angle": {
+  "n": 200,
+  "okOld": 199,
+  "okNew": 200,
+  "codeOldCT": 1,
+  "codeNewCT": 0,
+  "otherChanged": 0
+ },
+ "hairpin": {
+  "n": 200,
+  "okOld": 199,
+  "okNew": 200,
+  "codeOldCT": 1,
+  "codeNewCT": 0,
+  "otherChanged": 0
+ },
+ "s-curve": {
+  "n": 200,
+  "okOld": 196,
+  "okNew": 200,
+  "codeOldCT": 4,
+  "codeNewCT": 0,
+  "otherChanged": 0
+ },
+ "extreme": {
+  "n": 200,
+  "okOld": 0,
+  "okNew": 0,
+  "codeOldCT": 88,
+  "codeNewCT": 88,
+  "otherChanged": 0
+ }
+}

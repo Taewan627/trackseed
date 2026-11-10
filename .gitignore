@@ -13,3 +13,5 @@ experiments/e1/build/
 experiments/*/build/
 experiments/*/out/
 __pycache__/
+experiments/amendment-01/*/build/
+experiments/amendment-01/*/out/
