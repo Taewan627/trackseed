@@ -75,6 +75,27 @@ npm run preview
 
 v0.4의 적용 성공률과 최신 검증은 [V04_REPORT.md](V04_REPORT.md)를 참고하세요. 핵심 로직 37개와 브라우저 35개를 검사합니다. 기존 55개 테스트 파일은 보존하고, 패턴 검사 17개와 안정 버전 형상 해시를 추가했습니다. [COINS_REPORT.md](COINS_REPORT.md), [V03_REPORT.md](V03_REPORT.md), [TEST_REPORT.md](TEST_REPORT.md), [DRIVING_QUALITY_REPORT.md](DRIVING_QUALITY_REPORT.md)는 이전 변경 기록입니다. 브라우저 테스트는 소프트웨어 WebGL로 진행하므로 실제 데스크톱 GPU FPS나 Firefox/Safari 호환성을 입증하는 성능 시험은 아닙니다.
 
+### Exchange format (v1)
+
+`src/schema.ts`의 `exportTrack(track)`은 트랙 전체를 `tracklab.track` 스키마 v1 JSON 문서로 내보내고, `serializeTrack(track)`은 이를 정렬 키·공백 없는 정규(canonical) JSON 문자열로 만듭니다. 문서 필드는 다음과 같습니다.
+
+| 필드 | 내용 |
+| --- | --- |
+| `schema`, `schemaVersion` | 항상 `"tracklab.track"`, `1` |
+| `generator` | `{ name: "tracklab", version }` (`src/version.ts`, `package.json`과 동일) |
+| `params` | `sanitize()`를 거친 `Params` (범위를 벗어나거나 정규화되지 않은 값은 거부) |
+| `geometry` | `points`, `normals`, `roadEdges`, `straightSegments`, `length`, `bounds` |
+| `props`, `obstacles`, `coins` | 소품, 장애물, 코인 10개 |
+| `patternReport` | 특수 코너 적용·검증 결과 |
+| `integrity` | `{ algorithm: "sha256", canonical: "sorted-keys-json", digest }` — `digest`는 `integrity`를 제외한 문서를 `canonicalStringify`한 문자열의 SHA-256(순수 TS 구현, 브라우저에서도 동작) |
+
+`parseTrackDocument(json)`은 구조를 검증하고(스키마·버전·필수 필드·유한 수·digest 불일치) 위반 시 경로가 포함된 메시지(`$.geometry.points[7].x: ...`)의 `TrackDocumentError`를 던집니다. `importTrack(doc, { verify })`는 두 가지 검증 모드를 제공합니다.
+
+- `'digest'`(기본): 구조와 SHA-256 무결성만 확인합니다. 우연한 손상과 단순 변조를 잡지만, digest를 다시 계산해 넣은 위조는 통과합니다.
+- `'regenerate'`: 위 검사에 더해 `generateTrack(doc.params)`로 트랙을 다시 생성해 digest가 동일한지 확인합니다. 파라미터가 저장된 형상을 완전히 결정함을 증명하며, 재계산된 위조도 잡아냅니다.
+
+생성 경로(`core.ts`, `patterns.ts`, `coins.ts`)는 엔진마다 결과가 다를 수 있는 `Math.sin/cos/atan2/hypot/exp` 대신 `src/detmath.ts`의 결정적 구현을 사용하므로, 같은 시드는 JavaScript 엔진·OS와 무관하게 비트 단위로 같은 문서와 digest를 만듭니다. (`Math.sqrt`가 IEEE-754 정확 반올림이라는 가정을 둡니다.)
+
 ## 구성과 원본 차이
 
 ```text

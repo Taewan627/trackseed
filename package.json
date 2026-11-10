@@ -1,13 +1,13 @@
 {
   "name": "tracklab-lite",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js",
     "test:browser": "npm run build && playwright test"
   },
   "dependencies": { "three": "0.187.0" },
