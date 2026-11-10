@@ -15,3 +15,5 @@ experiments/*/out/
 __pycache__/
 experiments/amendment-01/*/build/
 experiments/amendment-01/*/out/
+experiments/e1/v1.0.0/build/
+experiments/e1/v1.0.0/page.html
