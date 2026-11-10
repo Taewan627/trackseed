@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/Taewan627/tracklab.git"
   },
-  "version": "0.5.1",
+  "version": "1.0.0",
   "type": "module",
   "bin": { "tracklab": "cli-dist/cli.js" },
   "scripts": {
