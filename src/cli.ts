@@ -1,0 +1,312 @@
+#!/usr/bin/env node
+// tracklab: headless command line interface (Node >= 20, no DOM).
+//   generate | batch | validate | metrics   (see `tracklab --help`)
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { DEFAULTS, LIMITS, generateTrack, sanitize, type Params } from './core.js';
+import { TrackDocumentError, canonicalStringify, exportTrack, importTrack } from './schema.js';
+import { DEFAULT_VALIDATE_OPTIONS, validateTrack, type ValidateOptions } from './validate.js';
+import { computeMetrics, type TrackMetrics } from './metrics.js';
+import { VERSION } from './version.js';
+
+class UsageError extends Error {}
+
+const MAIN_HELP = `tracklab ${VERSION} - headless TrackLab
+
+Usage: tracklab <command> [options]
+
+Commands:
+  generate   Generate one track as a canonical TrackDocumentV1 JSON document
+  batch      Generate every case of a parameter grid, validate and measure it
+  validate   Validate a track document (exit 0 ok, 1 violations, 2 invalid document)
+  metrics    Print geometric metrics of a track document as JSON
+
+Run "tracklab <command> --help" for the options of a command.
+Exit codes: 0 success, 1 failure of the requested check or generation, 2 usage error or invalid input.
+`;
+const HELP: Record<string, string> = {
+  generate: `Usage: tracklab generate [--seed N] [--params file.json | --set key=value ...] [--out file.json]
+
+Writes the canonical TrackDocumentV1 (sorted keys, no whitespace, plus a newline) to --out,
+or to stdout when --out is absent.
+
+  --seed N            Seed (0..2147483647); overrides "seed" from --params / --set
+  --params file.json  JSON object with a subset of the parameters
+  --set key=value     One parameter, repeatable (--set curves=8 --set cornerPattern=hairpin)
+  --out file.json     Output file (parent directories are created)
+
+Parameters (defaults): ${Object.entries(DEFAULTS).map(([k, v]) => `${k}=${v}`).join(' ')}
+Numeric ranges: ${Object.entries(LIMITS).map(([k, [lo, hi]]) => `${k} ${lo}..${hi}`).join(', ')}
+scene: nature|city|mixed; cornerPattern: auto|right-angle|hairpin|s-curve.
+Unknown keys and out-of-range values are errors (exit 2); nothing is clamped silently.
+Exit 1 if the generator rejects the parameters (e.g. a corner pattern that cannot be fitted).
+`,
+  batch: `Usage: tracklab batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing]
+
+grid.json:
+  { "seeds":  { "from": 1, "to": 6 }            // inclusive range, or an array of seeds
+    "params": { "cornerPattern": ["auto", "hairpin"], "straight": [0, 0.3], "obstacles": 3 } }
+Array-valued parameters are swept (Cartesian product); scalar values are fixed for every case.
+Case order: parameter names sorted alphabetically (first name varies slowest), then seed ascending.
+Case k is written to <dir>/case-<k as 4+ digits>-seed<seed>.json (k counts from 0).
+
+--jsonl writes one line per case. Deterministic fields: case, file, seed, params, generated, digest,
+ok, violationCodes, checkFailures, metrics, error. Wall-clock fields live ONLY under "timing"
+({"generation_ms": ...}, generateTrack() only, measured with performance.now); --no-timing omits
+them so two runs produce byte-identical JSONL.
+A case whose generation throws is recorded with generated=false and an error; it does not stop
+the batch. A one-line summary is printed to stderr. Exit 2 for an invalid grid.
+`,
+  validate: `Usage: tracklab validate file.json [--verify digest|regenerate] [--limit key=value ...] [--strict]
+
+Parses the document (schema, finite numbers, SHA-256 digest; --verify regenerate also regenerates
+the track from its params and compares digests), then runs the geometry validator and prints
+{ file, verify, digest, ok, violations, checks } as JSON on stdout.
+Exit 0: ok (no error-severity violation). Exit 1: at least one error-severity violation (with
+--strict, warnings also give 1). Exit 2: unreadable or invalid document, bad options.
+
+--limit key=value   Override a validator limit, repeatable. Defaults:
+${Object.entries(DEFAULT_VALIDATE_OPTIONS).map(([k, v]) => `    ${k}=${v}`).join('\n')}
+`,
+  metrics: `Usage: tracklab metrics file.json [--samples]
+
+Prints the geometric metrics of a track document as JSON (definitions: README, "Headless usage").
+--samples additionally includes the per-sample signed curvature array.
+Exit 2 for an unreadable or invalid document.
+`,
+};
+
+// ---- argument parsing ------------------------------------------------------
+interface Parsed { positional: string[]; flags: Map<string, string[]> }
+function parseArgs(argv: string[], valued: readonly string[], multi: readonly string[], boolean: readonly string[]): Parsed {
+  const positional: string[] = [], flags = new Map<string, string[]>();
+  for (let i = 0; i < argv.length; i++) {
+    const token = argv[i];
+    if (!token.startsWith('--')) { positional.push(token); continue; }
+    const eq = token.indexOf('=');
+    const name = token.slice(2, eq < 0 ? undefined : eq);
+    if (boolean.includes(name)) {
+      if (eq >= 0) throw new UsageError(`--${name} does not take a value`);
+      flags.set(name, ['true']); continue;
+    }
+    if (!valued.includes(name) && !multi.includes(name)) throw new UsageError(`unknown option --${name}`);
+    const values: string[] = [];
+    if (eq >= 0) values.push(token.slice(eq + 1));
+    else {
+      if (i + 1 >= argv.length) throw new UsageError(`--${name} needs a value`);
+      values.push(argv[++i]);
+      // --set a=1 b=2 : further tokens up to the next option belong to a repeatable flag.
+      if (multi.includes(name)) while (i + 1 < argv.length && !argv[i + 1].startsWith('--')) values.push(argv[++i]);
+    }
+    if (!multi.includes(name) && flags.has(name)) throw new UsageError(`--${name} given more than once`);
+    flags.set(name, [...(flags.get(name) ?? []), ...values]);
+  }
+  return { positional, flags };
+}
+const one = (p: Parsed, name: string) => p.flags.get(name)?.[0];
+
+function readText(path: string): string {
+  try { return readFileSync(path, 'utf8'); }
+  catch (e) { throw new UsageError(`cannot read ${path}: ${e instanceof Error ? e.message : String(e)}`); }
+}
+function readJson(path: string): unknown {
+  try { return JSON.parse(readText(path)); }
+  catch (e) { if (e instanceof UsageError) throw e; throw new UsageError(`${path}: invalid JSON (${e instanceof Error ? e.message : String(e)})`); }
+}
+function writeOut(path: string, text: string) {
+  try { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, text); }
+  catch (e) { throw new UsageError(`cannot write ${path}: ${e instanceof Error ? e.message : String(e)}`); }
+}
+
+// ---- parameters ------------------------------------------------------------
+const PARAM_KEYS = Object.keys(DEFAULTS) as (keyof Params)[];
+const isNumericKey = (k: string) => typeof DEFAULTS[k as keyof Params] === 'number';
+
+/** Check the keys and types of a raw parameter object and require that sanitize() keeps every value. */
+function strictParams(raw: Record<string, unknown>, where: string): Params {
+  for (const [k, v] of Object.entries(raw)) {
+    if (!PARAM_KEYS.includes(k as keyof Params)) throw new UsageError(`${where}: unknown parameter "${k}" (known: ${PARAM_KEYS.join(', ')})`);
+    if (isNumericKey(k) ? typeof v !== 'number' || !Number.isFinite(v) : typeof v !== 'string')
+      throw new UsageError(`${where}: parameter "${k}" must be ${isNumericKey(k) ? 'a finite number' : 'a string'}, got ${JSON.stringify(v)}`);
+  }
+  const clean = sanitize(raw as Partial<Params>);
+  for (const [k, v] of Object.entries(raw)) {
+    if (clean[k as keyof Params] !== v) throw new UsageError(
+      `${where}: parameter "${k}" = ${JSON.stringify(v)} is not valid (sanitized to ${JSON.stringify(clean[k as keyof Params])}; see "tracklab generate --help" for ranges)`);
+  }
+  return clean;
+}
+function parseAssignment(text: string, flag: string): [string, string] {
+  const eq = text.indexOf('=');
+  if (eq <= 0) throw new UsageError(`${flag} expects key=value, got "${text}"`);
+  return [text.slice(0, eq), text.slice(eq + 1)];
+}
+function parseNumber(text: string, what: string): number {
+  const n = text.trim() === '' ? NaN : Number(text);
+  if (!Number.isFinite(n)) throw new UsageError(`${what} must be a finite number, got "${text}"`);
+  return n;
+}
+
+function generateCommand(argv: string[]): number {
+  const p = parseArgs(argv, ['seed', 'params', 'out'], ['set'], []);
+  if (p.positional.length) throw new UsageError(`unexpected argument "${p.positional[0]}"`);
+  if (p.flags.has('params') && p.flags.has('set')) throw new UsageError('use either --params or --set, not both');
+  let raw: Record<string, unknown> = {};
+  if (p.flags.has('params')) {
+    const value = readJson(one(p, 'params')!);
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new UsageError('--params file must contain a JSON object');
+    raw = { ...value as Record<string, unknown> };
+  }
+  for (const item of p.flags.get('set') ?? []) {
+    const [k, v] = parseAssignment(item, '--set');
+    raw[k] = isNumericKey(k) ? parseNumber(v, `--set ${k}`) : v;
+  }
+  if (p.flags.has('seed')) raw.seed = parseNumber(one(p, 'seed')!, '--seed');
+  const params = strictParams(raw, 'parameters');
+  let text: string;
+  try { text = canonicalStringify(exportTrack(generateTrack(params))) + '\n'; }
+  catch (e) { process.stderr.write(`tracklab: generation failed: ${e instanceof Error ? e.message : String(e)}\n`); return 1; }
+  if (p.flags.has('out')) writeOut(one(p, 'out')!, text); else process.stdout.write(text);
+  return 0;
+}
+
+// ---- batch -----------------------------------------------------------------
+function expandGrid(grid: unknown): { seed: number; params: Params }[] {
+  if (typeof grid !== 'object' || grid === null || Array.isArray(grid)) throw new UsageError('grid must be a JSON object');
+  const g = grid as Record<string, unknown>;
+  for (const k of Object.keys(g)) if (k !== 'seeds' && k !== 'params') throw new UsageError(`grid: unknown field "${k}" (expected "seeds" and "params")`);
+  let seeds: number[];
+  const s = g.seeds;
+  const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v);
+  if (Array.isArray(s) && s.length > 0 && s.every(isInt)) seeds = s as number[];
+  else if (typeof s === 'object' && s !== null && !Array.isArray(s) && isInt((s as { from?: unknown }).from) && isInt((s as { to?: unknown }).to)
+    && Object.keys(s).length === 2 && (s as { to: number }).to >= (s as { from: number }).from) {
+    const { from, to } = s as { from: number; to: number };
+    if (to - from >= 100000) throw new UsageError('grid.seeds: range too large (max 100000 seeds)');
+    seeds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  } else throw new UsageError('grid.seeds must be {"from": int, "to": int} (inclusive, to >= from) or a non-empty array of integers');
+  const raw = g.params ?? {};
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw new UsageError('grid.params must be an object');
+  const spec = raw as Record<string, unknown>;
+  if ('seed' in spec) throw new UsageError('grid.params must not contain "seed"; use grid.seeds');
+  const keys = Object.keys(spec).sort();
+  const axes = keys.map(k => {
+    const v = spec[k];
+    if (Array.isArray(v) && v.length === 0) throw new UsageError(`grid.params.${k} is an empty array`);
+    return Array.isArray(v) ? v : [v];
+  });
+  const total = axes.reduce((a, v) => a * v.length, seeds.length);
+  if (total > 100000) throw new UsageError(`grid expands to ${total} cases (max 100000)`);
+  const cases: { seed: number; params: Params }[] = [];
+  const index = axes.map(() => 0);
+  for (let c = 0; c < total / seeds.length; c++) {
+    const combo: Record<string, unknown> = {};
+    keys.forEach((k, a) => { combo[k] = axes[a][index[a]]; });
+    for (const seed of seeds) cases.push({ seed, params: strictParams({ ...combo, seed }, `grid case ${cases.length}`) });
+    for (let a = axes.length - 1; a >= 0; a--) { if (++index[a] < axes[a].length) break; index[a] = 0; }
+  }
+  return cases;
+}
+
+function metricsSummary(m: TrackMetrics): Omit<TrackMetrics, 'curvature'> {
+  const { curvature: _curvature, ...rest } = m;
+  return rest;
+}
+
+function batchCommand(argv: string[]): number {
+  const p = parseArgs(argv, ['grid', 'out', 'jsonl'], [], ['no-timing']);
+  if (p.positional.length) throw new UsageError(`unexpected argument "${p.positional[0]}"`);
+  if (!p.flags.has('grid')) throw new UsageError('--grid is required');
+  if (!p.flags.has('out')) throw new UsageError('--out is required');
+  const cases = expandGrid(readJson(one(p, 'grid')!));
+  const outDir = one(p, 'out')!, timing = !p.flags.has('no-timing');
+  mkdirSync(outDir, { recursive: true });
+  const lines: string[] = [];
+  let generated = 0, ok = 0;
+  cases.forEach(({ seed, params }, k) => {
+    let track: ReturnType<typeof generateTrack> | undefined, error: string | undefined;
+    const t0 = performance.now();
+    try { track = generateTrack(params); } catch (e) { error = e instanceof Error ? e.message : String(e); }
+    const ms = Math.round((performance.now() - t0) * 1000) / 1000;
+    const base = { case: k, seed, params };
+    let record: Record<string, unknown>;
+    if (!track) {
+      record = { ...base, file: null, generated: false, digest: null, ok: null, violationCodes: [], checkFailures: {}, metrics: null, error };
+    } else {
+      generated++;
+      const doc = exportTrack(track);
+      const file = `case-${String(k).padStart(4, '0')}-seed${seed}.json`;
+      writeOut(join(outDir, file), canonicalStringify(doc) + '\n');
+      const result = validateTrack(track);
+      if (result.ok) ok++;
+      record = { ...base, file, generated: true, digest: doc.integrity.digest, ok: result.ok,
+        violationCodes: [...new Set(result.violations.map(v => v.code))].sort(),
+        checkFailures: Object.fromEntries(result.checks.filter(c => c.failures > 0).map(c => [c.id, c.failures])),
+        metrics: metricsSummary(computeMetrics(track)), error: null };
+    }
+    if (timing) record.timing = { generation_ms: ms };
+    lines.push(JSON.stringify(record));
+  });
+  if (p.flags.has('jsonl')) writeOut(one(p, 'jsonl')!, lines.join('\n') + (lines.length ? '\n' : ''));
+  process.stderr.write(`tracklab batch: ${cases.length} cases, ${generated} generated, ${cases.length - generated} generation failures, ${ok} ok\n`);
+  return 0;
+}
+
+// ---- validate / metrics ----------------------------------------------------
+function loadDocument(path: string, verify: 'digest' | 'regenerate') {
+  try { return importTrack(readText(path), { verify }); }
+  catch (e) {
+    if (e instanceof TrackDocumentError) throw new UsageError(`${path}: invalid track document: ${e.message}`);
+    throw e;
+  }
+}
+
+function validateCommand(argv: string[]): number {
+  const p = parseArgs(argv, ['verify'], ['limit'], ['strict']);
+  if (p.positional.length !== 1) throw new UsageError('validate expects exactly one file');
+  const verify = one(p, 'verify') ?? 'digest';
+  if (verify !== 'digest' && verify !== 'regenerate') throw new UsageError(`--verify must be "digest" or "regenerate", got "${verify}"`);
+  const options: Record<string, number> = {};
+  for (const item of p.flags.get('limit') ?? []) {
+    const [k, v] = parseAssignment(item, '--limit');
+    if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
+    options[k] = parseNumber(v, `--limit ${k}`);
+  }
+  const file = p.positional[0];
+  const track = loadDocument(file, verify);
+  const result = validateTrack(track, options as ValidateOptions);
+  const digest = (JSON.parse(readText(file)) as { integrity: { digest: string } }).integrity.digest;
+  process.stdout.write(JSON.stringify({ file, verify, digest, ...result }, null, 2) + '\n');
+  const warned = result.checks.some(c => c.severity === 'warning' && !c.passed);
+  return !result.ok || (p.flags.has('strict') && warned) ? 1 : 0;
+}
+
+function metricsCommand(argv: string[]): number {
+  const p = parseArgs(argv, [], [], ['samples']);
+  if (p.positional.length !== 1) throw new UsageError('metrics expects exactly one file');
+  const m = computeMetrics(loadDocument(p.positional[0], 'digest'));
+  process.stdout.write(JSON.stringify(p.flags.has('samples') ? m : metricsSummary(m), null, 2) + '\n');
+  return 0;
+}
+
+function main(argv: string[]): number {
+  const [command, ...rest] = argv;
+  try {
+    if (command === undefined || command === '--help' || command === '-h' || command === 'help') {
+      process.stdout.write(MAIN_HELP); return command === undefined ? 2 : 0;
+    }
+    if (!(command in HELP)) throw new UsageError(`unknown command "${command}"`);
+    if (rest.includes('--help') || rest.includes('-h')) { process.stdout.write(HELP[command]); return 0; }
+    switch (command) {
+      case 'generate': return generateCommand(rest);
+      case 'batch': return batchCommand(rest);
+      case 'validate': return validateCommand(rest);
+      default: return metricsCommand(rest);
+    }
+  } catch (e) {
+    if (e instanceof UsageError) { process.stderr.write(`tracklab: ${e.message}\nRun "tracklab --help" for usage.\n`); return 2; }
+    throw e;
+  }
+}
+
+process.exitCode = main(process.argv.slice(2));

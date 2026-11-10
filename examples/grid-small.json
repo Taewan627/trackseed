@@ -1,0 +1,11 @@
+{
+  "seeds": { "from": 1, "to": 6 },
+  "params": {
+    "cornerPattern": ["auto", "right-angle", "hairpin", "s-curve"],
+    "cornerCount": 1,
+    "cornerStrength": 60,
+    "straight": [0, 0.3],
+    "obstacles": 3,
+    "density": 10
+  }
+}

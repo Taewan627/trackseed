@@ -96,6 +96,78 @@ v0.4의 적용 성공률과 최신 검증은 [V04_REPORT.md](V04_REPORT.md)를 �
 
 설계 목표: 생성 경로(`core.ts`, `patterns.ts`, `coins.ts`)는 엔진마다 결과가 다를 수 있는 `Math.sin/cos/atan2/hypot/exp` 대신 `src/detmath.ts`의 결정적 구현만 사용하고(IEEE-754 기본 연산과 정확 반올림 `Math.sqrt`만 의존; 이 가정은 명세가 아닌 주요 엔진의 공통 동작입니다), 같은 시드가 JavaScript 엔진·OS와 무관하게 비트 단위로 같은 문서와 digest를 만들도록 설계했습니다. 현재 검증 증거는 Node 22(Linux)에서의 실행뿐이며, 엔진·OS 간 일치 여부는 계획된 결정성 실험(E1)에서 검증할 예정이고 아직 검증되지 않았습니다. 또한 `src/vehicle.ts`의 주행 런타임은 여전히 `Math.*`를 사용하므로 이 결정성 보장의 범위에 포함되지 않습니다.
 
+## Headless usage
+
+TrackLab can be used without a browser: a validator (`src/validate.ts`), geometric metrics (`src/metrics.ts`) and a command line (`src/cli.ts`, Node >= 20, no DOM). None of them change generation output.
+
+```bash
+npm ci
+npm run build:cli                      # tsc -p tsconfig.cli.json -> cli-dist/
+node cli-dist/cli.js --help            # also: generate|batch|validate|metrics --help
+node cli-dist/cli.js generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json
+node cli-dist/cli.js validate track.json --verify regenerate    # exit 0 ok / 1 violations / 2 invalid document
+node cli-dist/cli.js metrics track.json
+node cli-dist/cli.js batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl
+```
+
+`package.json` declares `"bin": {"tracklab": "cli-dist/cli.js"}`; `cli-dist/` is a build artifact and is git-ignored. `npm test` runs `build:cli` first because `tests/cli.test.ts` spawns the compiled CLI.
+
+Commands:
+
+| Command | Behaviour | Exit codes |
+| --- | --- | --- |
+| `generate [--seed N] [--params file.json \| --set key=value ...] [--out file.json]` | Canonical `TrackDocumentV1` (see "Exchange format") to `--out` or stdout. Unknown keys and out-of-range values are rejected, not clamped. | 0 ok, 1 generator rejected the parameters, 2 usage error |
+| `batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing]` | One document per case plus one JSONL summary line per case (below). | 0 completed, 2 invalid grid or usage |
+| `validate file.json [--verify digest\|regenerate] [--limit key=value ...] [--strict]` | Parses the document (schema, digest, optional regeneration), runs the validator, prints the report as JSON. | 0 no error-severity violation, 1 at least one (`--strict`: warnings too), 2 invalid document |
+| `metrics file.json [--samples]` | Metrics as JSON (`--samples` adds the per-sample curvature array). | 0, or 2 invalid document |
+
+Grid file (`examples/grid-small.json` expands to 48 cases, including the three corner-pattern modes):
+
+```json
+{ "seeds":  { "from": 1, "to": 6 },
+  "params": { "cornerPattern": ["auto", "right-angle", "hairpin", "s-curve"], "straight": [0, 0.3], "obstacles": 3 } }
+```
+
+Array-valued parameters are swept (Cartesian product, parameter names sorted alphabetically, first name slowest, seeds innermost in ascending order); scalars are fixed. `seeds` may also be an array. Case `k` is written to `case-<k, 4+ digits>-seed<seed>.json`. A case whose generation throws (for example a corner pattern that cannot be fitted) is recorded with `"generated": false` and the error message and does not stop the batch.
+
+JSONL line fields. Deterministic: `case`, `file`, `seed`, `params` (sanitized), `generated`, `digest` (document SHA-256), `ok`, `violationCodes` (sorted unique codes), `checkFailures` (complete failure count per failing check), `metrics` (all metrics except the per-sample array), `error`. Non-deterministic wall-clock data appears only under `timing.generation_ms` (time of the `generateTrack()` call, `performance.now()`); `--no-timing` omits it so that two runs give byte-identical JSONL.
+
+### Validator
+
+`validateTrack(track, options?) => { ok, violations, checks }` is pure and takes anything with `params.width`, `points` and `roadEdges` (a `Track` or an imported document). It reports problems on every generation mode and never repairs them; in particular Auto mode runs no geometry audit at generation time, and the validator reports the overlaps at sharp straight/curve joins that the "알려진 한계와 다음 단계" section below admits. `ok` is false iff a check of severity `error` failed or was skipped. Every check appears in `checks` with `passed`, `skipped`, `checked` (items examined), `failures` (complete count) and `stats` (observed extremes). `violations` lists at most `maxViolationsPerCheck` entries per code.
+
+| Check (`checks[].id`) | Codes | Severity | Definition and default limit |
+| --- | --- | --- | --- |
+| `structure` | `STRUCTURE` | error | at least 4 points; both `roadEdges` have one entry per point |
+| `finite` | `NON_FINITE` | error | every x/y/z of points and both edges, and `params.width`, is finite; if it fails, all later checks are `skipped` |
+| `closure` | `CLOSURE_POSITION`, `CLOSURE_EDGE`, `CLOSURE_HEIGHT`, `CLOSURE_TANGENT` | error | last point equals first within `closureTolerance` = 1e-6 (3D; also each edge); \|y_last - y_first\| <= `heightTolerance` = 1e-6; heading change (x/z) between the segment entering and the segment leaving the seam <= `tangentToleranceDegrees` = 5 |
+| `self-intersection` | `SELF_INTERSECTION_CENTERLINE`, `SELF_INTERSECTION_EDGE`, `EDGE_EDGE_INTERSECTION` | error | planar (x/z) segment intersection, found with a spatial hash, of the centerline with itself, of each road edge with itself, and of the left edge with the right edge; segments sharing a vertex are skipped, touching counts as intersecting. A grade-separated crossing is therefore reported too. `index`/`value` are the two segment indices |
+| `edge-fold` | `EDGE_FOLD` | error | the two ribbon triangles of every segment (the triangles used for the asphalt mesh) must have x/z cross product > `foldEpsilon` = 1e-5; otherwise the ribbon is flipped or degenerate there (inner edge crossing itself) |
+| `min-turn-radius` | `MIN_TURN_RADIUS` | warning | local radius 1/\|kappa\| (kappa as defined below) < `minRadiusToHalfWidth` x width/2, default factor 1 |
+| `max-slope` | `MAX_SLOPE` | warning | \|dy\| / planar run of a segment > `maxSlope` = 0.3 (rise over run, about 16.7 degrees). This default is a convention of this tool, not a standard |
+
+Defaults are exported as `DEFAULT_VALIDATE_OPTIONS`; on the CLI use `--limit key=value`.
+
+### Metrics
+
+`computeMetrics(track, options?) => TrackMetrics` takes the centerline in TrackLab convention (closed, last point repeats the first). All fields are geometric; none rates fun or difficulty. Curvature is the discrete Menger curvature of the x/z projection at sample `i` from its neighbours `a`, `b`, `c`: `kappa = 2 cross(b - a, c - b) / (|b - a| |c - b| |c - a|)` (1/R of the circle through the three points; sign = sign of the x/z cross product).
+
+| Field | Definition |
+| --- | --- |
+| `sampleCount` | `points.length - 1` |
+| `length` | closed 3D arc length, sum of Euclidean segment lengths |
+| `boundingBoxArea` | (max x - min x) (max z - min z) of the centerline points, without road margin |
+| `straightLengthFraction` | 3D arc length of segments whose two end samples both have \|kappa\| < `straightKappa` = 5e-4 (radius > 2000) divided by `length`. By arc length, not segment count; unrelated to `params.straight`, which counts spline pieces |
+| `meanAbsCurvature`, `maxAbsCurvature`, `p95AbsCurvature` | mean, maximum and 95th percentile (nearest rank: the ceil(0.95 n)-th smallest) of \|kappa\| over samples |
+| `curvatureEntropyBits` | Shannon entropy, in bits, of the distribution of samples over 8 fixed \|kappa\| bins with lower edges 0, 5e-4, 1e-3, 2e-3, 4e-3, 8e-3, 1.6e-2, 3.2e-2 (last bin open); `curvatureHistogram` holds the counts. Adapted from the curvature-entropy idea in Loiacono, Cardamone & Lanzi, IEEE TCIAIG 3(3), 2011; the bins and the use of discrete Menger curvature are choices of this tool, so values are not comparable with that paper |
+| `turnCount` | number of maximal runs of consecutive samples with the same sign of kappa and \|kappa\| > `turnKappa` = 4e-3 (radius < 250); a run touching the seam is merged across it; an S-curve counts as 2 |
+| `elevationRange` | max y - min y |
+| `maxAbsSlope`, `meanAbsSlope` | max over segments of \|dy\| / planar run; sum \|dy\| / sum planar run (run-weighted mean). Segments with zero planar run are skipped |
+| `totalTurningDegrees` | sum over vertices of the absolute heading change in the x/z plane, in degrees (360 for a simple loop) |
+| `curvature` | the signed kappa per sample (omitted by the CLI unless `--samples`) |
+
+Thresholds are options (`straightKappa`, `turnKappa`). `validate.ts` and `metrics.ts` use only `+ - * /`, `Math.sqrt`, exact `Math.*` helpers and `src/detmath.ts` (plus a local `dlog2` built from those operations), so they inherit the same unverified-across-engines caveat as generation: the only verified evidence is Node 22 on Linux.
+
 ## 구성과 원본 차이
 
 ```text
