@@ -1,0 +1,70 @@
+{
+  "source": "v0.3 stable backup before v0.4",
+  "fields": [
+    "waypoints",
+    "points",
+    "normals",
+    "roadEdges",
+    "straightSegments",
+    "length",
+    "bounds",
+    "props",
+    "obstacles"
+  ],
+  "cases": [
+    {
+      "params": {},
+      "sha256": "10aa85ff3d5df76d353fbf7ad0c1d8aef7070772631b615787f9e63bb4d211ee"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "curves": 3,
+        "straight": 0.6,
+        "width": 20,
+        "size": 1,
+        "height": 200,
+        "density": 0,
+        "obstacles": 8
+      },
+      "sha256": "67f1cd36d8045b37b437b0972abc93a5a5cb39870297a22b8c272f4d83b2aea1"
+    },
+    {
+      "params": {
+        "seed": 2147483647,
+        "curves": 10,
+        "straight": 0,
+        "width": 80,
+        "size": 3,
+        "height": 200,
+        "density": 20,
+        "obstacles": 8
+      },
+      "sha256": "53b5ba78914aeb529534f08fbbc171f7956f997407d593b7778ebc97e0197ef7"
+    },
+    {
+      "params": {
+        "seed": 99999,
+        "curves": 3,
+        "width": 80,
+        "straight": 0,
+        "size": 3,
+        "height": 0,
+        "scene": "nature"
+      },
+      "sha256": "47577512202eb8e1ac26ba40e848fa1fca24ccb65facda1ba795d1bff53ef84b"
+    },
+    {
+      "params": {
+        "seed": 7,
+        "curves": 10,
+        "width": 20,
+        "straight": 0.6,
+        "size": 1,
+        "height": 0,
+        "scene": "city"
+      },
+      "sha256": "32534bb364f5ff6cbc4cfaef103436905ee5229b956bcd01d8354123e4f80bcb"
+    }
+  ]
+}

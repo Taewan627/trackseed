@@ -1,0 +1,7 @@
+# Upload only the audited Build Output API artifact, using --prebuilt.
+# A regular source deployment intentionally has no package/source files.
+*
+!.vercel/
+!.vercel/output/
+!.vercel/output/**
+!vercel.json
