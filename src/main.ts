@@ -7,11 +7,12 @@ import { COIN_COUNT, CoinRun } from './coins.js';
 import { PatternGenerationError } from './patterns.js';
 import { TrackDocumentError, exportTrack, importTrack, parseTrackDocument, serializeTrack } from './schema.js';
 import { validateTrack, type ValidationResult } from './validate.js';
+import { VERSION } from './version.js';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `
   <header class="app-header">
-    <a class="brand" href="./" aria-label="TrackLab Lite 홈"><span class="brand-mark">⌁</span><strong>TrackLab<span> Lite</span></strong><span class="version">v0.4</span></a>
+    <a class="brand" href="./" aria-label="TrackLab Lite 홈"><span class="brand-mark">⌁</span><strong>TrackLab<span> Lite</span></strong><span class="version">v${VERSION}</span></a>
     <div class="header-path">WORKSPACE <span>/</span> Procedural track studio</div>
     <div class="local-badge"><i></i> LOCAL SESSION</div>
   </header>
