@@ -133,3 +133,40 @@ test('cli: batch rejects invalid grids with exit 2 and writes nothing', () => {
     mkdirSync(join(dir, 'unused'));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () => {
+  const dir = tmp();
+  try {
+    // Seed 36 with a hairpin pattern has one seam heading change above 5 degrees that the ratio rule accepts.
+    const file = join(dir, 'seam.json');
+    assert.equal(run(['generate', '--seed', '36', '--set', 'cornerPattern=hairpin', 'curves=10', 'cornerCount=2', '--out', file]).code, 0);
+    const codes = (r: { out: string }) => (JSON.parse(r.out) as { violations: { code: string }[] }).violations.map(v => v.code);
+    const def = run(['validate', file]), ratio = run(['validate', file, '--closure-tangent-mode', 'ratio']);
+    assert.equal(def.out, ratio.out, 'ratio is the default'); assert.equal(def.code, 0);
+    assert.ok(!codes(def).includes('CLOSURE_TANGENT'));
+    const abs = run(['validate', file, '--closure-tangent-mode=absolute']);
+    assert.equal(abs.code, 1); assert.ok(codes(abs).includes('CLOSURE_TANGENT'));
+    // seam-ratio 0 makes the ratio rule equal to the absolute limit; a large ratio never fires; same as --limit seamRatio=
+    assert.equal(run(['validate', file, '--seam-ratio', '0']).code, 1);
+    assert.equal(run(['validate', file, '--seam-ratio', '2']).out, def.out);
+    assert.equal(run(['validate', file, '--seam-ratio', '5']).out, run(['validate', file, '--limit', 'seamRatio=5']).out);
+    // Errors: bad mode, bad ratio, conflicting spec, non-numeric limit
+    for (const bad of [['--closure-tangent-mode', 'sloppy'], ['--seam-ratio', 'x'], ['--seam-ratio', '-1'],
+      ['--seam-ratio', '3', '--limit', 'seamRatio=3'], ['--limit', 'closureTangentMode=absolute']]) {
+      const r = run(['validate', file, ...bad]); assert.equal(r.code, 2, bad.join(' ')); assert.match(r.err, /tracklab:/);
+    }
+    // batch: same options, summary reflects the mode; documents and digests are unaffected.
+    const grid = join(dir, 'g.json');
+    writeFileSync(grid, JSON.stringify({ seeds: [36], params: { cornerPattern: 'hairpin', curves: 10, cornerCount: 2 } }));
+    const line = (args: string[]) => {
+      const out = join(dir, 'o-' + args.join('_').replace(/[^\w]/g, '')), jl = out + '.jsonl';
+      const r = run(['batch', '--grid', grid, '--out', out, '--jsonl', jl, '--no-timing', ...args]); assert.equal(r.code, 0, r.err);
+      return JSON.parse(readFileSync(jl, 'utf8').trim()) as { ok: boolean; violationCodes: string[]; digest: string; checkFailures: Record<string, number> };
+    };
+    const d = line([]), a = line(['--closure-tangent-mode', 'absolute']), s0 = line(['--seam-ratio', '0']);
+    assert.equal(d.ok, true); assert.equal(a.ok, false); assert.ok(a.violationCodes.includes('CLOSURE_TANGENT'));
+    assert.equal(s0.ok, false); assert.equal(a.digest, d.digest);
+    assert.equal(run(['batch', '--grid', grid, '--out', join(dir, 'x'), '--closure-tangent-mode', 'nope']).code, 2);
+    assert.match(run(['validate', '--help']).out, /--closure-tangent-mode/); assert.match(run(['batch', '--help']).out, /--seam-ratio/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

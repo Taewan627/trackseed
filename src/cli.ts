@@ -42,6 +42,7 @@ Unknown keys and out-of-range values are errors (exit 2); nothing is clamped sil
 Exit 1 if the generator rejects the parameters (e.g. a corner pattern that cannot be fitted).
 `,
   batch: `Usage: tracklab batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing]
+                       [--closure-tangent-mode ratio|absolute] [--seam-ratio N]
 
 grid.json:
   { "seeds":  { "from": 1, "to": 6 }            // inclusive range, or an array of seeds
@@ -56,8 +57,13 @@ ok, violationCodes, checkFailures, metrics, error. Wall-clock fields live ONLY u
 them so two runs produce byte-identical JSONL.
 A case whose generation throws is recorded with generated=false and an error; it does not stop
 the batch. A one-line summary is printed to stderr. Exit 2 for an invalid grid.
+
+--closure-tangent-mode ratio|absolute  CLOSURE_TANGENT rule of the validator (default ratio)
+--seam-ratio N                         seam-continuity outlier factor of the ratio rule (default ${DEFAULT_VALIDATE_OPTIONS.seamRatio})
+The validator options affect only "ok", "violationCodes" and "checkFailures"; documents, digests and metrics do not change.
 `,
   validate: `Usage: tracklab validate file.json [--verify digest|regenerate] [--limit key=value ...] [--strict]
+                         [--closure-tangent-mode ratio|absolute] [--seam-ratio N]
 
 Parses the document (schema, finite numbers, SHA-256 digest; --verify regenerate also regenerates
 the track from its params and compares digests), then runs the geometry validator and prints
@@ -65,8 +71,12 @@ the track from its params and compares digests), then runs the geometry validato
 Exit 0: ok (no error-severity violation). Exit 1: at least one error-severity violation (with
 --strict, warnings also give 1). Exit 2: unreadable or invalid document, bad options.
 
---limit key=value   Override a validator limit, repeatable. Defaults:
+--limit key=value   Override a numeric validator limit, repeatable. Defaults:
 ${Object.entries(DEFAULT_VALIDATE_OPTIONS).map(([k, v]) => `    ${k}=${v}`).join('\n')}
+--closure-tangent-mode ratio|absolute  CLOSURE_TANGENT rule: 'ratio' (default) fails a seam only if its heading change
+                    exceeds both tangentToleranceDegrees and seamRatio x the largest neighbouring turn; 'absolute'
+                    uses tangentToleranceDegrees alone (the pre-0.5.1 rule)
+--seam-ratio N      seam-continuity outlier factor of the ratio rule (same as --limit seamRatio=N)
 `,
   metrics: `Usage: tracklab metrics file.json [--samples]
 
@@ -213,11 +223,35 @@ function metricsSummary(m: TrackMetrics): Omit<TrackMetrics, 'curvature'> {
   return rest;
 }
 
+/** Validator options from --closure-tangent-mode / --seam-ratio (and numeric --limit entries). */
+function validatorOptions(p: Parsed): ValidateOptions {
+  const options: Record<string, number | string> = {};
+  for (const item of p.flags.get('limit') ?? []) {
+    const [k, v] = parseAssignment(item, '--limit');
+    if (k === 'closureTangentMode') throw new UsageError('closureTangentMode is not numeric; use --closure-tangent-mode ratio|absolute');
+    if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
+    options[k] = parseNumber(v, `--limit ${k}`);
+  }
+  if (p.flags.has('seam-ratio')) {
+    if ('seamRatio' in options) throw new UsageError('give the seam ratio either as --seam-ratio or as --limit seamRatio=, not both');
+    const r = parseNumber(one(p, 'seam-ratio')!, '--seam-ratio');
+    if (r < 0) throw new UsageError(`--seam-ratio must be >= 0, got ${r}`);
+    options.seamRatio = r;
+  }
+  if (p.flags.has('closure-tangent-mode')) {
+    const m = one(p, 'closure-tangent-mode')!;
+    if (m !== 'ratio' && m !== 'absolute') throw new UsageError(`--closure-tangent-mode must be "ratio" or "absolute", got "${m}"`);
+    options.closureTangentMode = m;
+  }
+  return options as ValidateOptions;
+}
+
 function batchCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['grid', 'out', 'jsonl'], [], ['no-timing']);
+  const p = parseArgs(argv, ['grid', 'out', 'jsonl', 'closure-tangent-mode', 'seam-ratio'], [], ['no-timing']);
   if (p.positional.length) throw new UsageError(`unexpected argument "${p.positional[0]}"`);
   if (!p.flags.has('grid')) throw new UsageError('--grid is required');
   if (!p.flags.has('out')) throw new UsageError('--out is required');
+  const vopts = validatorOptions(p);
   const cases = expandGrid(readJson(one(p, 'grid')!));
   const outDir = one(p, 'out')!, timing = !p.flags.has('no-timing');
   mkdirSync(outDir, { recursive: true });
@@ -237,7 +271,7 @@ function batchCommand(argv: string[]): number {
       const doc = exportTrack(track);
       const file = `case-${String(k).padStart(4, '0')}-seed${seed}.json`;
       writeOut(join(outDir, file), canonicalStringify(doc) + '\n');
-      const result = validateTrack(track);
+      const result = validateTrack(track, vopts);
       if (result.ok) ok++;
       record = { ...base, file, generated: true, digest: doc.integrity.digest, ok: result.ok,
         violationCodes: [...new Set(result.violations.map(v => v.code))].sort(),
@@ -262,19 +296,14 @@ function loadDocument(path: string, verify: 'digest' | 'regenerate') {
 }
 
 function validateCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['verify'], ['limit'], ['strict']);
+  const p = parseArgs(argv, ['verify', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict']);
   if (p.positional.length !== 1) throw new UsageError('validate expects exactly one file');
   const verify = one(p, 'verify') ?? 'digest';
   if (verify !== 'digest' && verify !== 'regenerate') throw new UsageError(`--verify must be "digest" or "regenerate", got "${verify}"`);
-  const options: Record<string, number> = {};
-  for (const item of p.flags.get('limit') ?? []) {
-    const [k, v] = parseAssignment(item, '--limit');
-    if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
-    options[k] = parseNumber(v, `--limit ${k}`);
-  }
+  const options = validatorOptions(p);
   const file = p.positional[0];
   const track = loadDocument(file, verify);
-  const result = validateTrack(track, options as ValidateOptions);
+  const result = validateTrack(track, options);
   const digest = (JSON.parse(readText(file)) as { integrity: { digest: string } }).integrity.digest;
   process.stdout.write(JSON.stringify({ file, verify, digest, ...result }, null, 2) + '\n');
   const warned = result.checks.some(c => c.severity === 'warning' && !c.passed);
