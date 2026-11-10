@@ -9,3 +9,4 @@ tmp/
 .vercel
 .env*
 cli-dist/
+experiments/e1/build/
