@@ -10,3 +10,6 @@ tmp/
 .env*
 cli-dist/
 experiments/e1/build/
+experiments/*/build/
+experiments/*/out/
+__pycache__/
