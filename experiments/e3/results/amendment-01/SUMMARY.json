@@ -1,0 +1,424 @@
+{
+ "bins": 30,
+ "checks": {
+  "autoPair1OccupiedPrimary": 263,
+  "autoPair1OccupiedValidOnly": 160,
+  "autoValidMedianStraightFraction": 0.025525,
+  "autoValidMedianTurning": 360.0,
+  "autoValidN": 3792,
+  "autoValidShareStraight0": 0.9533227848101266,
+  "patternModesStatsEqualPrimary": {
+   "auto": false,
+   "hairpin": true,
+   "right-angle": true,
+   "s-curve": true
+  }
+ },
+ "comparison": {
+  "auto": {
+   "length": {
+    "medianAmended": 2656.7,
+    "medianOriginal": 2738.07,
+    "medianPrimary": 2588.035,
+    "nAmended": 3792,
+    "nOriginal": 2859,
+    "nPrimary": 12150
+   },
+   "straightLengthFraction": {
+    "medianAmended": 0.025525,
+    "medianOriginal": 0.0489244,
+    "medianPrimary": 0.32631699999999997,
+    "nAmended": 3792,
+    "nOriginal": 2859,
+    "nPrimary": 12150
+   },
+   "totalTurningDegrees": {
+    "medianAmended": 360.0,
+    "medianOriginal": 362.19,
+    "medianPrimary": 360.0,
+    "nAmended": 3792,
+    "nOriginal": 2859,
+    "nPrimary": 12150
+   }
+  },
+  "hairpin": {
+   "length": {
+    "medianAmended": 3268.11,
+    "medianOriginal": 3435.225,
+    "medianPrimary": 3268.11,
+    "nAmended": 12144,
+    "nOriginal": 10218,
+    "nPrimary": 12144
+   },
+   "straightLengthFraction": {
+    "medianAmended": 0.06160665,
+    "medianOriginal": 0.0590314,
+    "medianPrimary": 0.06160665,
+    "nAmended": 12144,
+    "nOriginal": 10218,
+    "nPrimary": 12144
+   },
+   "totalTurningDegrees": {
+    "medianAmended": 712.826,
+    "medianOriginal": 712.9485,
+    "medianPrimary": 712.826,
+    "nAmended": 12144,
+    "nOriginal": 10218,
+    "nPrimary": 12144
+   }
+  },
+  "right-angle": {
+   "length": {
+    "medianAmended": 2781.085,
+    "medianOriginal": 2824.07,
+    "medianPrimary": 2781.085,
+    "nAmended": 12150,
+    "nOriginal": 9699,
+    "nPrimary": 12150
+   },
+   "straightLengthFraction": {
+    "medianAmended": 0.11317050000000001,
+    "medianOriginal": 0.148621,
+    "medianPrimary": 0.11317050000000001,
+    "nAmended": 12150,
+    "nOriginal": 9699,
+    "nPrimary": 12150
+   },
+   "totalTurningDegrees": {
+    "medianAmended": 449.74649999999997,
+    "medianOriginal": 436.37,
+    "medianPrimary": 449.74649999999997,
+    "nAmended": 12150,
+    "nOriginal": 9699,
+    "nPrimary": 12150
+   }
+  },
+  "s-curve": {
+   "length": {
+    "medianAmended": 2931.9449999999997,
+    "medianOriginal": 3046.6,
+    "medianPrimary": 2931.9449999999997,
+    "nAmended": 12150,
+    "nOriginal": 10017,
+    "nPrimary": 12150
+   },
+   "straightLengthFraction": {
+    "medianAmended": 0.00336789,
+    "medianOriginal": 0.0,
+    "medianPrimary": 0.00336789,
+    "nAmended": 12150,
+    "nOriginal": 10017,
+    "nPrimary": 12150
+   },
+   "totalTurningDegrees": {
+    "medianAmended": 769.2905000000001,
+    "medianOriginal": 770.951,
+    "medianPrimary": 769.2905000000001,
+    "nAmended": 12150,
+    "nOriginal": 10017,
+    "nPrimary": 12150
+   }
+  }
+ },
+ "population": "generated tracks with ok = 1 under validator 0.5.1 (ratio)",
+ "source": "experiments/e2/results/amendment-01/validity.csv.gz",
+ "sourceSha256": "66a6af63b5fbb8f9fb7c70d34a0b4ec0ed431ee98bd79acf83342d728dd3df0a",
+ "validOnly": {
+  "curvatureEntropyBits": {
+   "auto": {
+    "iqr": 0.614045,
+    "max": 2.71039,
+    "mean": 2.153370466772152,
+    "median": 2.2864750000000003,
+    "min": 1.18712,
+    "n": 3792,
+    "sd": 0.3808669072243512
+   },
+   "hairpin": {
+    "iqr": 0.4138074999999999,
+    "max": 2.78925,
+    "mean": 2.28273520256917,
+    "median": 2.344325,
+    "min": 1.24447,
+    "n": 12144,
+    "sd": 0.29930512180461427
+   },
+   "right-angle": {
+    "iqr": 0.27195000000000036,
+    "max": 2.73082,
+    "mean": 2.333820864197531,
+    "median": 2.37968,
+    "min": 1.48553,
+    "n": 12150,
+    "sd": 0.19699710941019039
+   },
+   "s-curve": {
+    "iqr": 0.4523999999999999,
+    "max": 2.80182,
+    "mean": 2.0753266444444445,
+    "median": 2.063075,
+    "min": 1.08366,
+    "n": 12150,
+    "sd": 0.30654147970499235
+   }
+  },
+  "elevationRange": {
+   "auto": {
+    "iqr": 485.806,
+    "max": 485.865,
+    "mean": 226.7083723628692,
+    "median": 194.331,
+    "min": 0.0,
+    "n": 3792,
+    "sd": 199.67264951678158
+   },
+   "hairpin": {
+    "iqr": 485.835,
+    "max": 485.869,
+    "mean": 226.7263067358366,
+    "median": 194.341,
+    "min": 0.0,
+    "n": 12144,
+    "sd": 199.6703376520823
+   },
+   "right-angle": {
+    "iqr": 485.80975,
+    "max": 485.869,
+    "mean": 226.71954699588477,
+    "median": 194.338,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 199.66438393346485
+   },
+   "s-curve": {
+    "iqr": 485.82,
+    "max": 485.869,
+    "mean": 226.72123539094648,
+    "median": 194.339,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 199.6658698761006
+   }
+  },
+  "length": {
+   "auto": {
+    "iqr": 727.0799999999999,
+    "max": 3726.92,
+    "mean": 2657.3148918776374,
+    "median": 2656.7,
+    "min": 1472.69,
+    "n": 3792,
+    "sd": 477.60273119026425
+   },
+   "hairpin": {
+    "iqr": 1529.2174999999997,
+    "max": 5833.44,
+    "mean": 3491.615364789196,
+    "median": 3268.11,
+    "min": 1668.01,
+    "n": 12144,
+    "sd": 904.7965481301995
+   },
+   "right-angle": {
+    "iqr": 727.6775000000002,
+    "max": 5908.69,
+    "mean": 2778.6922419753087,
+    "median": 2781.085,
+    "min": 1362.87,
+    "n": 12150,
+    "sd": 519.5644080999056
+   },
+   "s-curve": {
+    "iqr": 1063.0524999999998,
+    "max": 5669.62,
+    "mean": 2958.7486781893003,
+    "median": 2931.9449999999997,
+    "min": 1367.99,
+    "n": 12150,
+    "sd": 678.3455217794224
+   }
+  },
+  "maxAbsSlope": {
+   "auto": {
+    "iqr": 2.01639,
+    "max": 6.30037,
+    "mean": 1.191982108913502,
+    "median": 0.920132,
+    "min": 0.0,
+    "n": 3792,
+    "sd": 1.1833227635440995
+   },
+   "hairpin": {
+    "iqr": 1.0931225,
+    "max": 2.71085,
+    "mean": 0.7074677960309618,
+    "median": 0.618124,
+    "min": 0.0,
+    "n": 12144,
+    "sd": 0.6715756719040359
+   },
+   "right-angle": {
+    "iqr": 1.6498675,
+    "max": 3.31674,
+    "mean": 0.8848257823045267,
+    "median": 0.738462,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 0.8051334467344039
+   },
+   "s-curve": {
+    "iqr": 1.4103050000000001,
+    "max": 3.30428,
+    "mean": 0.844785872510288,
+    "median": 0.7105585,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 0.7912562615433044
+   }
+  },
+  "straightLengthFraction": {
+   "auto": {
+    "iqr": 0.0794121,
+    "max": 0.573303,
+    "mean": 0.051328138536392405,
+    "median": 0.025525,
+    "min": 0.0,
+    "n": 3792,
+    "sd": 0.07471791766568449
+   },
+   "hairpin": {
+    "iqr": 0.062190325000000005,
+    "max": 0.567144,
+    "mean": 0.09611880483366271,
+    "median": 0.06160665,
+    "min": 0.02409,
+    "n": 12144,
+    "sd": 0.07853813938028836
+   },
+   "right-angle": {
+    "iqr": 0.22570325,
+    "max": 0.531764,
+    "mean": 0.13505450796296295,
+    "median": 0.11317050000000001,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 0.12663282921025593
+   },
+   "s-curve": {
+    "iqr": 0.02115145,
+    "max": 0.501653,
+    "mean": 0.02474847698518519,
+    "median": 0.00336789,
+    "min": 0.0,
+    "n": 12150,
+    "sd": 0.05803143567392975
+   }
+  },
+  "totalTurningDegrees": {
+   "auto": {
+    "iqr": 40.42599999999999,
+    "max": 560.601,
+    "mean": 385.03886234177213,
+    "median": 360.0,
+    "min": 360.0,
+    "n": 3792,
+    "sd": 43.00572241266044
+   },
+   "hairpin": {
+    "iqr": 4.254750000000058,
+    "max": 813.864,
+    "mean": 713.9102623517787,
+    "median": 712.826,
+    "min": 703.008,
+    "n": 12144,
+    "sd": 8.136015475952085
+   },
+   "right-angle": {
+    "iqr": 126.60200000000003,
+    "max": 696.361,
+    "mean": 480.8922548148148,
+    "median": 449.74649999999997,
+    "min": 360.59,
+    "n": 12150,
+    "sd": 81.50581603732766
+   },
+   "s-curve": {
+    "iqr": 22.562000000000012,
+    "max": 849.223,
+    "mean": 770.2819343209877,
+    "median": 769.2905000000001,
+    "min": 743.34,
+    "n": 12150,
+    "sd": 12.240745172924541
+   }
+  }
+ },
+ "validOnlyCoverage": {
+  "elevationRange|maxAbsSlope": {
+   "auto": {
+    "coverage": 0.03888888888888889,
+    "entropyBits": 3.6148908274387344,
+    "occupied": 35
+   },
+   "hairpin": {
+    "coverage": 0.023333333333333334,
+    "entropyBits": 3.1599158304180994,
+    "occupied": 21
+   },
+   "right-angle": {
+    "coverage": 0.02666666666666667,
+    "entropyBits": 2.979847903432332,
+    "occupied": 24
+   },
+   "s-curve": {
+    "coverage": 0.024444444444444446,
+    "entropyBits": 3.212821754647583,
+    "occupied": 22
+   }
+  },
+  "straightLengthFraction|curvatureEntropyBits": {
+   "auto": {
+    "coverage": 0.17777777777777778,
+    "entropyBits": 6.257040466172185,
+    "occupied": 160
+   },
+   "hairpin": {
+    "coverage": 0.2722222222222222,
+    "entropyBits": 6.90737322901175,
+    "occupied": 245
+   },
+   "right-angle": {
+    "coverage": 0.4266666666666667,
+    "entropyBits": 7.148173524143328,
+    "occupied": 384
+   },
+   "s-curve": {
+    "coverage": 0.22666666666666666,
+    "entropyBits": 5.586507434715195,
+    "occupied": 204
+   }
+  },
+  "totalTurningDegrees|length": {
+   "auto": {
+    "coverage": 0.14777777777777779,
+    "entropyBits": 5.472305821206241,
+    "occupied": 133
+   },
+   "hairpin": {
+    "coverage": 0.1111111111111111,
+    "entropyBits": 4.914117609113939,
+    "occupied": 100
+   },
+   "right-angle": {
+    "coverage": 0.39222222222222225,
+    "entropyBits": 7.617695769327472,
+    "occupied": 353
+   },
+   "s-curve": {
+    "coverage": 0.11666666666666667,
+    "entropyBits": 5.495228489599542,
+    "occupied": 105
+   }
+  }
+ }
+}
