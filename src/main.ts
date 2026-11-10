@@ -5,6 +5,8 @@ import { TrackView } from './view.js';
 import { NO_INPUT, spawnVehicle, updateVehicle, type Controls } from './vehicle.js';
 import { COIN_COUNT, CoinRun } from './coins.js';
 import { PatternGenerationError } from './patterns.js';
+import { TrackDocumentError, exportTrack, importTrack, parseTrackDocument, serializeTrack } from './schema.js';
+import { validateTrack, type ValidationResult } from './validate.js';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `
@@ -24,6 +26,16 @@ app.innerHTML = `
       </section>
       <section class="parameter-section"><h2><span>03</span> 환경 설정</h2><div id="environment-fields"></div>
         <label class="select-field" for="scene">배경 종류<select id="scene" name="scene"><option value="nature">Nature · 자연</option><option value="city">City · 도시</option><option value="mixed" selected>Mixed · 혼합</option></select></label>
+      </section>
+      <section class="parameter-section"><h2><span>04</span> JSON 입출력</h2>
+        <div class="io-actions"><button type="button" id="export-json" class="io-button">Export JSON</button><button type="button" id="import-json" class="io-button">Import JSON</button></div>
+        <input id="import-file" type="file" accept=".json,application/json" hidden aria-label="트랙 JSON 파일 선택">
+        <p id="io-message" class="io-message" role="status" hidden></p>
+      </section>
+      <section class="parameter-section" id="validation-section"><h2><span>05</span> Validation</h2>
+        <div class="validation-head"><span id="validation-badge" class="validation-badge" role="status">—</span><span id="validation-counts" class="validation-counts"></span></div>
+        <ul id="validation-checks" class="validation-checks"></ul>
+        <ul id="validation-violations" class="validation-violations"></ul>
       </section>
       <section class="seed-section"><div class="seed-label"><label for="seed">RANDOM SEED</label><span>같은 값, 같은 트랙</span></div><div class="seed-input"><span>#</span><input id="seed" name="seed" type="number" min="0" max="2147483647" step="1" required value="42"><button type="button" id="shuffle" aria-label="새 Seed로 트랙 생성" title="새 Seed로 생성 [R]">⤨</button></div></section>
       </div><div class="form-actions"><button class="generate" type="submit">Generate track <span>↗</span></button><button id="reset" class="reset" type="button">기본값으로 초기화</button></div>
@@ -71,6 +83,8 @@ let view: TrackView;
 let minimap: Minimap;
 let regenerationTimer: ReturnType<typeof setTimeout> | undefined;
 let accumulator = 0;
+let lastExportDigest: string | null = null;
+let lastValidation: { ok: boolean; errors: number; warnings: number; checks: number; failedChecks: string[] } | null = null;
 
 function readParams(): Params {
   const raw = Object.fromEntries(Object.keys(LIMITS).map(key => [key,
@@ -134,6 +148,81 @@ function generate() {
   $('speed').textContent = '0.0'; $('gear').textContent = 'N'; $('surface').textContent = 'ASPHALT';
   updateCoinHUD();
   showPatternReport();
+  showValidation();
+}
+const VIOLATION_LIMIT = 5;
+function showValidation() {
+  const result: ValidationResult = validateTrack(track);
+  const errors = result.checks.filter(c => c.severity === 'error').reduce((n, c) => n + c.failures, 0);
+  const warnings = result.checks.filter(c => c.severity === 'warning').reduce((n, c) => n + c.failures, 0);
+  const badge = $('validation-badge');
+  badge.textContent = result.ok ? 'OK' : 'INVALID';
+  badge.className = `validation-badge ${result.ok ? 'ok' : 'invalid'}`;
+  $('validation-counts').textContent = `오류 ${errors} · 경고 ${warnings}`;
+  const list = $('validation-checks'); list.replaceChildren();
+  for (const c of result.checks) {
+    const li = document.createElement('li');
+    li.className = `check-${c.skipped ? 'skipped' : c.passed ? 'pass' : c.severity}`;
+    li.dataset.check = c.id;
+    const name = document.createElement('span'); name.textContent = c.id;
+    const value = document.createElement('b'); value.textContent = c.skipped ? 'skipped' : c.passed ? 'pass' : `${c.failures} ${c.severity === 'error' ? 'error' : 'warning'}${c.failures === 1 ? '' : 's'}`;
+    li.append(name, value); list.append(li);
+  }
+  const vlist = $('validation-violations'); vlist.replaceChildren();
+  const shown = [...result.violations].sort((a, b) => Number(a.severity === 'warning') - Number(b.severity === 'warning')).slice(0, VIOLATION_LIMIT);
+  for (const v of shown) {
+    const li = document.createElement('li'); li.className = `violation-${v.severity}`;
+    const code = document.createElement('code'); code.textContent = v.code;
+    li.append(code, ` ${v.message}`); vlist.append(li);
+  }
+  if (result.violations.length > shown.length) {
+    const li = document.createElement('li'); li.className = 'violation-more';
+    li.textContent = `… 외 ${result.violations.length - shown.length}건`; vlist.append(li);
+  }
+  lastValidation = { ok: result.ok, errors, warnings, checks: result.checks.length,
+    failedChecks: result.checks.filter(c => !c.passed).map(c => c.id) };
+}
+function setIoMessage(text: string, kind: 'ok' | 'error') {
+  const el = $('io-message'); el.hidden = false; el.textContent = text; el.className = `io-message ${kind}`;
+}
+function exportJson() {
+  const json = serializeTrack(track);
+  const digest: string = JSON.parse(json).integrity.digest;
+  lastExportDigest = digest;
+  const name = `tracklab-${track.params.seed}-${digest.slice(0, 8)}.json`;
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setIoMessage(`내보내기 완료 · ${name}`, 'ok');
+  $('status').textContent = `JSON 내보내기 완료 · ${name}`;
+}
+function importFailure(reason: string) {
+  const message = `가져오기 실패 · ${reason} · 이전 트랙을 유지합니다`;
+  setIoMessage(message, 'error'); $('status').textContent = message;
+}
+async function importJson(file: File) {
+  let doc, params;
+  try {
+    doc = parseTrackDocument(await file.text());
+    importTrack(doc, { verify: 'regenerate' });
+    params = doc.params;
+  } catch (error) {
+    importFailure(error instanceof TrackDocumentError ? error.message : error instanceof Error ? error.message : String(error)); return;
+  }
+  const previous = track.params, before = generation;
+  clearTimeout(regenerationTimer); regenerationTimer = undefined;
+  writeParams(params); generate();
+  if (generation === before) {
+    writeParams(previous); showPatternReport();
+    importFailure('현재 빌드에서 트랙을 생성하지 못했습니다'); return;
+  }
+  const digest: string = JSON.parse(serializeTrack(track)).integrity.digest;
+  const sameBuild = exportTrack(track).generator.version === doc.generator.version;
+  if (sameBuild && digest !== doc.integrity.digest) {
+    importFailure('재생성된 digest가 문서와 다릅니다'); return;
+  }
+  const message = `가져오기 완료 · Seed ${params.seed} · digest ${doc.integrity.digest.slice(0, 8)} ${sameBuild ? '재생성 일치' : `(생성기 v${doc.generator.version}, 재생성 검증됨)`}`;
+  setIoMessage(message, 'ok'); $('status').textContent = message;
 }
 function showPatternReport() {
   $('pattern-warning').hidden = true;
@@ -168,6 +257,12 @@ try {
   $('parameters').addEventListener('input', pending);
   $('parameters').addEventListener('change', pending);
   $('shuffle').addEventListener('click', randomize);
+  $('export-json').addEventListener('click', exportJson);
+  $('import-json').addEventListener('click', () => $<HTMLInputElement>('import-file').click());
+  $('import-file').addEventListener('change', event => {
+    const input = event.target as HTMLInputElement, file = input.files?.[0];
+    input.value = ''; if (file) void importJson(file);
+  });
   $('reset').addEventListener('click', () => { writeParams(DEFAULTS); generate(); });
   $('overview').addEventListener('click', () => setCamera('overview'));
   $('chase').addEventListener('click', () => setCamera('chase'));
@@ -215,6 +310,7 @@ try {
     Object.defineProperty(window, '__tracklab', { get: () => ({ track, pose, generation,
       coins: { positions: coinRun.coins, collected: coinRun.collectedIds, count: coinRun.count,
         remaining: view.visibleCoinCount, total: COIN_COUNT },
+      exportDigest: lastExportDigest, validation: lastValidation,
       mode: view.mode, marker: minimap.marker, memory: { ...view.renderer.info.memory },
       calls: view.renderer.info.render.calls, triangles: view.renderer.info.render.triangles, input: [...keys] }) });
   }

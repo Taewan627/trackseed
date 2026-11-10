@@ -1,0 +1,136 @@
+import { test, expect } from '@playwright/test';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+async function ready(page) {
+  await page.goto('/?test=1');
+  await expect(page.locator('#status')).toContainText('생성 완료');
+}
+async function exportFile(page) {
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#export-json').click()]);
+  const path = join(mkdtempSync(join(tmpdir(), 'tlsx-io-')), download.suggestedFilename());
+  await download.saveAs(path);
+  return { name: download.suggestedFilename(), path, text: readFileSync(path, 'utf8') };
+}
+async function parseInPage(page, text) {
+  return page.evaluate(async text => {
+    const { parseTrackDocument } = await import('/src/schema.ts');
+    const d = parseTrackDocument(text);
+    return { digest: d.integrity.digest, params: d.params };
+  }, text);
+}
+async function setParams(page, values) {
+  for (const [key, value] of Object.entries(values)) {
+    await page.locator(`#${key === 'seed' ? 'seed' : key + '-value'}`).fill(String(value));
+  }
+  await page.locator('button.generate').click();
+}
+
+test('io: export downloads a parseable document whose digest matches name and diagnostics', async ({ page }) => {
+  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  await ready(page);
+  const file = await exportFile(page);
+  const parsed = await parseInPage(page, file.text);
+  expect(file.name).toBe(`tracklab-42-${parsed.digest.slice(0, 8)}.json`);
+  expect(parsed.params.seed).toBe(42);
+  const live = await page.evaluate(async () => {
+    const { serializeTrack } = await import('/src/schema.ts');
+    const s = window.__tracklab;
+    return { json: serializeTrack(s.track), digest: s.exportDigest };
+  });
+  expect(file.text).toBe(live.json);
+  expect(live.digest).toBe(parsed.digest);
+  await expect(page.locator('#io-message')).toContainText('내보내기 완료');
+  expect(errors).toEqual([]);
+});
+
+test('io: importing an exported file into a fresh page reproduces params and digest', async ({ page, browser }) => {
+  await ready(page);
+  await setParams(page, { curves: 9, width: 70, seed: 777, height: 40 });
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.seed)).toBe(777);
+  const file = await exportFile(page);
+  const original = await parseInPage(page, file.text);
+  const fresh = await (await browser.newContext()).newPage();
+  await ready(fresh);
+  expect(await fresh.evaluate(() => window.__tracklab.track.params.seed)).toBe(42);
+  const generation = await fresh.evaluate(() => window.__tracklab.generation);
+  await fresh.locator('#import-file').setInputFiles(file.path);
+  await expect(fresh.locator('#status')).toContainText('가져오기 완료');
+  expect(await fresh.evaluate(() => window.__tracklab.generation)).toBeGreaterThan(generation);
+  const state = await fresh.evaluate(async () => {
+    const { exportTrack } = await import('/src/schema.ts');
+    const s = window.__tracklab;
+    return { params: s.track.params, digest: exportTrack(s.track).integrity.digest, coins: s.coins.total, speed: s.pose.speed };
+  });
+  expect(state.params).toEqual(original.params);
+  expect(state.digest).toBe(original.digest);
+  expect(state.speed).toBe(0);
+  await expect(fresh.locator('#seed')).toHaveValue('777');
+  await expect(fresh.locator('#curves-value')).toHaveValue('9');
+  await expect(fresh.locator('#active-seed')).toHaveText('777');
+  await fresh.context().close();
+});
+
+test('io: a tampered file shows the error and keeps the previous track', async ({ page }) => {
+  await ready(page);
+  const file = await exportFile(page);
+  const doc = JSON.parse(file.text);
+  doc.geometry.points[3].x += 1; // content changed, digest left alone
+  const tampered = join(mkdtempSync(join(tmpdir(), 'tlsx-bad-')), 'tampered.json');
+  writeFileSync(tampered, JSON.stringify(doc));
+  await setParams(page, { seed: 5 });
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.seed)).toBe(5);
+  const before = await page.evaluate(() => ({ generation: window.__tracklab.generation,
+    track: JSON.stringify(window.__tracklab.track) }));
+  await page.locator('#import-file').setInputFiles(tampered);
+  await expect(page.locator('#status')).toContainText('가져오기 실패');
+  await expect(page.locator('#status')).toContainText('digest mismatch');
+  await expect(page.locator('#io-message')).toHaveClass(/error/);
+  const after = await page.evaluate(() => ({ generation: window.__tracklab.generation,
+    track: JSON.stringify(window.__tracklab.track) }));
+  expect(after).toEqual(before);
+  await expect(page.locator('#seed')).toHaveValue('5');
+  // not JSON at all
+  const junk = join(mkdtempSync(join(tmpdir(), 'tlsx-junk-')), 'junk.json');
+  writeFileSync(junk, 'not json');
+  await page.locator('#import-file').setInputFiles(junk);
+  await expect(page.locator('#status')).toContainText('invalid JSON');
+  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before.generation);
+});
+
+test('io: validation panel is INVALID for default seed-42 Auto and OK for a pattern track', async ({ page }) => {
+  await ready(page);
+  await expect(page.locator('#validation-badge')).toHaveText('INVALID');
+  await expect(page.locator('#validation-checks [data-check="self-intersection"]')).toHaveClass(/check-error/);
+  await expect(page.locator('#validation-checks [data-check="edge-fold"]')).toHaveClass(/check-error/);
+  await expect(page.locator('#validation-violations .violation-error').first()).toBeVisible();
+  const summary = await page.evaluate(() => window.__tracklab.validation);
+  expect(summary.ok).toBe(false);
+  expect(summary.errors).toBeGreaterThan(0);
+  expect(summary.failedChecks).toEqual(expect.arrayContaining(['self-intersection', 'edge-fold']));
+  await page.locator('#cornerPattern').selectOption('right-angle');
+  await page.locator('#cornerCount-value').fill('3');
+  await page.locator('#cornerStrength-value').fill('60');
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.cornerPattern)).toBe('right-angle');
+  await expect(page.locator('#pattern-status')).toContainText('3 / 3개 적용');
+  await expect(page.locator('#validation-badge')).toHaveText('OK');
+  expect((await page.evaluate(() => window.__tracklab.validation)).ok).toBe(true);
+  await expect(page.locator('#validation-violations .violation-error')).toHaveCount(0);
+});
+
+test('io: keyboard driving still works after import', async ({ page }) => {
+  await ready(page);
+  const file = await exportFile(page);
+  await setParams(page, { seed: 9, height: 0, width: 80, obstacles: 0 });
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.seed)).toBe(9);
+  await page.locator('#import-file').setInputFiles(file.path);
+  await expect(page.locator('#status')).toContainText('가져오기 완료');
+  expect(await page.evaluate(() => window.__tracklab.track.params.seed)).toBe(42);
+  await page.locator('#viewport > canvas').focus();
+  const start = await page.evaluate(() => ({ x: window.__tracklab.pose.x, z: window.__tracklab.pose.z }));
+  await page.keyboard.down('ArrowUp');
+  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBeGreaterThan(5);
+  await expect.poll(() => page.evaluate(({ x, z }) => Math.hypot(window.__tracklab.pose.x - x, window.__tracklab.pose.z - z), start)).toBeGreaterThan(5);
+  await page.keyboard.up('ArrowUp');
+});
