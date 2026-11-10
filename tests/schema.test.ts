@@ -91,7 +91,8 @@ test('exchange format: export -> serialize -> parse -> import is lossless for >=
 });
 
 const resign = (o: Record<string, any>) => {
-  const { integrity, ...body } = o; return { ...o, integrity: { ...integrity, digest: sha256(canonicalStringify(body)) } };
+  const { integrity, ...body } = o; const { generator: _g, ...content } = body;
+  return { ...o, integrity: { ...integrity, digest: sha256(canonicalStringify(body)), contentDigest: sha256(canonicalStringify(content)) } };
 };
 
 test('exchange format: tampering, schema/version errors and structural problems throw TrackDocumentError', () => {
@@ -115,6 +116,8 @@ test('exchange format: tampering, schema/version errors and structural problems 
   const inf = base(); inf.obstacles = [{ x: 0, y: 0, z: Infinity, radius: 4, heading: 0 }]; rejects(() => parseTrackDocument(inf), /^\$\.obstacles\[0\]\.z$/);
   const shortNormals = base(); shortNormals.geometry.normals.pop(); rejects(() => parseTrackDocument(shortNormals), /^\$\.geometry\.normals$/);
   const badKind = base(); badKind.patternReport.patterns[0].kind = 'loop'; rejects(() => parseTrackDocument(badKind), /^\$\.patternReport\.patterns\[0\]\.kind$/);
+  const badContent = base(); badContent.integrity.contentDigest = 'ABC'; rejects(() => parseTrackDocument(badContent), /^\$\.integrity\.contentDigest$/);
+  const noContent = base(); delete noContent.integrity.contentDigest; rejects(() => parseTrackDocument(noContent), /^\$\.integrity\.contentDigest$/);
   const badDigest = base(); badDigest.integrity.digest = 'ABC'; rejects(() => parseTrackDocument(badDigest), /^\$\.integrity\.digest$/);
   const badAlg = base(); badAlg.integrity.algorithm = 'md5'; rejects(() => parseTrackDocument(badAlg), /^\$\.integrity\.algorithm$/);
   rejects(() => parseTrackDocument('{not json'), /^\$$/);
@@ -131,15 +134,41 @@ test('exchange format: a re-signed forgery passes digest mode but regenerate mod
   const doc = JSON.parse(serializeTrack(generateTrack({ seed: 5 }))) as Record<string, any>;
   const geom = JSON.parse(JSON.stringify(doc)); geom.geometry.points[10].x += 1;
   assert.doesNotThrow(() => importTrack(resign(geom), { verify: 'digest' }));
-  rejects(() => importTrack(resign(geom), { verify: 'regenerate' }), /^\$\.integrity\.digest$/);
+  rejects(() => importTrack(resign(geom), { verify: 'regenerate' }), /^\$\.integrity\.contentDigest$/);
   const par = JSON.parse(JSON.stringify(doc)); par.params.seed = 6;
   assert.doesNotThrow(() => importTrack(resign(par), { verify: 'digest' }));
-  rejects(() => importTrack(resign(par), { verify: 'regenerate' }), /^\$\.integrity\.digest$/);
+  rejects(() => importTrack(resign(par), { verify: 'regenerate' }), /^\$\.integrity\.contentDigest$/);
   const coin = JSON.parse(JSON.stringify(doc)); coin.coins[0].x += 0.25;
-  rejects(() => importTrack(resign(coin), { verify: 'regenerate' }), /^\$\.integrity\.digest$/);
+  rejects(() => importTrack(resign(coin), { verify: 'regenerate' }), /^\$\.integrity\.contentDigest$/);
   rejects(() => importTrack(doc, { verify: 'bogus' as never }), /^\$$/);
   // A document stamped by another generator version still regenerates if the content is identical.
   const other = JSON.parse(JSON.stringify(doc)); other.generator.version = '0.0.1';
   assert.doesNotThrow(() => importTrack(resign(other), { verify: 'regenerate' }));
   const typed: TrackDocumentV1 = parseTrackDocument(JSON.stringify(doc)); assert.equal(typed.schemaVersion, 1);
+});
+
+test('integrity.contentDigest: excludes generator, is stable across a simulated version change; digest still covers it', () => {
+  const doc = JSON.parse(serializeTrack(generateTrack({ seed: 21, cornerPattern: 's-curve', cornerCount: 1 }))) as Record<string, any>;
+  const { generator: _g, integrity: _i, ...content } = doc;
+  assert.equal(doc.integrity.contentDigest, sha256(canonicalStringify(content)));
+  const { integrity: _i2, ...whole } = doc;
+  assert.equal(doc.integrity.digest, sha256(canonicalStringify(whole)));
+  assert.notEqual(doc.integrity.digest, doc.integrity.contentDigest);
+  // Simulated version change: only the generator stamp differs; digest changes, contentDigest does not.
+  const bumped = resign({ ...JSON.parse(JSON.stringify(doc)), generator: { name: 'tracklab', version: '9.9.9' } });
+  assert.notEqual(bumped.integrity.digest, doc.integrity.digest);
+  assert.equal(bumped.integrity.contentDigest, doc.integrity.contentDigest);
+  assert.doesNotThrow(() => parseTrackDocument(bumped));
+  assert.doesNotThrow(() => importTrack(bumped, { verify: 'regenerate' }));
+  // Editing the generator stamp without re-signing is caught by digest; it leaves contentDigest valid.
+  const stamped = JSON.parse(JSON.stringify(doc)); stamped.generator.version = '9.9.9';
+  rejects(() => parseTrackDocument(stamped), /^\$\.integrity\.digest$/);
+  // Tampering with content while re-signing only digest (not contentDigest) is caught by contentDigest.
+  const forged = JSON.parse(JSON.stringify(doc)); forged.geometry.points[4].z += 1;
+  const { integrity: fi, ...fbody } = forged;
+  forged.integrity = { ...fi, digest: sha256(canonicalStringify(fbody)) };
+  rejects(() => parseTrackDocument(forged), /^\$\.integrity\.contentDigest$/);
+  // Replacing contentDigest only (digest untouched) is caught by digest first.
+  const swapped = JSON.parse(JSON.stringify(doc)); swapped.integrity.contentDigest = doc.integrity.digest;
+  assert.throws(() => parseTrackDocument(swapped), (e: unknown) => e instanceof TrackDocumentError && /^\$\.integrity\.contentDigest$/.test(e.path));
 });

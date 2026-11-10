@@ -31,7 +31,7 @@ export interface TrackDocumentV1 {
   obstacles: Obstacle[];
   coins: Coin[];
   patternReport: PatternReport;
-  integrity: { algorithm: 'sha256'; canonical: typeof CANONICAL_NAME; digest: string };
+  integrity: { algorithm: 'sha256'; canonical: typeof CANONICAL_NAME; digest: string; contentDigest: string };
 }
 /** Everything importTrack reconstructs (Track minus the internal `waypoints`, plus coins). */
 export type ImportedTrack = Omit<Track, 'waypoints'> & { coins: Coin[] };
@@ -75,6 +75,8 @@ function plain<T>(value: T, path = '$'): T {
 }
 
 const digestOf = (body: object) => sha256(canonicalStringify(body));
+/** Digest of the document without `integrity` and without `generator`: independent of which build stamped it. */
+const contentDigestOf = (body: object) => { const { generator: _generator, ...content } = body as Record<string, unknown>; return digestOf(content); };
 
 // ---- export --------------------------------------------------------------
 function assemble(track: Track, generator: { name: string; version: string }): TrackDocumentV1 {
@@ -85,7 +87,7 @@ function assemble(track: Track, generator: { name: string; version: string }): T
     props: track.props, obstacles: track.obstacles, coins: generateCoins(track),
     patternReport: track.patternReport,
   });
-  return { ...body, integrity: { algorithm: 'sha256', canonical: CANONICAL_NAME, digest: digestOf(body) } } as TrackDocumentV1;
+  return { ...body, integrity: { algorithm: 'sha256', canonical: CANONICAL_NAME, digest: digestOf(body), contentDigest: contentDigestOf(body) } } as TrackDocumentV1;
 }
 
 export function exportTrack(track: Track): TrackDocumentV1 {
@@ -202,13 +204,16 @@ export function parseTrackDocument(json: string | unknown): TrackDocumentV1 {
   list(root.obstacles, '$.obstacles', (x, p) => { nums(obj(x, p, ['x', 'y', 'z', 'radius', 'heading']), ['x', 'y', 'z', 'radius', 'heading'], p); return x; });
   list(root.coins, '$.coins', (x, p) => { const o = obj(x, p, ['id', 'x', 'y', 'z']); int(o.id, `${p}.id`); nums(o, ['x', 'y', 'z'], p); return x; });
   validateReport(root.patternReport, '$.patternReport');
-  const integ = obj(root.integrity, '$.integrity', ['algorithm', 'canonical', 'digest']);
+  const integ = obj(root.integrity, '$.integrity', ['algorithm', 'canonical', 'digest', 'contentDigest']);
   if (integ.algorithm !== 'sha256') fail('$.integrity.algorithm', 'expected "sha256"');
   if (integ.canonical !== CANONICAL_NAME) fail('$.integrity.canonical', `expected "${CANONICAL_NAME}"`);
   if (typeof integ.digest !== 'string' || !/^[0-9a-f]{64}$/.test(integ.digest)) fail('$.integrity.digest', 'expected 64 lower-case hex characters');
+  if (typeof integ.contentDigest !== 'string' || !/^[0-9a-f]{64}$/.test(integ.contentDigest)) fail('$.integrity.contentDigest', 'expected 64 lower-case hex characters');
   const { integrity: _integrity, ...body } = root;
   const actual = digestOf(body);
   if (actual !== integ.digest) fail('$.integrity.digest', `digest mismatch (document says ${integ.digest}, content hashes to ${actual})`);
+  const actualContent = contentDigestOf(body);
+  if (actualContent !== integ.contentDigest) fail('$.integrity.contentDigest', `contentDigest mismatch (document says ${integ.contentDigest}, content hashes to ${actualContent})`);
   return value as TrackDocumentV1;
 }
 
@@ -216,9 +221,10 @@ export function parseTrackDocument(json: string | unknown): TrackDocumentV1 {
  * Validate a document and turn it back into track data.
  * 'digest'     : structure + SHA-256 integrity only.
  * 'regenerate' : additionally runs generateTrack(doc.params) and requires the regenerated
- *                document (stamped with the incoming generator field, so a pure version bump
- *                does not invalidate old files) to hash to the same digest, i.e. the
- *                parameters fully determine the stored geometry on this build.
+ *                document to have the same contentDigest (the digest that excludes the
+ *                `generator` stamp, so documents written by another build with identical
+ *                content verify), i.e. the parameters fully determine the stored content
+ *                on this build.
  */
 export function importTrack(doc: unknown, options: { verify?: VerifyMode } = {}): ImportedTrack {
   const verify = options.verify ?? 'digest';
@@ -226,10 +232,10 @@ export function importTrack(doc: unknown, options: { verify?: VerifyMode } = {})
   const d = parseTrackDocument(doc);
   if (verify === 'regenerate') {
     let fresh: TrackDocumentV1;
-    try { fresh = assemble(generateTrack(d.params), d.generator); }
+    try { fresh = exportTrack(generateTrack(d.params)); }
     catch (e) { return fail('$.params', `cannot regenerate track (${e instanceof Error ? e.message : String(e)})`); }
-    if (fresh.integrity.digest !== d.integrity.digest) {
-      fail('$.integrity.digest', `regenerated geometry differs (regenerated ${fresh.integrity.digest}, document ${d.integrity.digest})`);
+    if (fresh.integrity.contentDigest !== d.integrity.contentDigest) {
+      fail('$.integrity.contentDigest', `regenerated content differs (regenerated ${fresh.integrity.contentDigest}, document ${d.integrity.contentDigest})`);
     }
   }
   const { points, normals, roadEdges, straightSegments, length, bounds } = d.geometry;

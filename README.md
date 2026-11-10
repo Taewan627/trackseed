@@ -89,12 +89,12 @@ v0.4의 적용 성공률과 최신 검증은 [V04_REPORT.md](V04_REPORT.md)를 �
 | `geometry` | `points`, `normals`, `roadEdges`, `straightSegments`, `length`, `bounds` |
 | `props`, `obstacles`, `coins` | 소품, 장애물, 코인 10개 |
 | `patternReport` | 특수 코너 적용·검증 결과 |
-| `integrity` | `{ algorithm: "sha256", canonical: "sorted-keys-json", digest }` — `digest`는 `integrity`를 제외한 문서를 `canonicalStringify`한 문자열의 SHA-256(순수 TS 구현, 브라우저에서도 동작) |
+| `integrity` | `{ algorithm: "sha256", canonical: "sorted-keys-json", digest, contentDigest }` — `contentDigest`(스키마 v1에 추가, schemaVersion은 미공개 상태라 1 유지)는 `integrity`와 `generator`를 모두 제외한 문서의 같은 방식 SHA-256으로, 생성기 버전 표기만 다른 문서에서도 동일합니다. `digest`는 `integrity`를 제외한 문서를 `canonicalStringify`한 문자열의 SHA-256(순수 TS 구현, 브라우저에서도 동작) |
 
 `parseTrackDocument(json)`은 구조를 검증하고(스키마·버전·필수 필드·유한 수·digest 불일치) 위반 시 경로가 포함된 메시지(`$.geometry.points[7].x: ...`)의 `TrackDocumentError`를 던집니다. `importTrack(doc, { verify })`는 두 가지 검증 모드를 제공합니다.
 
 - `'digest'`(기본): 구조와 SHA-256 무결성만 확인합니다. 우연한 손상과 단순 변조를 잡지만, digest를 다시 계산해 넣은 위조는 통과합니다.
-- `'regenerate'`: 위 검사에 더해 `generateTrack(doc.params)`로 트랙을 다시 생성해 digest가 동일한지 확인합니다. 파라미터가 저장된 형상을 완전히 결정함을 증명하며, 재계산된 위조도 잡아냅니다.
+- `'regenerate'`: 위 검사에 더해 `generateTrack(doc.params)`로 트랙을 다시 생성해 `contentDigest`가 동일한지 확인합니다(다른 버전의 생성기가 쓴 문서도 내용이 같으면 통과). 파라미터가 저장된 형상을 완전히 결정함을 증명하며, 재계산된 위조도 잡아냅니다.
 
 설계 목표: 생성 경로(`core.ts`, `patterns.ts`, `coins.ts`)는 엔진마다 결과가 다를 수 있는 `Math.sin/cos/atan2/hypot/exp` 대신 `src/detmath.ts`의 결정적 구현만 사용하고(IEEE-754 기본 연산과 정확 반올림 `Math.sqrt`만 의존; 이 가정은 명세가 아닌 주요 엔진의 공통 동작입니다), 같은 시드가 JavaScript 엔진·OS와 무관하게 비트 단위로 같은 문서와 digest를 만들도록 설계했습니다. 현재 검증 증거는 Node 22(Linux)에서의 실행뿐이며, 엔진·OS 간 일치 여부는 계획된 결정성 실험(E1)에서 검증할 예정이고 아직 검증되지 않았습니다. 또한 `src/vehicle.ts`의 주행 런타임은 여전히 `Math.*`를 사용하므로 이 결정성 보장의 범위에 포함되지 않습니다.
 

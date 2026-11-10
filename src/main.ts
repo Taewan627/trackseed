@@ -216,9 +216,9 @@ async function importJson(file: File) {
     writeParams(previous); showPatternReport();
     importFailure('현재 빌드에서 트랙을 생성하지 못했습니다'); return;
   }
-  const digest: string = JSON.parse(serializeTrack(track)).integrity.digest;
+  const contentDigest: string = JSON.parse(serializeTrack(track)).integrity.contentDigest;
   const sameBuild = exportTrack(track).generator.version === doc.generator.version;
-  if (sameBuild && digest !== doc.integrity.digest) {
+  if (contentDigest !== doc.integrity.contentDigest) {
     importFailure('재생성된 digest가 문서와 다릅니다'); return;
   }
   const message = `가져오기 완료 · Seed ${params.seed} · digest ${doc.integrity.digest.slice(0, 8)} ${sameBuild ? '재생성 일치' : `(생성기 v${doc.generator.version}, 재생성 검증됨)`}`;
