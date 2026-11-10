@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { CAR_RADIUS, generateTrack, roadContact, sanitize, type Params } from '../src/core.js';
 import { generateCoins } from '../src/coins.js';
 import { NO_INPUT, spawnVehicle, updateVehicle } from '../src/vehicle.js';
@@ -9,14 +9,31 @@ import { MAX_PATTERN_ATTEMPTS, PatternGenerationError, validatePatternGeometry }
 
 const kinds = ['right-angle', 'hairpin', 's-curve'] as const;
 
-test('v0.4: Auto and count zero reproduce the stable v0.3 geometry, scenery and obstacle hashes', () => {
-  const fixture = JSON.parse(readFileSync('tests/fixtures/legacy-layouts.json', 'utf8')) as {
-    fields: (keyof ReturnType<typeof generateTrack>)[]; cases: { params: Partial<Params>; sha256: string }[] };
+test('v0.5: Auto and count zero reproduce the golden v0.5 (deterministic-math) geometry, scenery and obstacle hashes', () => {
+  // legacy-layouts.json (v0.3 Math.* hashes) is kept untouched as a historical record; the
+  // deterministic-math rewrite changes floats at ulp level, so the live assertions use golden-v05.json.
+  const fixture = JSON.parse(readFileSync('tests/fixtures/golden-v05.json', 'utf8')) as {
+    fields: (keyof ReturnType<typeof generateTrack>)[]; cases: { params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   for (const entry of fixture.cases) for (const cornerPattern of ['auto', ...kinds] as const) {
     const track = generateTrack({ ...entry.params, cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.fields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256); assert.equal(track.patternReport.inserted, 0);
     assert.equal(track.patternReport.attempts, 0); assert.equal(track.patternReport.geometry, null);
+    assert.equal(createHash('sha256').update(JSON.stringify(generateCoins(track))).digest('hex'), entry.coinsSha256);
+  }
+});
+
+test('v0.5: right-angle, hairpin and s-curve pattern layouts match the golden v0.5 hashes', () => {
+  const fixture = JSON.parse(readFileSync('tests/fixtures/golden-v05.json', 'utf8')) as {
+    patternFields: (keyof ReturnType<typeof generateTrack>)[];
+    patternCases: { name: string; params: Partial<Params>; sha256: string; coinsSha256: string }[] };
+  assert.deepEqual(new Set(fixture.patternCases.map(c => c.params.cornerPattern)), new Set(kinds));
+  for (const entry of fixture.patternCases) {
+    const track = generateTrack(entry.params);
+    assert.ok(track.patternReport.inserted > 0, entry.name);
+    const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.patternFields.map(k => [k, track[k]])))).digest('hex');
+    assert.equal(hash, entry.sha256, entry.name);
+    assert.equal(createHash('sha256').update(JSON.stringify(generateCoins(track))).digest('hex'), entry.coinsSha256, entry.name);
   }
 });
 
@@ -129,6 +146,7 @@ test('v0.4: 0–3 patterns, extreme parameters, reproducibility, boundaries and 
   times.sort((a, b) => a - b);
   const summary = { disabled, byPattern, inserted, attempts, rejectedCases: failures,
     timingMs: { median: times[Math.floor(times.length / 2)], p95: times[Math.floor(times.length * 0.95)], max: times.at(-1) } };
+  mkdirSync('tmp', { recursive: true });
   writeFileSync('tmp/v04-pattern-audit.json', JSON.stringify(summary, null, 2));
   for (const stats of Object.values(byPattern)) assert.ok(stats.applied / stats.attempted >= 0.98);
   t.diagnostic(JSON.stringify({ disabled, byPattern, inserted, attempts, timingMs: summary.timingMs }));

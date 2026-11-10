@@ -1,3 +1,4 @@
+import { dhypot } from './detmath.js';
 import { CAR_RADIUS, random, roadContact, roadHeight, type Point, type Track } from './core.js';
 import { spawnVehicle } from './vehicle.js';
 
@@ -17,11 +18,11 @@ export function generateCoins(track: Track): Coin[] {
     const x = p.x + n.x * offset, z = p.z + n.z * offset;
     // Leave room for the whole vehicle, not just the coin, to reach the pickup.
     if (roadContact(track, x, z).clearance < CAR_RADIUS + 0.4) return false;
-    if (Math.hypot(x - track.points[0].x, z - track.points[0].z) < 40) return false;
-    if (Math.hypot(x - spawn.x, z - spawn.z) < 40) return false;
-    if (track.obstacles.some(o => Math.hypot(x - o.x, z - o.z) <
+    if (dhypot(x - track.points[0].x, z - track.points[0].z) < 40) return false;
+    if (dhypot(x - spawn.x, z - spawn.z) < 40) return false;
+    if (track.obstacles.some(o => dhypot(x - o.x, z - o.z) <
       CAR_RADIUS + o.radius + COIN_RADIUS + 2)) return false;
-    if (coins.some(c => Math.hypot(x - c.x, z - c.z) < 28)) return false;
+    if (coins.some(c => dhypot(x - c.x, z - c.z) < 28)) return false;
     coins.push({ id: coins.length, x, y: roadHeight(track, x, z), z });
     return true;
   };
@@ -61,7 +62,7 @@ export class CoinRun {
     const picked: number[] = [];
     for (const coin of this.coins) {
       // Height prevents collecting a different level at an overlapping corner.
-      if (!this.collected.has(coin.id) && Math.hypot(position.x - coin.x,
+      if (!this.collected.has(coin.id) && dhypot(position.x - coin.x,
         position.y - coin.y, position.z - coin.z) <= COIN_PICKUP_RADIUS) {
         this.collected.add(coin.id); picked.push(coin.id);
       }

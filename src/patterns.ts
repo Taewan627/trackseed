@@ -1,3 +1,4 @@
+import { datan2, dcos, dexp, dhypot, dsin } from './detmath.js';
 import type { Params, Point } from './core.js';
 
 export type CornerPattern = 'auto' | 'right-angle' | 'hairpin' | 's-curve';
@@ -24,12 +25,12 @@ export class PatternGenerationError extends Error {
 }
 
 const P = (x: number, z: number): Point => ({ x, y: 0, z });
-const distance = (a: Point, b: Point) => Math.hypot(b.x - a.x, b.z - a.z);
+const distance = (a: Point, b: Point) => dhypot(b.x - a.x, b.z - a.z);
 const mix = (a: Point, b: Point, t: number) => P(a.x + (b.x - a.x) * t, a.z + (b.z - a.z) * t);
 const direction = (a: Point, b: Point) => {
   const d = distance(a, b) || 1; return P((b.x - a.x) / d, (b.z - a.z) / d);
 };
-const angle = (a: Point, b: Point) => Math.atan2(a.x * b.z - a.z * b.x, a.x * b.x + a.z * b.z);
+const angle = (a: Point, b: Point) => datan2(a.x * b.z - a.z * b.x, a.x * b.x + a.z * b.z);
 const degrees = (r: number) => r * 180 / Math.PI;
 
 function cumulative(points: Point[]) {
@@ -59,7 +60,7 @@ function smoothBase(original: Point[], scale: number, margin: number, rounding: 
   const sampled = resample(original.map(p => P(p.x * scale, p.z * scale)));
   const n = sampled.points.length - 1, sigma = Math.max(12, margin * rounding) / sampled.step;
   const radius = Math.ceil(sigma * 3);
-  const weights = Array.from({ length: radius * 2 + 1 }, (_, i) => Math.exp(-0.5 * ((i - radius) / sigma) ** 2));
+  const weights = Array.from({ length: radius * 2 + 1 }, (_, i) => dexp(-0.5 * (((i - radius) / sigma) * ((i - radius) / sigma))));
   const sum = weights.reduce((a, b) => a + b, 0);
   const points = sampled.points.slice(0, -1).map((_, i) => {
     let x = 0, z = 0;
@@ -79,14 +80,14 @@ function localPattern(kind: Exclude<CornerPattern, 'auto'>, radius: number, stre
   const line = (length: number) => {
     const start = points.at(-1)!;
     for (let i = 1, n = Math.ceil(length / 4); i <= n; i++)
-      points.push(P(start.x + Math.cos(heading) * length * i / n, start.z + Math.sin(heading) * length * i / n));
+      points.push(P(start.x + dcos(heading) * length * i / n, start.z + dsin(heading) * length * i / n));
   };
   const arc = (turn: number) => {
     const start = points.at(-1)!, sign = Math.sign(turn), before = heading;
     for (let i = 1, n = Math.ceil(Math.abs(turn) * radius / 4); i <= n; i++) {
       const h = before + turn * i / n;
-      points.push(P(start.x + sign * radius * (Math.sin(h) - Math.sin(before)),
-        start.z + sign * radius * (Math.cos(before) - Math.cos(h))));
+      points.push(P(start.x + sign * radius * (dsin(h) - dsin(before)),
+        start.z + sign * radius * (dcos(before) - dcos(h))));
     }
     heading += turn;
   };
@@ -112,8 +113,9 @@ function bezier(a: Point, b: Point, da: Point, db: Point): Point[] {
   const n = Math.max(8, Math.ceil((distance(a, c) + distance(c, d) + distance(d, b)) / 4));
   return Array.from({ length: n + 1 }, (_, i) => {
     const t = i / n, u = 1 - t;
-    return P(u ** 3 * a.x + 3 * u ** 2 * t * c.x + 3 * u * t ** 2 * d.x + t ** 3 * b.x,
-      u ** 3 * a.z + 3 * u ** 2 * t * c.z + 3 * u * t ** 2 * d.z + t ** 3 * b.z);
+    const u3 = u * u * u, u2 = u * u, t2 = t * t, t3 = t * t * t;
+    return P(u3 * a.x + 3 * u2 * t * c.x + 3 * u * t2 * d.x + t3 * b.x,
+      u3 * a.z + 3 * u2 * t * c.z + 3 * u * t2 * d.z + t3 * b.z);
   });
 }
 

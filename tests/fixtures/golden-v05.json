@@ -1,0 +1,164 @@
+{
+  "source": "v0.5 deterministic-math (src/detmath.ts) golden hashes; legacy-layouts.json is kept as the v0.3 historical record",
+  "hashing": "sha256(JSON.stringify(Object.fromEntries(fields.map(k => [k, generateTrack(params)[k]])))) as lower-case hex; coinsSha256 = sha256(JSON.stringify(generateCoins(track)))",
+  "fields": [
+    "waypoints",
+    "points",
+    "normals",
+    "roadEdges",
+    "straightSegments",
+    "length",
+    "bounds",
+    "props",
+    "obstacles"
+  ],
+  "patternFields": [
+    "waypoints",
+    "points",
+    "normals",
+    "roadEdges",
+    "straightSegments",
+    "length",
+    "bounds",
+    "props",
+    "obstacles",
+    "patternReport"
+  ],
+  "cases": [
+    {
+      "name": "legacy-case-1",
+      "params": {},
+      "sha256": "29ddde02d791780486e320928d105f95e40d0cfc148119f56f1465acafe6181b",
+      "coinsSha256": "78d499d294be9c7d750741b62c98d8ef96c4999afc4602e9e05eb0721b591780"
+    },
+    {
+      "name": "legacy-case-2",
+      "params": {
+        "seed": 0,
+        "curves": 3,
+        "straight": 0.6,
+        "width": 20,
+        "size": 1,
+        "height": 200,
+        "density": 0,
+        "obstacles": 8
+      },
+      "sha256": "3114b8a48cdebc8131d6cc7b5f2b55efa058bd6a4ee2130e9df4e3bba5333214",
+      "coinsSha256": "163d249003a176247189e85dac7647aad549dede5b32ce7aafcdcecfbbd26406"
+    },
+    {
+      "name": "legacy-case-3",
+      "params": {
+        "seed": 2147483647,
+        "curves": 10,
+        "straight": 0,
+        "width": 80,
+        "size": 3,
+        "height": 200,
+        "density": 20,
+        "obstacles": 8
+      },
+      "sha256": "89b8746c3631578fc0efcad070e96c6b2a391ea123e2b1b5e01c34b9dabf6cbb",
+      "coinsSha256": "e00d9a0a5ee13d72583cc40bc525143f4b24536255875b48ba5ae00e2e531e68"
+    },
+    {
+      "name": "legacy-case-4",
+      "params": {
+        "seed": 99999,
+        "curves": 3,
+        "width": 80,
+        "straight": 0,
+        "size": 3,
+        "height": 0,
+        "scene": "nature"
+      },
+      "sha256": "0dd5a87c241c785f6325c42a1c5b6a7458f27a8da505900cef1a3fc07bd13a4b",
+      "coinsSha256": "9fb65d4f23af76bf3b8e0d0c0a815da8856413939a648bea72231f1558218653"
+    },
+    {
+      "name": "legacy-case-5",
+      "params": {
+        "seed": 7,
+        "curves": 10,
+        "width": 20,
+        "straight": 0.6,
+        "size": 1,
+        "height": 0,
+        "scene": "city"
+      },
+      "sha256": "24ed2b7881aed578aeb38bb1ef025168c312489c870d6bef7b19bc5a4f0c1f93",
+      "coinsSha256": "563d6c19306cfb8058fe29488b67f38b6e0d2b970d7f9d1239bcfece3b388273"
+    }
+  ],
+  "patternCases": [
+    {
+      "name": "right-angle",
+      "params": {
+        "density": 10,
+        "obstacles": 3,
+        "seed": 42,
+        "cornerPattern": "right-angle",
+        "cornerCount": 2,
+        "cornerStrength": 60
+      },
+      "sha256": "f9aebbf180242d5bef16034a4fc68ed4e213afd6d3467390e7037bc37e200e46",
+      "coinsSha256": "b2fb7455443cd086c7d4acba9d6b18a782eb239f11479a68e06c6166392c81cb"
+    },
+    {
+      "name": "hairpin",
+      "params": {
+        "density": 10,
+        "obstacles": 3,
+        "seed": 7,
+        "cornerPattern": "hairpin",
+        "cornerCount": 1,
+        "cornerStrength": 80
+      },
+      "sha256": "6ff705d24435987e8923e9bbe2f6e55bc938f7d7b7ff2fd4463686e533059d63",
+      "coinsSha256": "0ea60f988a240e3617e83b84e591b9ef56c3148f09e3a82b6aaf9264358dc9c6"
+    },
+    {
+      "name": "s-curve",
+      "params": {
+        "density": 10,
+        "obstacles": 3,
+        "seed": 99999,
+        "cornerPattern": "s-curve",
+        "cornerCount": 3,
+        "cornerStrength": 40,
+        "curves": 8
+      },
+      "sha256": "9cd7874e6c4eb355532ff9a4281020254de75e4b29a8c4080fd4d2da67d65f32",
+      "coinsSha256": "73a1c63fddb22de59e36e2c36df34d5ed056ed4cebaac586323800ec84f6b66f"
+    },
+    {
+      "name": "right-angle-wide-hilly",
+      "params": {
+        "seed": 2147483647,
+        "curves": 10,
+        "width": 80,
+        "height": 200,
+        "cornerPattern": "right-angle",
+        "cornerCount": 3,
+        "cornerStrength": 100
+      },
+      "sha256": "31a833945fe5d58a992149c28fd0addff046ba8d4722017d0cc3beaa3220392a",
+      "coinsSha256": "99993e2acdd4dbd6975ff214b85a143a10b894786fbd939fc6c6aac852bf376e"
+    },
+    {
+      "name": "hairpin-narrow-flat",
+      "params": {
+        "seed": 0,
+        "curves": 6,
+        "width": 20,
+        "height": 0,
+        "straight": 0,
+        "cornerPattern": "hairpin",
+        "cornerCount": 2,
+        "cornerStrength": 20
+      },
+      "sha256": "cb7c5e74ec890e72ea6380631b8441bc0feff3fd50c1fcf5b6098175e5181fb0",
+      "coinsSha256": "cbe68ae2d1757d8c84557271d6dc26746b47e9a41a2e6aa9c756c014dae56c06"
+    }
+  ]
+}

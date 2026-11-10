@@ -1,3 +1,4 @@
+import { dcos, dhypot, datan2, dsin } from './detmath.js';
 import { applyPatterns, type CornerPattern, type PatternReport } from './patterns.js';
 export interface Point { x: number; y: number; z: number }
 export type SceneType = 'nature' | 'city' | 'mixed';
@@ -59,8 +60,8 @@ export function catmull(a: number, b: number, c: number, d: number, t: number): 
 
 // Both harmonics are periodic: position AND height derivative match at the seam.
 export function elevation(t: number, p: Params): number {
-  return (Math.sin(t * TAU * 2 + p.seed * 0.01)
-    + Math.sin(t * TAU * 4 + p.seed * 0.02) * 0.4) * p.height;
+  return (dsin(t * TAU * 2 + p.seed * 0.01)
+    + dsin(t * TAU * 4 + p.seed * 0.02) * 0.4) * p.height;
 }
 
 export interface Prop extends Point {
@@ -83,7 +84,7 @@ export function generateTrack(input: Partial<Params> = {}): Track {
   const waypoints = Array.from({ length: p.curves }, (_, i) => {
     const r = radius * (0.7 + rng() * 0.4);
     const a = i / p.curves * TAU - Math.PI / 2 + (rng() * 0.7 - 0.35) * Math.PI * 0.7 / p.curves;
-    return { x: Math.cos(a) * r, y: 0, z: Math.sin(a) * r };
+    return { x: dcos(a) * r, y: 0, z: dsin(a) * r };
   });
   const order = Array.from({ length: p.curves }, (_, i) => i);
   for (let i = order.length - 1; i > 0; i--) {
@@ -120,12 +121,12 @@ export function generateTrack(input: Partial<Params> = {}): Track {
   const normals = points.map((_, i) => {
     const a = points[(i - 1 + n) % n], b = points[(i + 1) % n];
     const dx = b.x - a.x, dz = b.z - a.z;
-    const len = Math.hypot(dx, dz) || 1;
+    const len = dhypot(dx, dz) || 1;
     return { x: -dz / len, z: dx / len };
   });
   const margin = p.width / 2 + CURB + SIDEWALK;
   let length = 0;
-  for (let i = 0; i < n; i++) length += Math.hypot(points[i + 1].x - points[i].x,
+  for (let i = 0; i < n; i++) length += dhypot(points[i + 1].x - points[i].x,
     points[i + 1].y - points[i].y, points[i + 1].z - points[i].z);
   const track: Track = {
     params: p, waypoints, points, normals, straightSegments, length, patternReport,
@@ -163,7 +164,7 @@ export function project(track: Track, x: number, z: number, hint?: number): Proj
     const len2 = dx * dx + dz * dz;
     const t = clamp(((x - a.x) * dx + (z - a.z) * dz) / (len2 || 1), 0, 1);
     const px = a.x + dx * t, pz = a.z + dz * t;
-    const dist2 = (x - px) ** 2 + (z - pz) ** 2;
+    const dist2 = (x - px) * (x - px) + (z - pz) * (z - pz);
     if (dist2 < best) {
       best = dist2;
       const len = Math.sqrt(len2) || 1;
@@ -189,10 +190,10 @@ export function roadContact(track: Track, x: number, z: number): RoadContact {
       if ((a.z > reference.z) !== (b.z > reference.z) &&
         reference.x < a.x + dx * (reference.z - a.z) / dz) referenceInside = !referenceInside;
       const t = clamp(((x - a.x) * dx + (z - a.z) * dz) / (dx * dx + dz * dz || 1), 0, 1);
-      const px = a.x + dx * t, pz = a.z + dz * t, d2 = (x - px) ** 2 + (z - pz) ** 2;
+      const px = a.x + dx * t, pz = a.z + dz * t, d2 = (x - px) * (x - px) + (z - pz) * (z - pz);
       if (d2 < best) {
         best = d2; qx = px; qz = pz;
-        const center = track.points[i], length = Math.hypot(dx, dz) || 1;
+        const center = track.points[i], length = dhypot(dx, dz) || 1;
         const sign = Math.sign(-dz * (center.x - a.x) + dx * (center.z - a.z));
         fallbackX = -dz / length * sign; fallbackZ = dx / length * sign;
       }
@@ -239,7 +240,7 @@ function makeObstacles(track: Track): Obstacle[] {
     const pt = track.points[idx], normal = track.normals[idx];
     const offset = (rng() - 0.5) * track.params.width * 0.5;
     return { x: pt.x + normal.x * offset, y: pt.y, z: pt.z + normal.z * offset,
-      radius: 4, heading: Math.atan2(normal.z, -normal.x) };
+      radius: 4, heading: datan2(normal.z, -normal.x) };
   });
 }
 
@@ -262,9 +263,9 @@ function makeProps(track: Track): Prop[] {
     // Check the whole track, so props cannot invade a nearby corner or start zone.
     const clearance = kind === 'building' ? 13 * scale : 5 * scale;
     if (project(track, x, z).distance < p.width / 2 + CURB + clearance) continue;
-    if (Math.hypot(x - points[0].x, z - points[0].z) < 32) continue;
+    if (dhypot(x - points[0].x, z - points[0].z) < 32) continue;
     props.push({ x, y: pt.y + (kind === 'building' ? 0 : CURB_HEIGHT), z, kind, scale,
-      heading: Math.atan2(normal.z, -normal.x) });
+      heading: datan2(normal.z, -normal.x) });
   }
   return props;
 }
