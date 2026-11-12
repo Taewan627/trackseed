@@ -4,7 +4,7 @@
 # See REPRODUCE.md for the table of experiments, commands and what each group covers.
 #
 # Usage: scripts/reproduce-check.sh <scratch-dir> [group ...]
-#   groups: e1 e2 amend e6 e7 e5 e9       (default: e1 e2 amend e6 e7; e5 and e9 need network to fetch third-party sources; e9 takes about 4 minutes)
+#   groups: e1 e2 amend e6 e7 e5 e9 e9a2 e10  (default: e1 e2 amend e6 e7; e5, e9 and e9a2 need network to fetch third-party sources; e9 about 4 minutes, e9a2 about 7, e10 about 20 (one run))
 # Output: <scratch-dir>/reproduce-check.tsv (label, committed file, fresh file, raw sha256 match, decompressed or JSON content match)
 #         and <scratch-dir>/logs/*.log. Exit status is 0 even when a comparison differs; read the table.
 set -uo pipefail
@@ -125,6 +125,26 @@ for g in "${groups[@]}"; do
         compare "E9 $f (experiments/e9/results)" "experiments/e9/results/$f" "$scratch/e9/$f"
       done
     else echo -e "E9 extract\t-\t-\tnot run\tnot run (see logs/e9-extract.log)" >> "$tsv"; fi
+    ;;
+  e9a2)
+    note "e9a2: E9 addendum-02 (network: pinned fetch, extraction, TrackSeed adapter), one harness run into scratch"
+    cd "$repo" && npm run build:cli > "$scratch/logs/build-cli.log" 2>&1
+    if (cd "$repo/experiments/e9" && ./extract.sh > "$scratch/logs/e9a2-extract.log" 2>&1 && node adapters/gen_trackseed.mjs --build build >> "$scratch/logs/e9a2-extract.log" 2>&1); then
+      mkdir -p "$scratch/e9a2"
+      (cd "$repo/experiments/e9" && node addendum-02.mjs "$scratch/e9a2" > "$scratch/logs/e9a2-run.log" 2>&1 && node analyze-addendum-02.mjs "$scratch/e9a2" > "$scratch/logs/e9a2-analyze.log" 2>&1)
+      for f in tracks.csv.gz SUMMARY.json SUMMARY.md sources.json env.json; do
+        [ "$f" = tracks.csv.gz ] && gzip -n -9 -c "$scratch/e9a2/tracks.csv" > "$scratch/e9a2/tracks.csv.gz"
+        compare "E9 addendum-02 $f (experiments/e9/results/addendum-02)" "experiments/e9/results/addendum-02/$f" "$scratch/e9a2/$f"
+      done
+    else echo -e "E9 addendum-02 extract\t-\t-\tnot run\tnot run (see logs/e9a2-extract.log)" >> "$tsv"; fi
+    ;;
+  e10)
+    note "e10: adversarial classes, one run on the held-out seeds (about 20 minutes; the committed DETERMINISM.txt records two runs)"
+    cd "$repo" && npm run build:cli > "$scratch/logs/build-cli.log" 2>&1
+    mkdir -p "$scratch/e10"
+    node experiments/e10/run.mjs "$scratch/e10" > "$scratch/logs/e10-run.log" 2>&1 && node experiments/e10/analyze.mjs "$scratch/e10" > "$scratch/logs/e10-analyze.log" 2>&1
+    gzip -n -9 -c "$scratch/e10/instances.csv" > "$scratch/e10/instances.csv.gz"
+    for f in instances.csv.gz clean.json env.json SUMMARY.json SUMMARY.md; do compare "E10 $f (experiments/e10/results)" "experiments/e10/results/$f" "$scratch/e10/$f"; done
     ;;
   *) note "unknown group $g" ;;
   esac

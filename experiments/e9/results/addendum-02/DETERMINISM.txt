@@ -1,0 +1,8 @@
+E9 addendum-02 determinism check (2026-11-12T21:29:12Z), node v22.23.4: two full runs (addendum-02.mjs + analyze-addendum-02.mjs), sha256 of every output
+E9 polylines SHA256SUMS sha256: 44a1b4353f8176d71f0a97c33a8d1c525e067c63372a9fbae890d0e83fe0d1d1
+identical  a55ed075cb6bd6a2c853f3d1fa6b871d074035fb220e8245b9bddc7e0a3ef9d1  tracks.csv
+identical  3f19eb7016a4b8c21b1553030800fbd76926e992e3fb83004bedfa7e3b5b5414  sources.json
+identical  ae1de2c60b517fbee65d54e6a30dac89bc6856d0a2c8524f012c1bab179835ac  env.json
+identical  5efa6f7830a5beb87eaa872aa4593d2a8faa3874d41bb20773e0c44c38de1d02  SUMMARY.json
+identical  f825631feda4dc16d5fe9d03cc708da7663c92a96cf7cf148f09815fa2fe7788  SUMMARY.md
+A12: held (all outputs identical in the two runs)
