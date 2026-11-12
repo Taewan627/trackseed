@@ -22,7 +22,8 @@ function evaluate(c, timing) {
   const base = [c.index, c.mode, c.curves, c.straight, c.width, c.size, c.height, c.seed];
   if (!track) return { row: [...base, 0, error, '', '', '', '', ...METRICS.map(() => '')].join(','), gen: t1 - t0, val: null };
   const t2 = performance.now();
-  const v = validateTrack(track);
+  // pin the validator rule in force when E2 ran (pre-AMENDMENT-01, absolute 5 deg); see experiments/AMENDMENT-01.md
+  const v = validateTrack(track, { closureTangentMode: 'absolute' });
   const t3 = performance.now();
   const m = computeMetrics(track);
   const codes = [...new Set(v.violations.map(x => x.code))].sort().join(';');
