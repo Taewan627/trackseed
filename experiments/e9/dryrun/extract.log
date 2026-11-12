@@ -1,0 +1,76 @@
+== tumftm-racetrack-database
+repository: https://github.com/TUMFTM/racetrack-database.git
+pinned commit: e59595d1f3573b30d1ded6a08984935b957688e0 (2021-09-18T16:28:20+02:00)
+licence: LGPL-3.0 (no copyright line in the file; contact TUM FTM); centre lines derived from OpenStreetMap (ODbL) -> fetched at run time only, never vendored (file LICENSE)
+e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118  LICENSE
+== bacinger-f1-circuits
+repository: https://github.com/bacinger/f1-circuits.git
+pinned commit: 8094e957b8d6aa8b9f4510c93968556cccd30e02 (2026-10-16T19:18:28+02:00)
+licence: MIT, Copyright (c) 2019-2025 Tomislav Bacinger (initial circuit data from a Google My Maps layer, see CANDIDATES.md) (file LICENSE.md)
+f093960027c8ebcc3220000b8316ec29cc6f9149b7625ebad02524bf44ebf2f3  LICENSE.md
+== juangallostra-procedural-tracks
+repository: https://github.com/juangallostra/procedural-tracks.git
+pinned commit: 8e22e36b2d0b15209eb165371faf1e2870b8834b (2022-06-22T08:40:54+02:00)
+licence: MIT, Copyright (c) 2020 Juan Gallostra Acin (file LICENSE)
+77e1c40b7d1ca103fd0f2e322c6e33c8d2a8f13bfdb6fa3ef5fffd21588bddc6  LICENSE
+== amz-random-track-generator
+repository: https://github.com/AMZ-Racing/random-track-generator.git
+pinned commit: b9e42a7845911c055d14997073fb3c49dcf54732 (2025-10-09T10:59:03+02:00)
+licence: MIT, Copyright (c) 2024 Mees van Loben Sels (file LICENSE)
+bb1dd8cd02693966f63240b5a18afb14e7377bd8395451a220e530cfbdaabb7b  LICENSE
+== gymnasium
+repository: https://github.com/Farama-Foundation/Gymnasium.git
+pinned commit: 8ba8c3a63bb4e000b7f33923f43d292acac07be1 (2026-10-05T11:55:30+01:00)
+licence: MIT, Copyright (c) 2016 OpenAI, (c) 2022 Farama Foundation (tag v1.4.0) (file LICENSE)
+7dacaa9772e856aee6943b32ef663d3634d91d72ec7bbc74d136943673f91e18  LICENSE
+== drift-school
+repository: https://github.com/alexnieves-cs/drift-school.git
+pinned commit: f4c61cf7ffb746a105d90c7f0cae665dc53ae765 (2026-11-12T06:26:56-05:00)
+licence: MIT, Copyright (c) 2026 Alex Nieves (file LICENSE)
+99041524470ec9862d846d80e3d3c87da666c4e5a6f28e59967cf9f837d0981d  LICENSE
+== zzangupenn-track-gen
+repository: https://github.com/zzangupenn/track_gen.git
+pinned commit: e5ea23d2de72969c8c02491738275f0a31e97b6b (2024-05-23T13:25:45-04:00)
+licence: MIT, Copyright (c) 2020 Joseph Auckley, Matthew O'Kelly, Aman Sinha, Hongrui Zheng, Zirui Zang (file LICENSE)
+b6362c15a2f7a8dd62d31a2161ddfd38bb45edbc32b1a2d5fffeaf77041342ed  LICENSE
+fetch.sh: done (see <repo>/experiments/e9/build/THIRD_PARTY.txt)
+seeds.json: 1000 seeds, sha256 6fc50bc3d1fad596f5593ee17116c15992c0c16b702e8d0b4da2abe1fcbcc095
+[real-tumftm] wrote 25 polylines, 0 generator failures -> build/polylines/real-tumftm
+[real-bacinger-f1] wrote 40 polylines, 0 generator failures -> build/polylines/real-bacinger-f1
+[gen-juangallostra] wrote 998 polylines, 2 generator failures -> build/polylines/gen-juangallostra
+[gen-amz-voronoi] wrote 921 polylines, 79 generator failures -> build/polylines/gen-amz-voronoi
+[gen-carracing] wrote 1000 polylines, 0 generator failures -> build/polylines/gen-carracing
+[gen-zzangupenn] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-zzangupenn
+[gen-driftschool-s0] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-driftschool-s0
+[gen-driftschool-s1] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-driftschool-s1
+[gen-driftschool-s2] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-driftschool-s2
+[gen-driftschool-s3] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-driftschool-s3
+[gen-driftschool-s4] wrote 1000 polylines, 0 generator failures -> <repo>/experiments/e9/build/polylines/gen-driftschool-s4
+source                     unit tracks  fail | pts min  median    max |  spacing(min/med/max of per-track medians) |    width min/med/max |       length min/med/max | dropped-close
+gen-amz-voronoi            m       921    79 |     999     999   1000 |        0.1378        0.3194        0.4737 |      3/     3/     3 |   140.48/  321.94/  479.24 | 788   agg-sha256 1e56f919015cbb85
+gen-carracing              u      1000     0 |     222     292    375 |           3.5           3.5           3.5 |  13.33/ 13.33/ 13.33 |    778.2/  1025.5/    1316 | 0   agg-sha256 5a8236465b838033
+gen-driftschool-s0         u      1000     0 |     322     376    423 |       0.09985           0.1        0.1002 |    2.2/   2.2/   2.2 |    32.15/  37.615/  42.284 | 0   agg-sha256 3eab623703265096
+gen-driftschool-s1         u      1000     0 |     382     435    483 |       0.09987           0.1        0.1001 |    1.5/   1.5/   1.5 |   38.173/  43.523/  48.306 | 0   agg-sha256 6e78f5b1c2081210
+gen-driftschool-s2         u      1000     0 |     442     494    544 |       0.09989           0.1        0.1001 |      1/     1/     1 |   44.173/  49.366/  54.367 | 0   agg-sha256 ba12f2056752c606
+gen-driftschool-s3         u      1000     0 |     502     556    605 |        0.0999           0.1        0.1001 |    0.8/   0.8/   0.8 |   50.192/   55.62/  60.468 | 0   agg-sha256 d84953890bc926f6
+gen-driftschool-s4         u      1000     0 |     562     613    666 |       0.09991           0.1        0.1001 |   0.75/  0.75/  0.75 |    56.22/  61.271/  66.606 | 0   agg-sha256 fb0c64247869b27a
+gen-juangallostra          px      998     2 |    1000    1000   1000 |             2         2.236         4.123 |     40/    40/    40 |   1833.4/    2264/    4138 | 0   agg-sha256 5554cff84c2e4c40
+gen-zzangupenn             u      1000     0 |     108     141    191 |             5             5             5 |     10/    10/    10 |   544.95/  709.28/  962.39 | 0   agg-sha256 0edd7c2e66f4d0cc
+real-bacinger-f1           m        40     0 |      81     116    203 |         12.04         20.09         37.97 |     12/    12/    12 |   3324.3/  5258.1/  6978.3 | 0   agg-sha256 60071bc935ed57c6
+real-tumftm                m        25     0 |     460     931   1401 |         4.997             5         5.004 |      9/ 11.65/  16.3 |   2295.8/  4649.8/  7000.1 | 0   agg-sha256 690730a7692b6c64
+source                     files parsed errors min<3pts exact-closing-copy bad-width
+gen-amz-voronoi              921    921      0        0                133         0
+gen-carracing               1000   1000      0        0                  0         0
+gen-driftschool-s0          1000   1000      0        0                  0         0
+gen-driftschool-s1          1000   1000      0        0                  0         0
+gen-driftschool-s2          1000   1000      0        0                  0         0
+gen-driftschool-s3          1000   1000      0        0                  0         0
+gen-driftschool-s4          1000   1000      0        0                  0         0
+gen-juangallostra            998    998      0        0                588         0
+gen-zzangupenn              1000   1000      0        0                  0         0
+real-bacinger-f1              40     40      0        0                 40         0
+real-tumftm                   25     25      0        0                  0         0
+
+real	1m14.630s
+user	1m9.236s
+sys	0m3.776s
