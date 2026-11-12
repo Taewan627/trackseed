@@ -3,7 +3,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-const here = dirname(fileURLToPath(import.meta.url)), R = join(here, 'results'), O = join(here, 'out'), root = join(here, '../..');
+const here = dirname(fileURLToPath(import.meta.url)), root = join(here, '../..');
+// Optional E5_SCRATCH=<dir>: read results/ and out/ from <dir> instead of the repository (used for verification re-runs).
+const base = process.env.E5_SCRATCH ?? here, R = join(base, 'results'), O = join(base, 'out');
 const lib = f => import(pathToFileURL(join(root, 'cli-dist', f)).href);
 const { trackFromPolyline } = await lib('polyline.js');
 const { validateTrack } = await lib('validate.js');
@@ -118,7 +120,8 @@ const CONFIGS = [['auto', {}], ['right-angle', { cornerPattern: 'right-angle', c
   ['s-curve', { cornerPattern: 's-curve', cornerCount: 3, cornerStrength: 40, curves: 8 }], ['extreme', { curves: 10, size: 3, width: 80, height: 200, obstacles: 8, density: 20 }]]; // = experiments/e1/PROTOCOL.md
 const seeds200 = ref.cases.slice(0, 200).map(c => c.seed);
 const q3 = { 'third-party (as is)': groupStats(tpRows), [`third-party (scaled x${SCALE})`]: groupStats(tpScaled) };
-for (const [id, over] of CONFIGS) q3[`TrackLab ${id}`] = groupStats(metricsOf(seeds200.map(seed => computeMetrics(generateTrack({ ...over, seed })))));
+// v1.1: pin the v1.0.0 join so committed results reproduce (docs/generator-auto-join.md)
+for (const [id, over] of CONFIGS) q3[`TrackLab ${id}`] = groupStats(metricsOf(seeds200.map(seed => computeMetrics(generateTrack({ ...over, seed, autoJoin: 'legacy' })))));
 const minTurning = Math.min(...tpRows.map(r => r.totalTurningDegrees));
 
 // ---------------- predictions vs results ----------------

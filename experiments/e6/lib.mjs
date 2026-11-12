@@ -34,7 +34,8 @@ export const MODES = [
   ['hairpin', { cornerPattern: 'hairpin', cornerCount: 1, cornerStrength: 80 }],
   ['s-curve', { cornerPattern: 's-curve', cornerCount: 3, cornerStrength: 40 }],
 ];
-export function gen(params) { try { return core.generateTrack(params); } catch (e) { return null; } }
+// v1.1: pin the v1.0.0 join so committed results reproduce (docs/generator-auto-join.md)
+export function gen(params) { try { return core.generateTrack({ ...params, autoJoin: 'legacy' }); } catch (e) { return null; } }
 
 /** Clean negatives N1 (pattern modes) and N2 (Auto, straight 0) of one seed: lazily yields { set, mode, params, key }. */
 export function* negativeCases(seed) {

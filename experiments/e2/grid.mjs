@@ -12,5 +12,7 @@ export const CASES = [];
 for (const [mode, over] of MODES)
   for (const curves of LEVELS.curves) for (const straight of LEVELS.straight) for (const width of LEVELS.width)
     for (const size of LEVELS.size) for (const height of LEVELS.height) for (const seed of SEEDS)
-      CASES.push({ index: CASES.length, mode, curves, straight, width, size, height, seed, params: { ...over, curves, straight, width, size, height, seed } });
+      // v1.1: pin the v1.0.0 join so committed results reproduce (docs/generator-auto-join.md). Used by e2/run.mjs,
+      // amendment-01/run-e2.mjs and amendment-01/examples.mjs, which all generate from CASES[i].params.
+      CASES.push({ index: CASES.length, mode, curves, straight, width, size, height, seed, params: { ...over, curves, straight, width, size, height, seed, autoJoin: 'legacy' } });
 if (CASES.length !== 48600) throw new Error('expected 48600 cases');
