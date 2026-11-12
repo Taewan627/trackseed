@@ -30,7 +30,7 @@ Script: `experiments/e8/exploratory.mjs`; raw output: `experiments/e8/explorator
 3. The same pattern holds at sizes 1 and 3 with the threshold shifted: size 1 has 10.0% warnings at `height` 20 and 96.0% at 30; size 3 has 0% at 20 and 32.0% at 30 (a larger `size` makes the track longer, so the same elevation is spread over more horizontal distance).
 4. At the current default `height` = 80 the warning rate is 100% for every size (200/200 each), which reproduces the reviewer's observation (and the README statement for E2).
 5. With the default configuration, validator `ok` (error-severity violations only) is 200/200 at `height` 15, 20, 25 and 80, as expected: `height` does not enter the x/z geometry that the error checks look at.
-6. Visible elevation: the elevation range of the centreline (max y minus min y) is about 48.6 units at `height` 20 (36.4 at 15, 60.7 at 25, 194.3 at 80), in every one of the 200 tracks to two decimals. For comparison the default road width is 40 units.
+6. Visible elevation: the elevation range of the centreline (max y minus min y) is 48.6 units at `height` 20 (the minimum over the 200 tracks equals the size-2 median, 48.58); the minimum is 36.4 at 15, 60.7 at 25 and 194.3 at 80. For comparison the default road width is 40 units.
 
 ## Choice
 
