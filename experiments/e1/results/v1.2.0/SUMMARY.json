@@ -1,0 +1,754 @@
+{
+  "reference": "node22",
+  "casesPerSubject": 1000,
+  "expected": {
+    "s1S2Differ": 400,
+    "s1S2Equal": 600
+  },
+  "bundles": [
+    "86daefb6584e1e61d62eb5394e2bfff81ff99e0b2f6e7db4c169fc38e1b14e19  build/s1.mjs",
+    "5f63662933ae09cb84efc4e460853ae9e2d52e32c3e755c53c25d556ec23072e  build/s2.mjs"
+  ],
+  "rows": [
+    {
+      "label": "node22",
+      "name": "Node 22 (reference)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v22.23.4",
+          "cliVersion": null,
+          "v8": "12.4.254.21-node.57",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v22.23.4",
+          "cliVersion": null,
+          "v8": "12.4.254.21-node.57",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "node22-repeat",
+      "name": "Node 22 (repeat run)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v22.23.4",
+          "cliVersion": null,
+          "v8": "12.4.254.21-node.57",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v22.23.4",
+          "cliVersion": null,
+          "v8": "12.4.254.21-node.57",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "node20",
+      "name": "Node 20",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v20.20.2",
+          "cliVersion": null,
+          "v8": "11.3.244.8-node.38",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v20.20.2",
+          "cliVersion": null,
+          "v8": "11.3.244.8-node.38",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "node24",
+      "name": "Node 24",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v24.22.2",
+          "cliVersion": null,
+          "v8": "13.6.233.17-node.63",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "node",
+          "version": "v24.22.2",
+          "cliVersion": null,
+          "v8": "13.6.233.17-node.63",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "deno",
+      "name": "Deno",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "deno",
+          "version": "2.9.6",
+          "cliVersion": null,
+          "v8": "15.0.245.2-rusty",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "deno",
+          "version": "2.9.6",
+          "cliVersion": null,
+          "v8": "15.0.245.2-rusty",
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "bun",
+      "name": "Bun (JavaScriptCore)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "bun",
+          "version": "1.4.4",
+          "cliVersion": null,
+          "v8": null,
+          "revision": "38afee6c84fcf48c0edb2466aa4b27d287a59c30",
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "bun",
+          "version": "1.4.4",
+          "cliVersion": null,
+          "v8": null,
+          "revision": "38afee6c84fcf48c0edb2466aa4b27d287a59c30",
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "chrome",
+      "name": "Chrome headless (V8)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+          "cliVersion": "chrome 153.0.8010.12 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+          "cliVersion": "chrome 153.0.8010.12 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "firefox",
+      "name": "Firefox (SpiderMonkey)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (X11; Linux x86_64; rv:157.0) Gecko/20100101 Firefox/157.0",
+          "cliVersion": "firefox 157.0 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (X11; Linux x86_64; rv:157.0) Gecko/20100101 Firefox/157.0",
+          "cliVersion": "firefox 157.0 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    },
+    {
+      "label": "webkit",
+      "name": "WebKit (Playwright build, JavaScriptCore)",
+      "subjects": {
+        "s1": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Safari/605.1.15",
+          "cliVersion": "webkit 27.2 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        },
+        "s2": {
+          "n": 1000,
+          "selfTest": true,
+          "generatorVersion": "1.2.0",
+          "documentStamps": [
+            "1.2.0"
+          ],
+          "engine": "browser",
+          "version": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Safari/605.1.15",
+          "cliVersion": "webkit 27.2 via playwright-core",
+          "v8": null,
+          "revision": null,
+          "throwCases": 0,
+          "embeddedMismatch": 0,
+          "digest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          },
+          "contentDigest": {
+            "mismatches": 0,
+            "agreement": 100,
+            "firstMismatches": []
+          }
+        }
+      },
+      "ran": true
+    }
+  ],
+  "checks": [
+    {
+      "label": "node22",
+      "name": "Node 22 (reference)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "node22-repeat",
+      "name": "Node 22 (repeat run)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "node20",
+      "name": "Node 20",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "node24",
+      "name": "Node 24",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "deno",
+      "name": "Deno",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "bun",
+      "name": "Bun (JavaScriptCore)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "chrome",
+      "name": "Chrome headless (V8)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "firefox",
+      "name": "Firefox (SpiderMonkey)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    },
+    {
+      "label": "webkit",
+      "name": "WebKit (Playwright build, JavaScriptCore)",
+      "cases": 1000,
+      "p2S1ContentEqualV110": 1000,
+      "p2S2ContentEqualV110": 1000,
+      "p3S2ContentEqualV100": 1000,
+      "p4S1DigestEqualV110": 0,
+      "p4S2DigestEqualV110": 0,
+      "p4S2DigestEqualV100": 0,
+      "s1S2ContentDiffer": 400,
+      "s1S2DifferByConfig": {
+        "auto": 200,
+        "extreme": 200
+      },
+      "s1S2DifferExactlyExpectedIds": true,
+      "documentStamps": {
+        "s1": [
+          "1.2.0"
+        ],
+        "s2": [
+          "1.2.0"
+        ]
+      }
+    }
+  ]
+}
