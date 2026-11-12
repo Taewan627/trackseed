@@ -11,6 +11,8 @@ const here = new URL('.', import.meta.url);
 const mod = await import(new URL('build/e5.mjs', here).href);
 const html = readFileSync(new URL('build/third_party/index.html', here), 'latin1');
 const { polylines, ...rest } = mod.runAll(html);
-mkdirSync(new URL('results/', here), { recursive: true }); mkdirSync(new URL('out/', here), { recursive: true });
-writeFileSync(new URL(`results/${label}.json`, here), JSON.stringify({ env: { engine, version, ...extra }, ...rest }) + '\n');
-writeFileSync(new URL(`out/${label}.polylines.json`, here), JSON.stringify(polylines) + '\n');
+// Optional E5_SCRATCH=<dir>: write results/ and out/ under <dir> instead of the repository (used for verification re-runs).
+const dest = process.env.E5_SCRATCH ? new URL(`file://${process.env.E5_SCRATCH.replace(/\/?$/, '/')}`) : here;
+mkdirSync(new URL('results/', dest), { recursive: true }); mkdirSync(new URL('out/', dest), { recursive: true });
+writeFileSync(new URL(`results/${label}.json`, dest), JSON.stringify({ env: { engine, version, ...extra }, ...rest }) + '\n');
+writeFileSync(new URL(`out/${label}.polylines.json`, dest), JSON.stringify(polylines) + '\n');
