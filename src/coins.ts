@@ -45,7 +45,7 @@ export function generateCoins(track: Track): Coin[] {
     if (coins.length === COIN_COUNT) break;
     tryPosition(index, 0);
   }
-  if (coins.length !== COIN_COUNT) throw new Error('안전한 코인 위치 10개를 찾을 수 없습니다.');
+  if (coins.length !== COIN_COUNT) throw new Error('Could not find 10 safe coin positions.');
   return coins;
 }
 

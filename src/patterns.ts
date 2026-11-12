@@ -19,7 +19,7 @@ export interface PatternReport {
 }
 export class PatternGenerationError extends Error {
   constructor(readonly attempts: number, readonly reasons: string[]) {
-    super(`특수 코너 적용 실패 (${attempts}회 시도): ${reasons.at(-1) ?? '형상 검사 실패'}`);
+    super(`Corner pattern failed (${attempts} attempts): ${reasons.at(-1) ?? 'geometry check failed'}`);
     this.name = 'PatternGenerationError';
   }
 }
@@ -156,11 +156,11 @@ function splicePatterns(base: ReturnType<typeof resample>, p: Params, rng: () =>
     memo.set(key, result); return result;
   };
   const selected = choose(0, p.cornerCount).indices.map(i => candidates[i]);
-  if (selected.length !== p.cornerCount) throw new Error('도로·보도 폭에 비해 안전한 패턴 연결 구간이 부족합니다');
+  if (selected.length !== p.cornerCount) throw new Error('Not enough safe pattern connection sections for the road and sidewalk width');
   let cursor = 0;
   for (const { from, to } of selected) {
     const center = (from + to) / 2;
-    if (from <= cursor || to >= n - 2) throw new Error('코너를 연결할 구간이 부족합니다');
+    if (from <= cursor || to >= n - 2) throw new Error('Not enough room to connect the corner');
     const a = base.points[from], b = base.points[to], u = direction(a, b), chord = distance(a, b);
     const middle = base.points[Math.floor(center)];
     let v = P(u.z, -u.x);
@@ -168,11 +168,11 @@ function splicePatterns(base: ReturnType<typeof resample>, p: Params, rng: () =>
     const localDirection = (d: Point) => P(d.x * u.x + d.z * u.z, d.x * v.x + d.z * v.z);
     const entry = localDirection(direction(base.points[from - 1], base.points[from + 1]));
     const exit = localDirection(direction(base.points[to - 1], base.points[to + 1]));
-    if (entry.x < 0.35 || exit.x < 0.35) throw new Error('연결 접선의 방향 여유가 부족합니다');
+    if (entry.x < 0.35 || exit.x < 0.35) throw new Error('Not enough tangent direction margin at the connection');
     const radius = Math.max(32, margin * (2.4 - 0.8 * strength)) * (1 + rng() * 0.03);
     const pattern = localPattern(kind, radius, strength), width = pattern.points.at(-1)!.x;
     const gap = (chord - width) / 2;
-    if (gap < margin * 1.4) throw new Error('도로·보도 폭에 비해 패턴 연결 공간이 부족합니다');
+    if (gap < margin * 1.4) throw new Error('Not enough space for the pattern connection given the road and sidewalk width');
     const first = direction(pattern.points[0], pattern.points[1]);
     const last = direction(pattern.points.at(-2)!, pattern.points.at(-1)!);
     const lift = gap * (entry.z / entry.x + first.z / first.x - exit.z / exit.x - last.z / last.x) / 4;
@@ -253,9 +253,9 @@ export function validatePatternGeometry(points: Point[], width: number, curb = 2
     }
   }
   const reasons: string[] = [];
-  if (!closed || points.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.z))) reasons.push('폐합 또는 좌표 검사 실패');
-  if (minRadius < margin * 1.12 || maxStepAngle > 20) reasons.push('접합부 또는 곡률 반경이 도로·보도 폭에 비해 작습니다');
-  if (foldedTriangles) reasons.push('도로·연석·보도 삼각형의 접힘이 검출됐습니다');
+  if (!closed || points.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.z))) reasons.push('Closure or coordinate check failed');
+  if (minRadius < margin * 1.12 || maxStepAngle > 20) reasons.push('Junction or curvature radius is too small for the road and sidewalk width');
+  if (foldedTriangles) reasons.push('Folded road, curb or sidewalk triangles detected');
   let selfIntersections = 0, boundaryIntersections = 0;
   const boundariesChecked = reasons.length === 0;
   if (boundariesChecked) {
@@ -282,8 +282,8 @@ export function validatePatternGeometry(points: Point[], width: number, curb = 2
       for (const key of keys) { const entries = grid.get(key) ?? []; entries.push(id); grid.set(key, entries); }
     }
   }
-  if (selfIntersections) reasons.push('중심선 자기교차가 검출됐습니다');
-  if (boundaryIntersections) reasons.push('도로·연석·보도 경계 겹침이 검출됐습니다');
+  if (selfIntersections) reasons.push('Centerline self-intersection detected');
+  if (boundaryIntersections) reasons.push('Road, curb and sidewalk boundary overlap detected');
   return { valid: reasons.length === 0, closed, minRadius, maxStepAngle, selfIntersections,
     boundaryIntersections, foldedTriangles, boundariesChecked, reasons };
 }
@@ -297,7 +297,7 @@ export function applyPatterns(original: Point[], p: Params, rng: () => number, c
       const geometry = validatePatternGeometry(candidate.points, p.width, curb, sidewalk);
       if (!geometry.valid) throw new Error(geometry.reasons.join(' · '));
       if (!candidate.measurements.every(m => m.verified) || candidate.measurements.length !== p.cornerCount)
-        throw new Error('선택한 코너의 실제 목표각 또는 곡률 변화 검사 실패');
+        throw new Error('Measured target angle or curvature change check failed for the selected corner');
       const report: PatternReport = { selected: p.cornerPattern, requested: p.cornerCount,
         inserted: candidate.measurements.length, attempts: attempt + 1, scale, patterns: candidate.measurements, geometry };
       return { points: candidate.points, report };

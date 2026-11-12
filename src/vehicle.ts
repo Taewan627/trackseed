@@ -12,7 +12,7 @@ const MARGIN = 0.002;
 export function spawnVehicle(track: Track): Vehicle {
   // Prefer the original start. Validate the complete conservative circle first.
   const index = track.points.findIndex(p => roadContact(track, p.x, p.z).clearance >= CAR_RADIUS + MARGIN);
-  if (index < 0) throw new Error('차량을 배치할 수 있는 아스팔트 영역이 없습니다.');
+  if (index < 0) throw new Error('No asphalt area to place the vehicle.');
   const a = track.points[index], b = track.points[index + 1];
   return { ...a, y: roadHeight(track, a.x, a.z), heading: Math.atan2(b.x - a.x, b.z - a.z), speed: 0,
     pitch: Math.atan2(b.y - a.y, Math.hypot(b.x - a.x, b.z - a.z)), surface: 'asphalt', collision: 0,
