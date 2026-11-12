@@ -72,8 +72,8 @@ test('v0.4: real rejected layout warns, preserves previous scene/coins and recov
   await edit(page, { cornerPattern: 'hairpin', cornerCount: 1, curves: 3, width: 80, straight: 0.6,
     size: 1, cornerStrength: 20, seed: 0, height: 200, density: 0, obstacles: 8 });
   await expect(page.locator('#pattern-warning')).toBeVisible();
-  // message text originates in src/patterns.ts (Korean in both UI languages; out of scope for the i18n dictionary)
-  await expect(page.locator('#pattern-warning')).toContainText('6회 시도');
+  // message text originates in src/patterns.ts (English in both UI languages; the i18n dictionary only wraps it)
+  await expect(page.locator('#pattern-warning')).toContainText('6 attempts');
   await expect(page.locator('#status')).toHaveText('Pattern application failed · previous track kept');
   const after = await page.evaluate(() => ({ generation: window.__tracklab.generation,
     track: JSON.stringify(window.__tracklab.track), coins: window.__tracklab.coins }));

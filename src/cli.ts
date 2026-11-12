@@ -3,7 +3,7 @@
 //   generate | batch | validate | metrics   (see `tracklab --help`)
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { DEFAULTS, LIMITS, generateTrack, sanitize, type Params } from './core.js';
+import { DEFAULTS, LIMITS, ParameterError, generateTrack, strictParams, type Params } from './core.js';
 import { TrackDocumentError, canonicalStringify, exportTrack, importTrack } from './schema.js';
 import { DEFAULT_VALIDATE_OPTIONS, validateTrack, type ValidateOptions } from './validate.js';
 import { computeMetrics, type TrackMetrics } from './metrics.js';
@@ -154,22 +154,12 @@ function writeOut(path: string, text: string) {
 }
 
 // ---- parameters ------------------------------------------------------------
-const PARAM_KEYS = Object.keys(DEFAULTS) as (keyof Params)[];
 const isNumericKey = (k: string) => typeof DEFAULTS[k as keyof Params] === 'number';
 
-/** Check the keys and types of a raw parameter object and require that sanitize() keeps every value. */
-function strictParams(raw: Record<string, unknown>, where: string): Params {
-  for (const [k, v] of Object.entries(raw)) {
-    if (!PARAM_KEYS.includes(k as keyof Params)) throw new UsageError(`${where}: unknown parameter "${k}" (known: ${PARAM_KEYS.join(', ')})`);
-    if (isNumericKey(k) ? typeof v !== 'number' || !Number.isFinite(v) : typeof v !== 'string')
-      throw new UsageError(`${where}: parameter "${k}" must be ${isNumericKey(k) ? 'a finite number' : 'a string'}, got ${JSON.stringify(v)}`);
-  }
-  const clean = sanitize(raw as Partial<Params>);
-  for (const [k, v] of Object.entries(raw)) {
-    if (clean[k as keyof Params] !== v) throw new UsageError(
-      `${where}: parameter "${k}" = ${JSON.stringify(v)} is not valid (sanitized to ${JSON.stringify(clean[k as keyof Params])}; see "tracklab generate --help" for ranges)`);
-  }
-  return clean;
+/** Strict parameter check shared with generateTrack(params, { strict: true }) (src/core.ts); failures are usage errors here. */
+function strictCliParams(raw: Record<string, unknown>, where: string): Params {
+  try { return strictParams(raw, where, '; see "tracklab generate --help" for ranges'); }
+  catch (e) { if (e instanceof ParameterError) throw new UsageError(e.message); throw e; }
 }
 function parseAssignment(text: string, flag: string): [string, string] {
   const eq = text.indexOf('=');
@@ -197,7 +187,7 @@ function generateCommand(argv: string[]): number {
     raw[k] = isNumericKey(k) ? parseNumber(v, `--set ${k}`) : v;
   }
   if (p.flags.has('seed')) raw.seed = parseNumber(one(p, 'seed')!, '--seed');
-  const params = strictParams(raw, 'parameters');
+  const params = strictCliParams(raw, 'parameters');
   let text: string;
   try { text = canonicalStringify(exportTrack(generateTrack(params))) + '\n'; }
   catch (e) { process.stderr.write(`tracklab: generation failed: ${e instanceof Error ? e.message : String(e)}\n`); return 1; }
@@ -237,7 +227,7 @@ function expandGrid(grid: unknown): { seed: number; params: Params }[] {
   for (let c = 0; c < total / seeds.length; c++) {
     const combo: Record<string, unknown> = {};
     keys.forEach((k, a) => { combo[k] = axes[a][index[a]]; });
-    for (const seed of seeds) cases.push({ seed, params: strictParams({ ...combo, seed }, `grid case ${cases.length}`) });
+    for (const seed of seeds) cases.push({ seed, params: strictCliParams({ ...combo, seed }, `grid case ${cases.length}`) });
     for (let a = axes.length - 1; a >= 0; a--) { if (++index[a] < axes[a].length) break; index[a] = 0; }
   }
   return cases;

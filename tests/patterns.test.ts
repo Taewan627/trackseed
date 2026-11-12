@@ -16,7 +16,7 @@ test('v0.5: Auto and count zero reproduce the golden v0.5 (deterministic-math) g
     fields: (keyof ReturnType<typeof generateTrack>)[]; cases: { params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   for (const entry of fixture.cases) for (const cornerPattern of ['auto', ...kinds] as const) {
     // the v0.5 golden is the legacy join (the default is now 'tangent')
-    const track = generateTrack({ ...entry.params, autoJoin: 'legacy', cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
+    const track = generateTrack({ height: 80, ...entry.params, autoJoin: 'legacy', cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.fields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256); assert.equal(track.patternReport.inserted, 0);
     assert.equal(track.patternReport.attempts, 0); assert.equal(track.patternReport.geometry, null);
@@ -30,7 +30,7 @@ test('v0.5: right-angle, hairpin and s-curve pattern layouts match the golden v0
     patternCases: { name: string; params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   assert.deepEqual(new Set(fixture.patternCases.map(c => c.params.cornerPattern)), new Set(kinds));
   for (const entry of fixture.patternCases) {
-    const track = generateTrack(entry.params);
+    const track = generateTrack({ height: 80, ...entry.params });
     assert.ok(track.patternReport.inserted > 0, entry.name);
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.patternFields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256, entry.name);
@@ -168,4 +168,24 @@ test('v0.4: high-speed approaches remain on asphalt at pattern arcs, collars and
       }
     }
   }
+});
+
+test('library error and audit-reason texts are English (no Hangul), and an exported document never carries a reason', () => {
+  const hangul = /[ᄀ-ᇿ㄰-㆏가-힯]/;
+  // the audit reasons of validatePatternGeometry (open seam, folded ribbons, self crossing)
+  const reasons = new Set<string>();
+  const crossing = Array.from({ length: 721 }, (_, i) => { const t = i / 720 * Math.PI * 2; return { x: 1000 * Math.sin(t), y: 0, z: 600 * Math.sin(2 * t) }; });
+  crossing[crossing.length - 1] = { ...crossing[0] };
+  const circle = Array.from({ length: 121 }, (_, i) => ({ x: 15 * Math.cos(i / 120 * Math.PI * 2), y: 0, z: 15 * Math.sin(i / 120 * Math.PI * 2) }));
+  circle[120] = { ...circle[0] };
+  const open = circle.map(p => ({ ...p })); open[120].x += 1;
+  for (const a of [validatePatternGeometry(crossing, 20), validatePatternGeometry(circle, 80), validatePatternGeometry(open, 20)]) for (const r of a.reasons) reasons.add(r);
+  assert.ok(reasons.size >= 3);
+  for (const r of reasons) assert.ok(/^[\x20-\x7e]+$/.test(r), r);
+  // a rejected layout: the thrown error and every collected reason are English
+  assert.throws(() => generateTrack({ cornerPattern: 'hairpin', cornerCount: 1, width: 80, curves: 3, cornerStrength: 20, seed: 0, size: 1 }), (e: unknown) =>
+    e instanceof PatternGenerationError && /^Corner pattern failed \(6 attempts\): [\x20-\x7e]+$/.test(e.message) && e.reasons.every(r => /^[\x20-\x7e]+$/.test(r)) && !hangul.test(e.message));
+  // an accepted layout stores an audit that is valid and has no reasons, so no message text can reach a document
+  const report = generateTrack({ cornerPattern: 'hairpin', cornerCount: 1, seed: 7 }).patternReport;
+  assert.deepEqual(report.geometry?.reasons, []);
 });

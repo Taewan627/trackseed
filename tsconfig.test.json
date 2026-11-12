@@ -7,5 +7,5 @@
     "outDir": ".test-build",
     "rootDir": "."
   },
-  "include": ["src/core.ts", "src/vehicle.ts", "src/schema.ts", "src/validate.ts", "src/metrics.ts", "src/polyline.ts", "tests/core.test.ts", "tests/patterns.test.ts", "tests/detmath.test.ts", "tests/schema.test.ts", "tests/validate.test.ts", "tests/metrics.test.ts", "tests/cli.test.ts", "tests/polyline.test.ts", "tests/autojoin.test.ts"]
+  "include": ["src/core.ts", "src/vehicle.ts", "src/schema.ts", "src/validate.ts", "src/metrics.ts", "src/polyline.ts", "tests/core.test.ts", "tests/patterns.test.ts", "tests/detmath.test.ts", "tests/schema.test.ts", "tests/validate.test.ts", "tests/metrics.test.ts", "tests/cli.test.ts", "tests/polyline.test.ts", "tests/autojoin.test.ts", "tests/schema-json.test.ts", "tests/strict.test.ts"]
 }

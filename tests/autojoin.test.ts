@@ -47,14 +47,14 @@ test('compat: all 1000 E1 v1.0.0 documents regenerate bit-identically (contentDi
     const stored = E1.cases[n++];
     assert.equal(stored.id, `${cid}:${seed}`);
     // 1. the v1.0.0 parameter object interpreted as a v1.0.0 document (no autoJoin key = legacy)
-    const doc = exportTrack(generateTrack({ ...over, seed, autoJoin: 'legacy' }));
+    const doc = exportTrack(generateTrack({ height: 80, ...over, seed, autoJoin: 'legacy' }));
     assert.equal(doc.integrity.contentDigest, stored.contentDigest, stored.id);
     assert.equal('autoJoin' in doc.params, false, stored.id);
     // 2. the stored document round-trips through the importer, which must regenerate it with the legacy join
     importTrack(JSON.parse(JSON.stringify(doc)), { verify: 'regenerate' });
     // 3. pattern configurations do not depend on the join at all: the plain (default-parameter) path matches too
     if (cid !== 'auto' && cid !== 'extreme') {
-      assert.equal(exportTrack(generateTrack({ ...over, seed })).integrity.contentDigest, stored.contentDigest, stored.id);
+      assert.equal(exportTrack(generateTrack({ height: 80, ...over, seed })).integrity.contentDigest, stored.contentDigest, stored.id);
       viaDefaultPath++;
     }
   }
@@ -67,8 +67,8 @@ test('compat: the 8 CI golden digests (legacy file for the legacy join, v1.1 fil
   assert.equal(Object.keys(legacy).length, 8); assert.deepEqual(Object.keys(current), Object.keys(legacy));
   for (const seed of [0, 1, 42, 7]) for (const pattern of ['auto', 'hairpin'] as const) {
     const key = `seed-${seed}-${pattern}`;
-    assert.equal(exportTrack(generateTrack({ seed, cornerPattern: pattern, autoJoin: 'legacy' })).integrity.contentDigest, legacy[key], key);
-    assert.equal(exportTrack(generateTrack({ seed, cornerPattern: pattern })).integrity.contentDigest, current[key], key);
+    assert.equal(exportTrack(generateTrack({ seed, cornerPattern: pattern, height: 80, autoJoin: 'legacy' })).integrity.contentDigest, legacy[key], key);
+    assert.equal(exportTrack(generateTrack({ seed, cornerPattern: pattern, height: 80 })).integrity.contentDigest, current[key], key);
     if (pattern === 'hairpin') assert.equal(current[key], legacy[key], key); // inert option: same document
     else assert.notEqual(current[key], legacy[key], key);
   }
@@ -207,4 +207,12 @@ test('schema: autoJoin is validated strictly', () => {
   const legacyDoc = JSON.parse(serializeTrack(generateTrack({ seed: 3, curves: 5, straight: 0.3, autoJoin: 'legacy' })));
   const forged = resign(d => { Object.assign(d, { geometry: legacyDoc.geometry }); });
   rejects(() => importTrack(forged, { verify: 'regenerate' }), /^\$\.integrity\.contentDigest$/);
+});
+
+test('DEFAULTS.height is 20 (WP3e); documents store their height, so documents written at the former default 80 are unaffected', () => {
+  assert.equal(DEFAULTS.height, 20); assert.equal(generateTrack({}).params.height, 20);
+  const old = exportTrack(generateTrack({ seed: 42, height: 80 }));
+  assert.equal(old.params.height, 80);
+  importTrack(JSON.parse(JSON.stringify(old)), { verify: 'regenerate' });
+  assert.notEqual(exportTrack(generateTrack({ seed: 42 })).integrity.contentDigest, old.integrity.contentDigest);
 });
