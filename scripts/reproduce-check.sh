@@ -28,8 +28,13 @@ compare() {
     let content;
     if (committed.endsWith(".gz")) content = sha(zlib.gunzipSync(a)) === sha(zlib.gunzipSync(b)) ? "yes" : "no";
     else if (committed.endsWith(".json")) { // JSON: compare the field named by env CMP_FIELD if set, else the whole file
-      const ja = JSON.parse(a), jb = JSON.parse(b), f = process.env.CMP_FIELD;
-      content = f ? (JSON.stringify(ja[f]) === JSON.stringify(jb[f]) ? "yes" : "no") : (raw === "yes" ? "yes" : "no");
+      const ja = JSON.parse(a), jb = JSON.parse(b), f = process.env.CMP_FIELD, k = process.env.CMP_CASE_KEY;
+      if (f && k) { // per-case key (e.g. contentDigest): compare id + k for each element of ja[f]; report the count of differing cases
+        const pick = arr => arr.map(c => [c.id, c[k]]);
+        const pa = pick(ja[f]), pb = pick(jb[f]), mb = new Map(pb.map(([id, v]) => [id, v]));
+        const diff = pa.filter(([id, v]) => mb.get(id) !== v).length;
+        content = (diff === 0 && pa.length === pb.length) ? "yes" : `no (${diff} of ${pa.length} cases differ in ${k})`;
+      } else content = f ? (JSON.stringify(ja[f]) === JSON.stringify(jb[f]) ? "yes" : "no") : (raw === "yes" ? "yes" : "no");
     } else content = raw;
     console.log([label, committed, fresh, raw, content].join("\t"));
   ' "$1" "$2" "$3" >> "$tsv" 2>> "$scratch/logs/compare.err" || echo -e "$1\t$2\t$3\terror\terror" >> "$tsv"
@@ -49,7 +54,9 @@ for g in "${groups[@]}"; do
     cd "$repo"
     CMP_FIELD=cases compare "E1 node22 legacy (experiments/e1, alias 6fea4d6)" "experiments/e1/results/node22.legacy.json" "$scratch/e1-node22.legacy.json"
     CMP_FIELD=cases compare "E1 node22 v05 (HISTORICAL: entry-v05 bundles current src; not reproducible by design)" "experiments/e1/results/node22.v05.json" "$scratch/e1-node22.v05.json"
-    for s in v100 v050; do CMP_FIELD=cases compare "E1 v1.0.0 node22 $s" "experiments/e1/results/v1.0.0/node22.$s.json" "$scratch/e1-node22.$s.json"; done
+    # v100: the document digest changed by design at generator 1.1.0 (the stamp is part of the serialized document), so compare contentDigest per case
+    CMP_FIELD=cases CMP_CASE_KEY=contentDigest compare "E1 v1.0.0 node22 v100 (contentDigest per case; digest differs by design since generator 1.1.0)" "experiments/e1/results/v1.0.0/node22.v100.json" "$scratch/e1-node22.v100.json"
+    CMP_FIELD=cases compare "E1 v1.0.0 node22 v050" "experiments/e1/results/v1.0.0/node22.v050.json" "$scratch/e1-node22.v050.json"
     ;;
   e2)
     note "e2: full validity run (48,600 cases)"
