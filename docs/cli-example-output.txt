@@ -1,7 +1,7 @@
-$ tracklab generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json
+$ trackseed generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json
 exit 0; track.json: 98546 bytes
 
-$ tracklab validate track.json --verify regenerate
+$ trackseed validate track.json --verify regenerate
 {
   "file": "track.json",
   "verify": "regenerate",
@@ -20,7 +20,7 @@ $ tracklab validate track.json --verify regenerate
 checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: true, 0
 exit 0
 
-$ tracklab metrics track.json
+$ trackseed metrics track.json
 {
   "sampleCount": 325,
   "length": 2606.746448590328,
@@ -35,7 +35,7 @@ $ tracklab metrics track.json
     36,
   ... (output trimmed)
 
-$ tracklab batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
-tracklab batch: 48 cases, 48 generated, 0 generation failures, 48 ok
+$ trackseed batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
+trackseed batch: 48 cases, 48 generated, 0 generation failures, 48 ok
 first JSONL line (cut to 520 characters):
 {"case":0,"seed":1,"params":{"curves":6,"straight":0,"width":40,"size":2,"height":20,"obstacles":3,"density":10,"scene":"mixed","seed":1,"cornerPattern":"auto","cornerCount":1,"cornerStrength":60,"autoJoin":"tangent"},"file":"case-0000-seed1.json","generated":true,"digest":"29f6c028e4749758276c6e43ed49e5c950ebc801bcb850ed5146e841a2df1488","ok":true,"violationCodes":[],"checkFailures":{},"metrics":{"sampleCount":360,"length":2470.720628549252,"boundingBoxArea":638642.2681548327,"straightLengthFraction":0,"meanAbsCur

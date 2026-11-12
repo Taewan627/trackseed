@@ -1,19 +1,40 @@
 {
-  "name": "tracklab-lite",
-  "private": true,
+  "name": "trackseed",
+  "description": "TrackSeed: a deterministic procedural racing-track generator with a validator, geometric metrics and a self-verifying exchange format",
   "license": "MIT",
   "author": "Taewan Kim",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Taewan627/tracklab.git"
-  },
   "version": "1.1.0",
   "type": "module",
-  "bin": { "tracklab": "cli-dist/cli.js" },
+  "main": "./cli-dist/index.js",
+  "types": "./cli-dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./cli-dist/index.d.ts", "default": "./cli-dist/index.js" },
+    "./core": { "types": "./cli-dist/core.d.ts", "default": "./cli-dist/core.js" },
+    "./validate": { "types": "./cli-dist/validate.d.ts", "default": "./cli-dist/validate.js" },
+    "./metrics": { "types": "./cli-dist/metrics.d.ts", "default": "./cli-dist/metrics.js" },
+    "./schema": { "types": "./cli-dist/schema.d.ts", "default": "./cli-dist/schema.js" },
+    "./polyline": { "types": "./cli-dist/polyline.d.ts", "default": "./cli-dist/polyline.js" },
+    "./detmath": { "types": "./cli-dist/detmath.d.ts", "default": "./cli-dist/detmath.js" },
+    "./schema.json": "./schema/trackdocument-v1.schema.json",
+    "./package.json": "./package.json"
+  },
+  "bin": { "trackseed": "cli-dist/cli.js", "tracklab": "cli-dist/cli.js" },
+  "files": [
+    "cli-dist/",
+    "schema/",
+    "README.md",
+    "LICENSE",
+    "Licence.txt",
+    "CHANGELOG.md",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "sideEffects": false,
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "build:cli": "tsc -p tsconfig.cli.json",
+    "prepack": "npm run build:cli",
+    "release-check": "node scripts/release-check.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "npm run build:cli && tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js .test-build/tests/validate.test.js .test-build/tests/metrics.test.js .test-build/tests/cli.test.js .test-build/tests/polyline.test.js .test-build/tests/autojoin.test.js .test-build/tests/schema-json.test.js .test-build/tests/strict.test.js .test-build/tests/robust.test.js",
     "test:browser": "npm run build && playwright test"

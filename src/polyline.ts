@@ -1,14 +1,14 @@
-// Generic input path: build a TrackLab Track-like object from an arbitrary closed polyline, so that
-// validateTrack() and computeMetrics() can be applied to tracks that were NOT produced by TrackLab.
+// Generic input path: build a TrackSeed Track-like object from an arbitrary closed polyline, so that
+// validateTrack() and computeMetrics() can be applied to tracks that were NOT produced by TrackSeed.
 //
 // Conventions (identical to src/core.ts):
 //   - the ground plane is x/z, y is height (up); all planar tests of the validator use x/z only;
 //   - the closed loop is stored with points[n] === points[0] (n distinct vertices, n + 1 entries);
 //   - normals[i] is the unit x/z vector (-dz, dx)/|d| of the central difference points[i+1]-points[i-1] (wrapping);
 //   - roadEdges[side] (side = -1 -> roadEdges[0], +1 -> roadEdges[1]) = fround(point + normal * side * width / 2),
-//     with the same float32 rounding (Math.fround) as TrackLab's rendered ribbon;
+//     with the same float32 rounding (Math.fround) as TrackSeed's rendered ribbon;
 //   - straightSegments are all false (a third-party polyline carries no straight/curve labelling);
-//   - bounds are the x/z/y extent of the centerline widened by width / 2 in x and z (no TrackLab curb/sidewalk margin).
+//   - bounds are the x/z/y extent of the centerline widened by width / 2 in x and z (no TrackSeed curb/sidewalk margin).
 // Nothing is repaired, reordered, smoothed or resampled unless a resample option is requested (OFF by default). The one
 // preprocessing step that is always applied: consecutive duplicate vertices (distance <= DUPLICATE_TOLERANCE x bounding-box
 // diagonal, including the last vertex against the first) are removed and counted in `duplicatePointsRemoved`.

@@ -268,14 +268,14 @@ test('quality: real left/right key input has bounded yaw and keeps map position 
   await page.locator('button.generate').click();
   await page.locator('#viewport > canvas').focus(); await page.keyboard.press('c');
   await page.keyboard.down('ArrowUp');
-  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBeGreaterThan(25);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.pose.speed)).toBeGreaterThan(25);
   const traces = [];
   for (const key of ['ArrowRight', 'ArrowLeft']) {
     await page.keyboard.down(key);
     const frames = await page.evaluate(() => new Promise(resolve => {
       const frames = [];
       const sample = () => {
-        const { pose, marker } = window.__tracklab;
+        const { pose, marker } = window.__trackseed;
         frames.push({ x: pose.x, z: pose.z, heading: pose.heading, speed: pose.speed,
           mapX: marker.x, mapY: marker.y, mapHeading: marker.heading });
         if (frames.length === 12) resolve(frames);
@@ -297,7 +297,7 @@ test('quality: real left/right key input has bounded yaw and keeps map position 
   }
   await page.keyboard.up('ArrowUp');
   await page.keyboard.down('Space');
-  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.pose.speed)).toBe(0);
   await page.keyboard.up('Space');
   writeFileSync('test-results/quality-keyboard.json', JSON.stringify(traces, null, 2));
   await page.screenshot({ path: 'test-results/quality-driving.png' });

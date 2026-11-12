@@ -11,7 +11,7 @@ const run = (args: string[], cwd?: string) => {
   const r = spawnSync(process.execPath, [CLI, ...args], { encoding: 'utf8', cwd, maxBuffer: 1 << 28 });
   return { code: r.status, out: r.stdout, err: r.stderr };
 };
-const tmp = () => mkdtempSync(join(tmpdir(), 'tracklab-cli-'));
+const tmp = () => mkdtempSync(join(tmpdir(), 'trackseed-cli-'));
 
 test('cli: --help for the program and every command, exit 0 and a Usage line', () => {
   for (const args of [['--help'], ['generate', '--help'], ['batch', '--help'], ['validate', '--help'], ['metrics', '--help']]) {
@@ -174,7 +174,7 @@ test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () =>
     // Errors: bad mode, bad ratio, conflicting spec, non-numeric limit
     for (const bad of [['--closure-tangent-mode', 'sloppy'], [...R, '--seam-ratio', 'x'], [...R, '--seam-ratio', '-1'],
       [...R, '--seam-ratio', '3', '--limit', 'seamRatio=3'], ['--limit', 'closureTangentMode=absolute']]) {
-      const r = run(['validate', file, ...bad]); assert.equal(r.code, 2, bad.join(' ')); assert.match(r.err, /tracklab:/);
+      const r = run(['validate', file, ...bad]); assert.equal(r.code, 2, bad.join(' ')); assert.match(r.err, /trackseed:/);
     }
     // batch: same options, summary reflects the mode; documents and digests are unaffected.
     const grid = join(dir, 'g.json');

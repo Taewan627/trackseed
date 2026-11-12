@@ -8,7 +8,7 @@ import { DEFAULTS, LIMITS, ParameterError, generateTrack, strictParams, type Par
 import { serializeTrack } from '../src/schema.js';
 
 const CLI = join(process.cwd(), 'cli-dist', 'cli.js');
-const CLI_HINT = '; see "tracklab generate --help" for ranges';
+const CLI_HINT = '; see "trackseed generate --help" for ranges';
 const BAD: [string, Record<string, unknown>, RegExp][] = [
   ['unknown key', { seed: 1, turbo: 1 }, /unknown parameter "turbo"/],
   ['number below range', { curves: 2 }, /parameter "curves" = 2 is not valid \(sanitized to 3/],
@@ -56,7 +56,7 @@ test('strict: every out-of-range, off-grid, mistyped or unknown parameter throws
 });
 
 test('strict: the CLI rejects exactly what the library rejects (same function), with the same message, and accepts exactly the same input', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'tracklab-strict-'));
+  const dir = mkdtempSync(join(tmpdir(), 'trackseed-strict-'));
   try {
     const run = (input: Record<string, unknown>) => {
       const file = join(dir, 'p.json'); writeFileSync(file, JSON.stringify(input, (_k, v) => v === undefined ? '__undefined__' : v));
@@ -69,7 +69,7 @@ test('strict: the CLI rejects exactly what the library rejects (same function), 
       assert.equal(r.status, 2, name);
       let message = '';
       try { strictParams(input, 'parameters', CLI_HINT); } catch (e) { message = (e as Error).message; }
-      assert.ok(message.length > 0, name); assert.ok(r.stderr.includes(`tracklab: ${message}\n`), `${name}: ${r.stderr}`);
+      assert.ok(message.length > 0, name); assert.ok(r.stderr.includes(`trackseed: ${message}\n`), `${name}: ${r.stderr}`);
     }
     for (const input of GOOD) {
       const r = run(input);

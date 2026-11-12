@@ -1,12 +1,12 @@
-# Applying TrackLab to third-party track generators
+# Applying TrackSeed to third-party track generators
 
-TrackLab's validator and metrics work on a closed polyline, not only on TrackLab's own documents. `src/polyline.ts` builds a
+TrackSeed's validator and metrics work on a closed polyline, not only on TrackSeed's own documents. `src/polyline.ts` builds a
 Track-like object from `{ points: [{x, y?, z}], width, closed: true }` (x/z ground plane, y height; normals and float32 road edges
 as in `src/core.ts`; no repair, no resampling unless asked). Command line:
 
 ```
-tracklab validate-polyline track.json --width 4      # JSON {"points": [[x,z], ...]} or [{x,y,z}, ...]; .csv: x,z[,y]
-tracklab metrics-polyline  track.csv  --width 4
+trackseed validate-polyline track.json --width 4      # JSON {"points": [[x,z], ...]} or [{x,y,z}, ...]; .csv: x,z[,y]
+trackseed metrics-polyline  track.csv  --width 4
 ```
 
 Exit codes and the report format are those of `validate` and `metrics`; `--resample-spacing S` (off by default) resamples by

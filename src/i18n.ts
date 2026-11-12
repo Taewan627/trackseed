@@ -1,16 +1,16 @@
 // UI-only dictionary: English (default) and Korean. Nothing here touches generation, validation or
 // export. Korean values are the original strings of the Korean-only UI, kept verbatim.
 //
-// Language resolution order: ?lang=en|ko in the URL, then localStorage ('tracklab-lang'), then English.
+// Language resolution order: ?lang=en|ko in the URL, then localStorage ('trackseed-lang'), then English.
 // Every storage access is wrapped in try/catch (private mode, blocked storage, sandboxed iframes).
 
 export type Lang = 'en' | 'ko';
 export const LANGUAGES: readonly Lang[] = ['en', 'ko'];
-export const LANG_STORAGE_KEY = 'tracklab-lang';
+export const LANG_STORAGE_KEY = 'trackseed-lang';
 
 const en = {
-  'meta.description': 'TrackLab Lite — a local 3D lab for procedural track generation and manual driving',
-  'brand.aria': 'TrackLab Lite home',
+  'meta.description': 'TrackSeed — a local 3D lab for procedural track generation and manual driving',
+  'brand.aria': 'TrackSeed home',
   'lang.group.aria': 'Language',
   'panel.title': 'Track Lab',
   'panel.subtitle': 'Changes apply automatically.',
@@ -105,8 +105,8 @@ type Dict = typeof en;
 export type Key = keyof Dict;
 
 const ko: Dict = {
-  'meta.description': 'TrackLab Lite — 절차적 트랙 생성과 직접 주행을 위한 로컬 3D 실험실',
-  'brand.aria': 'TrackLab Lite 홈',
+  'meta.description': 'TrackSeed — 절차적 트랙 생성과 직접 주행을 위한 로컬 3D 실험실',
+  'brand.aria': 'TrackSeed 홈',
   'lang.group.aria': '언어',
   'panel.title': '트랙 실험실',
   'panel.subtitle': '조건을 조절하면 자동 반영됩니다.',

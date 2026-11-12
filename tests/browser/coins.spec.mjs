@@ -8,7 +8,7 @@ async function open(page) {
 
 async function visitCoin(page, index = 0) {
   await page.evaluate(index => {
-    const s = window.__tracklab, coin = s.coins.positions[index];
+    const s = window.__trackseed, coin = s.coins.positions[index];
     Object.assign(s.pose, { x: coin.x, y: coin.y, z: coin.z, speed: 0, vx: 0, vz: 0 });
   }, index);
 }
@@ -34,7 +34,7 @@ for (const mode of ['overview', 'chase']) {
       return { background: getComputedStyle(panel).backgroundColor, opacity: getComputedStyle(panel).opacity,
         canvasOpacity: getComputedStyle(canvas).opacity,
         textOpacity: getComputedStyle(document.querySelector('.mini-title')).opacity,
-        transparent, opaque, total: pixels.length / 4, mode: window.__tracklab.mode };
+        transparent, opaque, total: pixels.length / 4, mode: window.__trackseed.mode };
     });
     expect(result.background).toBe('rgba(22, 33, 39, 0.45)'); expect(result.opacity).toBe('1');
     expect(result.canvasOpacity).toBe('1'); expect(result.textOpacity).toBe('1');
@@ -47,20 +47,20 @@ for (const mode of ['overview', 'chase']) {
 
 test('coins: collect once, show completion, and manually regenerate a fresh counter and ten visible coins', async ({ page }) => {
   await open(page);
-  const initial = await page.evaluate(() => window.__tracklab.coins.positions);
+  const initial = await page.evaluate(() => window.__trackseed.coins.positions);
   await visitCoin(page);
   await expect(page.locator('#coin-count')).toHaveText('1 / 10');
-  expect(await page.evaluate(() => window.__tracklab.coins.remaining)).toBe(9);
+  expect(await page.evaluate(() => window.__trackseed.coins.remaining)).toBe(9);
   // Keep the real animation clock: replacing performance.now after startup can
   // invalidate the app's existing frame timestamp on a slow test machine.
   await frames(page, 12);
   await expect(page.locator('#coin-count')).toHaveText('1 / 10');
-  expect(await page.evaluate(() => window.__tracklab.coins.collected)).toEqual([0]);
+  expect(await page.evaluate(() => window.__trackseed.coins.collected)).toEqual([0]);
   for (let i = 1; i < 10; i++) {
     await visitCoin(page, i);
     await expect(page.locator('#coin-count')).toHaveText(`${i + 1} / 10`);
   }
-  expect(await page.evaluate(() => window.__tracklab.coins.remaining)).toBe(0);
+  expect(await page.evaluate(() => window.__trackseed.coins.remaining)).toBe(0);
   await expect(page.locator('#coin-complete')).toBeVisible();
   await page.screenshot({ path: 'test-results/coins-complete.png', animations: 'allow' });
   await visitCoin(page); await frames(page, 12);
@@ -68,7 +68,7 @@ test('coins: collect once, show completion, and manually regenerate a fresh coun
   await page.locator('button.generate').click();
   await expect(page.locator('#coin-count')).toHaveText('0 / 10');
   await expect(page.locator('#coin-complete')).toBeHidden();
-  const reset = await page.evaluate(() => window.__tracklab.coins);
+  const reset = await page.evaluate(() => window.__trackseed.coins);
   expect(reset.remaining).toBe(10); expect(reset.collected).toEqual([]); expect(reset.positions).toEqual(initial);
 });
 
@@ -77,16 +77,16 @@ test('coins: automatic width and Seed changes reset pickups and match regenerate
   for (const [index, mode] of ['overview', 'chase'].entries()) {
     await page.locator(`#${mode}`).click(); await visitCoin(page);
     await expect(page.locator('#coin-count')).toHaveText('1 / 10');
-    const before = await page.evaluate(() => window.__tracklab.generation);
+    const before = await page.evaluate(() => window.__trackseed.generation);
     await page.locator('#width-value').fill(String(index ? 80 : 20));
     await page.locator('#seed').fill(String(9900 + index));
-    await expect.poll(() => page.evaluate(() => window.__tracklab.generation)).toBeGreaterThan(before);
-    await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.seed)).toBe(9900 + index);
+    await expect.poll(() => page.evaluate(() => window.__trackseed.generation)).toBeGreaterThan(before);
+    await expect.poll(() => page.evaluate(() => window.__trackseed.track.params.seed)).toBe(9900 + index);
     await expect(page.locator('#coin-count')).toHaveText('0 / 10');
     await expect(page.locator('#coin-complete')).toBeHidden();
     const state = await page.evaluate(async () => {
       const { generateCoins } = await import('/src/coins.ts');
-      const s = window.__tracklab;
+      const s = window.__trackseed;
       return { remaining: s.coins.remaining, count: s.coins.count, mode: s.mode, speed: s.pose.speed,
         positions: s.coins.positions, expected: generateCoins(s.track) };
     });
@@ -101,13 +101,13 @@ test('coins: real keyboard driving collects the golden pickup ahead of the car',
     await page.locator(`#${key}-value`).fill(String(value));
   }
   await expect.poll(() => page.evaluate(() => {
-    const p = window.__tracklab.track.params;
+    const p = window.__trackseed.track.params;
     return p.height === 0 && p.width === 80 && p.obstacles === 0 && p.density === 0;
   })).toBe(true);
   await page.evaluate(async () => {
     const { project, roadHeight } = await import('/src/core.ts');
     const { COIN_PICKUP_RADIUS } = await import('/src/coins.ts');
-    const s = window.__tracklab, coin = s.coins.positions[0], hit = project(s.track, coin.x, coin.z);
+    const s = window.__trackseed, coin = s.coins.positions[0], hit = project(s.track, coin.x, coin.z);
     const x = coin.x - hit.dx * (COIN_PICKUP_RADIUS + 3), z = coin.z - hit.dz * (COIN_PICKUP_RADIUS + 3);
     Object.assign(s.pose, { x, z, y: roadHeight(s.track, x, z), speed: 0, vx: 0, vz: 0,
       heading: Math.atan2(hit.dx, hit.dz), roadIndex: hit.index });
@@ -118,10 +118,10 @@ test('coins: real keyboard driving collects the golden pickup ahead of the car',
   await page.locator('#viewport > canvas').focus(); await page.keyboard.down('ArrowUp');
   await expect(page.locator('#coin-count')).toHaveText('1 / 10');
   await page.keyboard.up('ArrowUp'); await page.keyboard.down('Space');
-  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.pose.speed)).toBe(0);
   await page.keyboard.up('Space');
-  expect(await page.evaluate(() => window.__tracklab.coins.collected)).toEqual([0]);
-  expect(await page.evaluate(() => window.__tracklab.coins.remaining)).toBe(9);
+  expect(await page.evaluate(() => window.__trackseed.coins.collected)).toEqual([0]);
+  expect(await page.evaluate(() => window.__trackseed.coins.remaining)).toBe(9);
 });
 
 test('coins: hidden pickups stop rendering and their shared GPU resources are disposed on regeneration', async ({ page }) => {

@@ -14,7 +14,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!;
 const T = (key: Key) => textAttr(key);
 app.innerHTML = `
   <header class="app-header">
-    <a class="brand" href="./" aria-label="${t('brand.aria')}" ${attrAttr(['aria-label', 'brand.aria'])}><span class="brand-mark">⌁</span><strong>TrackLab<span> Lite</span></strong><span class="version">v${VERSION}</span></a>
+    <a class="brand" href="./" aria-label="${t('brand.aria')}" ${attrAttr(['aria-label', 'brand.aria'])}><span class="brand-mark">⌁</span><strong>TrackSeed</strong><span class="version">v${VERSION}</span></a>
     <div class="header-path">WORKSPACE <span>/</span> Procedural track studio</div>
     <div class="local-badge"><i></i> LOCAL SESSION</div>
     <div class="lang-toggle" id="lang-toggle" role="group" aria-label="${t('lang.group.aria')}" ${attrAttr(['aria-label', 'lang.group.aria'])}><button type="button" id="lang-en" data-lang="en" lang="en" aria-pressed="true">EN</button><button type="button" id="lang-ko" data-lang="ko" lang="ko" aria-pressed="false">한국어</button></div>
@@ -252,7 +252,7 @@ function exportJson() {
   const json = serializeTrack(track);
   const digest: string = JSON.parse(json).integrity.digest;
   lastExportDigest = digest;
-  const name = `tracklab-${track.params.seed}-${digest.slice(0, 8)}.json`;
+  const name = `trackseed-${track.params.seed}-${digest.slice(0, 8)}.json`;
   const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -375,7 +375,7 @@ try {
   });
   // Read-only diagnostics only in the local dev server, explicitly opted into by tests.
   if (import.meta.env.DEV && new URLSearchParams(location.search).has('test')) {
-    Object.defineProperty(window, '__tracklab', { get: () => ({ track, pose, generation,
+    Object.defineProperty(window, '__trackseed', { get: () => ({ track, pose, generation,
       coins: { positions: coinRun.coins, collected: coinRun.collectedIds, count: coinRun.count,
         remaining: view.visibleCoinCount, total: COIN_COUNT },
       exportDigest: lastExportDigest, validation: lastValidation,

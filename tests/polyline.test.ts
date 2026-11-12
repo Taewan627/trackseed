@@ -13,7 +13,7 @@ const CLI = join(process.cwd(), 'cli-dist', 'cli.js');
 const run = (args: string[]) => { const r = spawnSync(process.execPath, [CLI, ...args], { encoding: 'utf8' }); return { code: r.status, out: r.stdout, err: r.stderr }; };
 const circle = (n: number, r: number) => Array.from({ length: n }, (_, i) => ({ x: r * Math.cos(2 * Math.PI * i / n), z: r * Math.sin(2 * Math.PI * i / n) }));
 
-test('polyline: a TrackLab track re-entered as a polyline gives identical edges, validation and metrics', () => {
+test('polyline: a TrackSeed track re-entered as a polyline gives identical edges, validation and metrics', () => {
   for (const seed of [1, 7, 42]) for (const cornerPattern of ['auto', 'hairpin'] as const) {
     const t = generateTrack({ seed, cornerPattern, cornerCount: 1 });
     const pl = trackFromPolyline({ points: t.points, width: t.params.width, closed: true });
@@ -67,7 +67,7 @@ test('polyline: parsers', () => {
 });
 
 test('cli: validate-polyline / metrics-polyline', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'tracklab-pl-'));
+  const dir = mkdtempSync(join(tmpdir(), 'trackseed-pl-'));
   try {
     const pts = circle(60, 200), json = join(dir, 'c.json'), csv = join(dir, 'c.csv');
     writeFileSync(json, JSON.stringify({ points: pts.map(p => [p.x, p.z]) }));

@@ -2,11 +2,31 @@
 
 ## Unreleased
 
-Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackLab's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
+This entry combines two changes made after the 1.1.0 tree was frozen: the rename to TrackSeed, and the validator and polyline-path robustness work (WP7a, described below).
 
-### Changed (behaviour only outside TrackLab's scale, or for inputs that crashed or were misreported)
+### Renamed
 
-- **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackLab's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
+- **The project is now called TrackSeed** (it was TrackLab, and TrackLab Lite in the web UI). Package name `trackseed`; CLI command `trackseed` (`cli-dist/cli.js`), usage and error text, web UI title, header, `<title>` and the English and Korean strings, README, documentation and CITATION.cff title were renamed. The command `tracklab` stays as a deprecated second `bin` entry for one release; `trackseed --help` says so.
+- **Document format identifiers keep the former name.** The schema name `tracklab.track` and the generator name `tracklab` in exported documents are unchanged on purpose: both are inside the digests, so renaming them would change every `digest` and `contentDigest` and break the reproduction of the committed results. `schemaVersion` stays 1.
+- Smaller user-visible changes: the exported file name is `trackseed-<seed>-<digest8>.json` (was `tracklab-...`), the language preference is stored under the `trackseed-lang` key (a stored `tracklab-lang` value is ignored, so a returning browser starts in English), the development diagnostic object is `window.__trackseed` (was `__tracklab`; absent from production builds as before).
+- No change to generated geometry, validator results, metrics or document bytes: the committed determinism goldens (`tests/fixtures/ci-golden-digests.json`, `ci-golden-digests-v1.1.json`) pass unchanged.
+
+Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackSeed's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
+
+### Repository and documentation
+
+- `docs/history/` (the v0.4 Korean README and the historical development and deployment reports) is removed from the tree; the files remain in the git history. Links to them were fixed.
+- README: new "Provenance" section and new "Development process and AI use" section (maintainer responsibility, the models named in the commit trailers, commit counts, the tooling identity used up to 2026-11-12 UTC).
+
+- **Installable package.** `private` is removed. `package.json` gains `main`, `types`, `exports` (`trackseed`, `trackseed/core`, `/validate`, `/metrics`, `/schema`, `/polyline`, `/detmath`, `trackseed/schema.json`), `bin` (`trackseed`, deprecated alias `tracklab`), `files` (built `cli-dist/` with `.d.ts` declarations, `schema/`, README, `LICENSE`, `Licence.txt`, CHANGELOG, THIRD_PARTY_NOTICES) and a `prepack` script that builds. New `src/index.ts` is the library entry point; `tsconfig.cli.json` also emits declarations. The `repository` field is omitted until the repository URL is final. Checked with `npm pack` and an install into an empty project: ESM import, `npx trackseed generate`, type-check against the declarations.
+
+- **Public demo.** `vercel.json` no longer sends `X-Robots-Tag: noindex, nofollow, noarchive`; `X-Content-Type-Options: nosniff` stays. `scripts/prepare-vercel-preview.mjs`, `scripts/verify-vercel-production.mjs` and `.vercelignore` are removed: they implemented a private, access-protected prebuilt deployment (robots exclusion, a content audit with a pattern list naming the maintainer's employer and products, a protection-bypass check) that does not apply to a public demo. A normal Vercel deployment of the repository builds with `npm run build` (`vercel.json`).
+
+- **`scripts/release-check.mjs`** (`npm run release-check`) fails while any tracked file outside `experiments/` still contains a PI token (an open decision for the maintainer), while `package.json`, `src/version.ts` and `CITATION.cff` disagree on the version, or while `npm pack --dry-run` lists a file outside the package whitelist (node_modules, test-results, `.env*`, tmp, sources, ...).
+
+### Changed (behaviour only outside TrackSeed's scale, or for inputs that crashed or were misreported)
+
+- **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackSeed's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
 - **Segment intersection test** uses the product of signs instead of the product of cross products (same result, no underflow at small scale). The spatial-hash cell floor scales with f, and above 50,000 vertices the cell is also capped at 4 mean segment lengths (200,000 vertices: about 1 s instead of 15 s; the set of reported pairs is the same).
 - **Polyline path removes consecutive duplicate vertices** (distance <= 1e-9 x bounding-box diagonal, last against first too) and reports `duplicatePointsRemoved` (CLI: `input.duplicatePointsRemoved`). A duplicated vertex used to give `SELF_INTERSECTION_CENTERLINE`, `SELF_INTERSECTION_EDGE` and `EDGE_FOLD` on a clean circle. Fewer than 3 distinct vertices is a `RangeError` (CLI exit 2). Generated tracks have no duplicates and do not use this path.
 
@@ -44,7 +64,7 @@ Changes since the commit that set the version to 1.0.0 (`eb8598f`). Every item p
 ### Documentation and library text
 
 - Library error and audit-reason texts (coins, vehicle, patterns) are in English.
-- README rewritten for reviewers; the earlier Korean README and historical reports are in [docs/history/](docs/history/). The wording on digests states that they give integrity checking, not authentication or provenance.
+- README rewritten for reviewers; the earlier Korean README and historical reports were kept in `docs/history/` at that time (removed from the tree after 1.1.0; they remain in the git history). The wording on digests states that they give integrity checking, not authentication or provenance.
 
 ### Compatibility
 

@@ -68,7 +68,7 @@ const REDUCE_LIMIT = 8589934592; // 2^33: n = round(x*2/pi) must have <= 33 bits
 
 // Returns the quadrant n (mod 4, in 0..3) and writes the reduced argument to `reduced[0]`
 // (|r| <= ~pi/4). Cody-Waite reduction with exactly representable pieces of pi/2. Accuracy is
-// ~1e-15 absolute for |x| <= 2^33 (~8.6e9); TrackLab's largest argument is ~4.3e7 (seed*0.02).
+// ~1e-15 absolute for |x| <= 2^33 (~8.6e9); TrackSeed's largest argument is ~4.3e7 (seed*0.02).
 // Beyond 2^33 the argument is first folded with the exact IEEE remainder `%` (deterministic, but
 // accuracy degrades roughly like |x|*1e-16 there).
 const reduced = [0];

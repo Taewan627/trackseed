@@ -37,7 +37,7 @@ test('toggle switches language in place without regenerating, re-renders dynamic
   await page.goto('/?test=1'); await ready(page);
   await page.locator('#seed').fill('777'); await page.locator('button.generate').click();
   await expect(page.locator('#active-seed')).toHaveText('777');
-  const before = await page.evaluate(() => ({ generation: window.__tracklab.generation, samples: window.__tracklab.track.points.length }));
+  const before = await page.evaluate(() => ({ generation: window.__trackseed.generation, samples: window.__trackseed.track.points.length }));
   await page.locator('#lang-ko').click();
   await expect(page.locator('#status')).toContainText('생성 완료');
   await expect(page.locator('#status')).toContainText('Seed 777');
@@ -51,7 +51,7 @@ test('toggle switches language in place without regenerating, re-renders dynamic
   await expect(page.locator('#camera-label')).toHaveText('Vehicle chase');
   await expect(page.locator('#orbit-hint')).toContainText('accelerate');
   await expect(page.locator('#status')).toContainText('Generated');
-  const after = await page.evaluate(() => ({ generation: window.__tracklab.generation, samples: window.__tracklab.track.points.length }));
+  const after = await page.evaluate(() => ({ generation: window.__trackseed.generation, samples: window.__trackseed.track.points.length }));
   expect(after).toEqual(before);
   await expect(page.locator('#seed')).toHaveValue('777');
 });
@@ -60,7 +60,7 @@ test('the language choice persists after reload (localStorage), and ?lang overri
   await page.goto('/'); await ready(page);
   await page.locator('#lang-ko').click();
   await expect(page.locator('label[for="width"]')).toHaveText('트랙 폭');
-  expect(await page.evaluate(() => localStorage.getItem('tracklab-lang'))).toBe('ko');
+  expect(await page.evaluate(() => localStorage.getItem('trackseed-lang'))).toBe('ko');
   await page.reload(); await ready(page);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
   await expect(page.locator('label[for="width"]')).toHaveText('트랙 폭');
