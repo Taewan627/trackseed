@@ -120,8 +120,10 @@ against first) are removed before the edges are built and counted in input.dupli
 non-finite points are reported, fewer than 3 distinct points are rejected.
 --resample-spacing S  OFF by default; resample linearly by arc length (about S units apart) before validating
 --resample-smooth S   OFF by default; lay a closed centripetal Catmull-Rom spline through the given points, then resample it by arc
-                      length at S. Rounds the corners of a coarsely sampled curve but passes through every input point (a vertex that
-                      sticks out stays a sharp feature). Exclusive with --resample-spacing. Both change the validated geometry.
+                      length at S. Rounds the corners of a coarsely sampled curve, but it passes through every input point, so it can
+                      hide a spike of up to about one road width (measured on a circle of radius 500, width 10; docs/validator.md,
+                      smooth resampling). Validate the raw polyline first and use this option only to separate sampling effects.
+                      Exclusive with --resample-spacing. Both change the validated geometry.
 --closure-tangent-mode, --seam-ratio, --absolute-tolerances, --no-sharp-vertex and --no-undersampled-check: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
 Output and exit codes as for "validate" ({ file, width, input, ok, violations, checks }); exit 2 for unreadable input.
 
