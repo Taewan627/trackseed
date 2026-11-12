@@ -1,6 +1,7 @@
 // EXPLORATORY (not pre-registered; run after the HELD-OUT run): numbers quoted in docs/generator-auto-join.md that are not E7 predictions.
 // Usage: node experiments/e7/exploratory.mjs > experiments/e7/results/exploratory.txt
 import { V100_PIN } from '../_v100-params.mjs'; // height 80 (v1.0.0 default) wherever height is left unset below
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs'; // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here)
 const core = await import(new URL('../../cli-dist/core.js', import.meta.url));
 const val = await import(new URL('../../cli-dist/validate.js', import.meta.url));
 const met = await import(new URL('../../cli-dist/metrics.js', import.meta.url));
@@ -9,7 +10,7 @@ const median = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1;
 const out = [];
 // 1. the auditor's default-parameter measurement: seeds 0..199, validator v1.1 default
 for (const join of ['legacy', 'tangent']) {
-  let ok = 0; for (let seed = 0; seed < 200; seed++) if (val.validateTrack(core.generateTrack({ ...V100_PIN, seed, autoJoin: join })).ok) ok++;
+  let ok = 0; for (let seed = 0; seed < 200; seed++) if (val.validateTrack(core.generateTrack({ ...V100_PIN, seed, autoJoin: join }), V12_VALIDATOR_PIN).ok) ok++;
   out.push(`default parameters, seeds 0..199, autoJoin ${join}: ${ok}/200 ok`);
 }
 // 2. per-join-vertex turn at curves 8, straight 0.3, seeds 0..299 (the auditor's setup): max turn over the join vertices of each track

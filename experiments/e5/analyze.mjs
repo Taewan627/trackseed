@@ -4,6 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { V100_PIN } from '../_v100-params.mjs';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs'; // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here)
 const here = dirname(fileURLToPath(import.meta.url)), root = join(here, '../..');
 // Optional E5_SCRATCH=<dir>: read results/ and out/ from <dir> instead of the repository (used for verification re-runs).
 const base = process.env.E5_SCRATCH ?? here, R = join(base, 'results'), O = join(base, 'out');
@@ -73,7 +74,7 @@ const validityLines = new Map(okPolys.map(p => [p.seed, { seed: p.seed }]));
 for (const W of WIDTHS) {
   let pass = 0; const errCases = {}, warnCases = {}, firstError = {};
   for (const p of okPolys) {
-    const v = validateTrack(trackFromPolyline(toInput(p, W, false)));
+    const v = validateTrack(trackFromPolyline(toInput(p, W, false)), V12_VALIDATOR_PIN);
     if (v.ok) pass++;
     const codes = new Map(); for (const x of v.violations) codes.set(x.code, x.severity);
     // violations list is capped per check, but every failing code appears at least once in it
@@ -86,7 +87,7 @@ for (const W of WIDTHS) {
 }
 { // 3D at W=4: MAX_SLOPE only
   let slope = 0, ok3 = 0;
-  for (const p of okPolys) { const v = validateTrack(trackFromPolyline(toInput(p, 4, true))); if (v.ok) ok3++; if (v.violations.some(x => x.code === 'MAX_SLOPE')) slope++; }
+  for (const p of okPolys) { const v = validateTrack(trackFromPolyline(toInput(p, 4, true)), V12_VALIDATOR_PIN); if (v.ok) ok3++; if (v.violations.some(x => x.code === 'MAX_SLOPE')) slope++; }
   q2.threeD = { width: 4, okCases: ok3, maxSlopeWarningCases: slope };
 }
 writeFileSync(join(R, 'validity.jsonl'), [...validityLines.values()].map(x => JSON.stringify(x)).join('\n') + '\n');

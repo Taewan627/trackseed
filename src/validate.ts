@@ -26,7 +26,7 @@ export interface Violation {
   limit?: number;
 }
 export interface CheckSummary {
-  id: 'structure' | 'finite' | 'closure' | 'local-kink' | 'self-intersection' | 'edge-fold' | 'min-turn-radius' | 'max-slope';
+  id: 'structure' | 'finite' | 'closure' | 'local-kink' | 'sharp-vertex' | 'self-intersection' | 'edge-fold' | 'min-turn-radius' | 'max-slope' | 'undersampled';
   /** Severity carried by this check's violations. */
   severity: Severity;
   /** True when the check ran and found nothing. */
@@ -83,6 +83,22 @@ export interface ValidateOptions {
   kinkSpikeSpacing?: number;
   /** ... AND exceeds this fraction of the road half width. */
   kinkSpikeHalfWidth?: number;
+  /**
+   * Absolute per-vertex rule (validator v1.3, mode 'kink' only): SHARP_VERTEX (error) at every vertex whose heading change (degrees, x/z)
+   * exceeds this, whatever its neighbours do. Default 30. Infinity (library) or 180 (the largest possible turn; CLI --limit, which takes
+   * finite numbers) disables it; --no-sharp-vertex also does. When disabled the check is not listed in `checks`.
+   */
+  sharpVertexDegrees?: number;
+  /**
+   * Sampling diagnostic (validator v1.3, mode 'kink' only): UNDERSAMPLED (warning) iff more than `undersampledShare` of the n vertices
+   * turn by more than `undersampledTurnDegrees`. `undersampledCheck: false` (CLI --no-undersampled-check) disables the check; it is then not
+   * listed in `checks`. Library and CLI-flag option, not a numeric `--limit` key.
+   */
+  undersampledCheck?: boolean;
+  /** UNDERSAMPLED: turn (degrees) above which a vertex counts as too sharply sampled. Default 12 (the documented sampling requirement s <= 0.2 R_min). */
+  undersampledTurnDegrees?: number;
+  /** UNDERSAMPLED: warn iff the share (0..1) of such vertices exceeds this. Default 0.1. */
+  undersampledShare?: number;
   /** A ribbon triangle whose x/z cross product is <= this (units^2) counts as flipped or degenerate. Default 1e-5. */
   foldEpsilon?: number;
   /** Warn when the local radius 1/|kappa| < factor * (width / 2). Default 1. */
@@ -99,12 +115,14 @@ export interface ValidateOptions {
    */
   absoluteTolerances?: boolean;
 }
-export const DEFAULT_VALIDATE_OPTIONS: Required<Omit<ValidateOptions, 'absoluteTolerances'>> = {
+export const DEFAULT_VALIDATE_OPTIONS: Required<Omit<ValidateOptions, 'absoluteTolerances' | 'undersampledCheck'>> = {
   closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'kink', foldEpsilon: 1e-5,
   // kink* defaults = the rule frozen on DEV in experiments/e6 (results/dev/FROZEN.json): rule 'outlier', window 3, maximum, ratio 3, floor 12 degrees.
   // kinkTurnDegrees, kinkCurvature, kinkSpike* belong to the other candidate rules and are inert under the default kinkRule.
   kinkRule: 'outlier', kinkTurnDegrees: 20, kinkCurvature: 1, kinkWindow: 3, kinkQuantile: 1, kinkRatio: 3, kinkFloorDegrees: 12,
   kinkSpikeSpacing: 0.2, kinkSpikeHalfWidth: 0.1,
+  // v1.3 (docs/validator.md, docs/validator-v1.3-exploration.md): absolute per-vertex rule and sampling diagnostic, both on by default in mode 'kink'.
+  sharpVertexDegrees: 30, undersampledTurnDegrees: 12, undersampledShare: 0.1,
   minRadiusToHalfWidth: 1, maxSlope: 0.3, maxViolationsPerCheck: 20,
 };
 
@@ -162,6 +180,23 @@ export function kinkProfile(points: Point[], width: number): KinkProfile {
     dev[i] = chord > 0 ? Math.abs(ax * (c.z - a.z) - az * (c.x - a.x)) / chord : l1;
   }
   return { n, halfWidth: width / 2, theta, spacing, dev, refs: new Map() };
+}
+/**
+ * Sampling diagnostic of the UNDERSAMPLED check: the share of the n vertices whose heading change exceeds `turnDegrees`; `flagged` iff that
+ * share exceeds `shareLimit`. Exported so that the CLI can print the same warning for metrics-polyline (which runs no validator).
+ */
+export function samplingDiagnostic(p: KinkProfile, turnDegrees: number, shareLimit: number) {
+  const n = p.n;
+  let over = 0, maxTurn = 0, maxAt = 0;
+  for (let i = 0; i < n; i++) {
+    if (p.theta[i] > turnDegrees) over++;
+    if (p.theta[i] > maxTurn) { maxTurn = p.theta[i]; maxAt = i; }
+  }
+  const share = over / n, sorted = Array.from(p.spacing).sort((x, y) => x - y);
+  const medianSpacing = n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+  const flagged = share > shareLimit;
+  const message = `${over} of ${n} vertices (${share * 100} %) turn by more than ${turnDegrees} degrees (limit ${shareLimit * 100} %; largest turn ${maxTurn} degrees at vertex ${maxAt}; median spacing ${medianSpacing}, width ${p.halfWidth * 2}): the polyline is too coarsely sampled for the requirement s <= 0.2 R_min (docs/validator.md), so kink and curvature results are unreliable`;
+  return { n, over, share, flagged, maxTurn, maxAt, medianSpacing, maxSpacing: sorted[n - 1], message };
 }
 /** Reference turn of the 'outlier' rule at every vertex: the `quantile` of theta at i +- 2 .. i +- window (distinct vertices other than i, i - 1, i + 1). */
 function outlierReference(p: KinkProfile, window: number, quantile: number): Float64Array {
@@ -291,6 +326,9 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
 
   const kinkMode = o.closureTangentMode === 'kink';
   if (kinkMode) kinkParts(o.kinkRule); // reject an unknown rule name up front
+  // v1.3 checks: mode 'kink' only (the legacy modes return the v1.0.0 set of 7 checks); a disabled check is not listed in `checks`
+  const runSharp = kinkMode && o.sharpVertexDegrees < Infinity;
+  const runUndersampled = kinkMode && options.undersampledCheck !== false;
   const pts = track.points, n = pts.length - 1, width = track.params.width;
   const edges = track.roadEdges;
   const structureProblems: string[] = [];
@@ -300,9 +338,10 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   if (structureProblems.length) {
     for (const message of structureProblems) add({ code: 'STRUCTURE', severity: 'error', message });
     record({ id: 'structure', severity: 'error', skipped: false, checked: 1, failures: structureProblems.length, stats: {} });
-    for (const [id, severity] of [['finite', 'error'], ['closure', 'error'], ['local-kink', 'error'], ['self-intersection', 'error'],
-      ['edge-fold', 'error'], ['min-turn-radius', 'warning'], ['max-slope', 'warning']] as const)
-      if (id !== 'local-kink' || kinkMode) record({ id, severity, skipped: true, checked: 0, failures: 0, stats: {} });
+    for (const [id, severity] of [['finite', 'error'], ['closure', 'error'], ['local-kink', 'error'], ['sharp-vertex', 'error'], ['self-intersection', 'error'],
+      ['edge-fold', 'error'], ['min-turn-radius', 'warning'], ['max-slope', 'warning'], ['undersampled', 'warning']] as const)
+      if (id === 'local-kink' ? kinkMode : id === 'sharp-vertex' ? runSharp : id === 'undersampled' ? runUndersampled : true)
+        record({ id, severity, skipped: true, checked: 0, failures: 0, stats: {} });
     return { ok: false, violations, checks };
   }
   record({ id: 'structure', severity: 'error', checked: 1, failures: 0, stats: {} });
@@ -387,6 +426,23 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
     }
   }
 
+  // 2c. absolute per-vertex turn (v1.3): independent of the neighbours, so polygons, uniform sawtooths and paired defects cannot mask each other
+  if (runSharp) {
+    if (!kink) record({ id: 'sharp-vertex', severity: 'error', skipped: true, checked: 0, failures: 0, stats: {} });
+    else {
+      const { theta } = kink.profile;
+      let failures = 0, maxTurn = 0;
+      for (let i = 0; i < n; i++) {
+        maxTurn = Math.max(maxTurn, theta[i]);
+        if (!(theta[i] > o.sharpVertexDegrees)) continue;
+        failures++;
+        add({ code: 'SHARP_VERTEX', severity: 'error', index: i, value: theta[i], limit: o.sharpVertexDegrees,
+          message: `heading changes by ${theta[i]} degrees at vertex ${i} (absolute limit ${o.sharpVertexDegrees} degrees, independent of the neighbours)` });
+      }
+      record({ id: 'sharp-vertex', severity: 'error', checked: n, failures, stats: { maxTurnDegrees: maxTurn, limit: o.sharpVertexDegrees } });
+    }
+  }
+
   // 3. self-intersection (centerline, each edge, edge vs edge) -------------
   if (!finite) record({ id: 'self-intersection', severity: 'error', skipped: true, checked: 0, failures: 0, stats: {} });
   else {
@@ -466,6 +522,17 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
       }
     }
     record({ id: 'max-slope', severity: 'warning', checked: n, failures, stats: { maxAbsSlope, limit: o.maxSlope } });
+  }
+
+  // 7. sampling diagnostic (v1.3, warning): too many vertices turn by more than the 12 degrees of the documented sampling requirement
+  if (runUndersampled) {
+    if (!kink) record({ id: 'undersampled', severity: 'warning', skipped: true, checked: 0, failures: 0, stats: {} });
+    else {
+      const d = samplingDiagnostic(kink.profile, o.undersampledTurnDegrees, o.undersampledShare);
+      if (d.flagged) add({ code: 'UNDERSAMPLED', severity: 'warning', index: d.maxAt, value: d.share, limit: o.undersampledShare, message: d.message });
+      record({ id: 'undersampled', severity: 'warning', checked: n, failures: d.flagged ? d.over : 0,
+        stats: { share: d.share, verticesOverTurn: d.over, turnDegrees: o.undersampledTurnDegrees, maxTurnDegrees: d.maxTurn, medianSpacing: d.medianSpacing, maxSpacing: d.maxSpacing, width } });
+    }
   }
 
   return { ok: checks.every(c => c.severity !== 'error' || c.passed), violations, checks };

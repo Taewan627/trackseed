@@ -1,11 +1,25 @@
 $ trackseed generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json
 exit 0; track.json: 98546 bytes
 
+$ integrity of track.json (digest covers the generator version stamp, contentDigest does not)
+{
+  "generator": {
+    "name": "tracklab",
+    "version": "1.2.0"
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical": "sorted-keys-json",
+    "contentDigest": "ec4b4306eecbd57619cc1fa4d70a073c8257ba1e0596781a7e1cbda8951327b9",
+    "digest": "d8a5cafa06c3d5a15c47cc8a611bb3543deea91720443124da0397c1d63788db"
+  }
+}
+
 $ trackseed validate track.json --verify regenerate
 {
   "file": "track.json",
   "verify": "regenerate",
-  "digest": "2062329927bd5b0a2c35c4dfbb8bab3774ae518237b689130382e7bc4c4a98f3",
+  "digest": "d8a5cafa06c3d5a15c47cc8a611bb3543deea91720443124da0397c1d63788db",
   "ok": true,
   "violations": [],
   "checks": [
@@ -17,7 +31,7 @@ $ trackseed validate track.json --verify regenerate
       "stats": {},
       "skipped": false,
   ... (violations list trimmed)
-checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: true, 0
+checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | sharp-vertex: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: true, 0 | undersampled: true, 0
 exit 0
 
 $ trackseed metrics track.json
@@ -38,4 +52,4 @@ $ trackseed metrics track.json
 $ trackseed batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
 trackseed batch: 48 cases, 48 generated, 0 generation failures, 48 ok
 first JSONL line (cut to 520 characters):
-{"case":0,"seed":1,"params":{"curves":6,"straight":0,"width":40,"size":2,"height":20,"obstacles":3,"density":10,"scene":"mixed","seed":1,"cornerPattern":"auto","cornerCount":1,"cornerStrength":60,"autoJoin":"tangent"},"file":"case-0000-seed1.json","generated":true,"digest":"29f6c028e4749758276c6e43ed49e5c950ebc801bcb850ed5146e841a2df1488","ok":true,"violationCodes":[],"checkFailures":{},"metrics":{"sampleCount":360,"length":2470.720628549252,"boundingBoxArea":638642.2681548327,"straightLengthFraction":0,"meanAbsCur
+{"case":0,"seed":1,"params":{"curves":6,"straight":0,"width":40,"size":2,"height":20,"obstacles":3,"density":10,"scene":"mixed","seed":1,"cornerPattern":"auto","cornerCount":1,"cornerStrength":60,"autoJoin":"tangent"},"file":"case-0000-seed1.json","generated":true,"digest":"0b10ff53a047cb657837e8eb3d992e4b5d827643835143f928f0edea8d98aefa","ok":true,"violationCodes":[],"checkFailures":{},"metrics":{"sampleCount":360,"length":2470.720628549252,"boundingBoxArea":638642.2681548327,"straightLengthFraction":0,"meanAbsCur

@@ -6,7 +6,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
 (cd ../.. && npm run build:cli > /dev/null)
 ./extract.sh > build/extract.log 2>&1 || { cat build/extract.log; exit 1; }
-rm -rf build/det1 build/det2 results; mkdir -p results
+rm -rf build/det1 build/det2; git clean -fdq -- results; mkdir -p results # only untracked leftovers are removed: committed files (NOTES.md, ...) stay
 node run.mjs build/det1
 node analyze.mjs build/det1
 node run.mjs build/det2

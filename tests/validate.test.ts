@@ -27,7 +27,7 @@ const check = (r: ReturnType<typeof validateTrack>, id: string) => r.checks.find
 test('validator: a circle is ok, every check is reported as passed with counts', () => {
   const r = validateTrack(build(circle(400, 360)));
   assert.equal(r.ok, true); assert.deepEqual(r.violations, []);
-  assert.deepEqual(r.checks.map(c => c.id), ['structure', 'finite', 'closure', 'local-kink', 'self-intersection', 'edge-fold', 'min-turn-radius', 'max-slope']);
+  assert.deepEqual(r.checks.map(c => c.id), ['structure', 'finite', 'closure', 'local-kink', 'sharp-vertex', 'self-intersection', 'edge-fold', 'min-turn-radius', 'max-slope', 'undersampled']);
   for (const c of r.checks) { assert.equal(c.passed, true, c.id); assert.equal(c.skipped, false); assert.equal(c.failures, 0); assert.ok(c.checked > 0, c.id); }
   assert.equal(check(r, 'self-intersection').checked, 3 * 360);
   assert.ok(Math.abs(check(r, 'min-turn-radius').stats.minRadius - 400) < 1e-6);
@@ -215,7 +215,7 @@ test('validator v1.1: red-team probes. A seam spike d >= 2 and an interior spike
 
 test('validator v1.1: clean circle, coarse circle, smooth generated tracks and a stadium pass; Auto with straight > 0 is flagged at its joins', () => {
   assert.equal(validateTrack(build(circle(400, 360))).ok, true);
-  assert.equal(validateTrack(build(circle(400, 12), 40)).ok, true); // 30 degrees at every vertex: uniform, not a kink
+  assert.equal(validateTrack(build(circle(400, 12), 40), { sharpVertexDegrees: Infinity }).ok, true); // 30 degrees at every vertex: uniform, not a kink for the RELATIVE rule (v1.3 SHARP_VERTEX: exactly at its limit, decided by rounding)
   for (const params of [{ cornerPattern: 'right-angle' as const, cornerCount: 2, curves: 6, width: 20, seed: 3 }, { cornerPattern: 'hairpin' as const, cornerCount: 1, cornerStrength: 80, curves: 10, straight: 0.6, seed: 11 },
     { cornerPattern: 's-curve' as const, cornerCount: 3, curves: 3, seed: 5 }, { cornerPattern: 'auto' as const, straight: 0, curves: 6, width: 80, seed: 9 }]) {
     const r = validateTrack(generateTrack(params)); assert.equal(codes(r).includes('LOCAL_KINK') || codes(r).includes('CLOSURE_TANGENT'), false, JSON.stringify(params));
@@ -264,7 +264,7 @@ test('validator v1.1: rule options, API and errors', () => {
     assert.equal(validateTrack(bad, { kinkRule }).ok, false, kinkRule); assert.equal(validateTrack(t, { kinkRule }).ok, true, kinkRule);
   }
   // thresholds are options; a huge floor disables the outlier rule
-  assert.equal(validateTrack(bad, { kinkFloorDegrees: 1000 }).ok, true);
+  assert.equal(validateTrack(bad, { kinkFloorDegrees: 1000, sharpVertexDegrees: Infinity }).ok, true); // (v1.3: SHARP_VERTEX switched off to isolate the relative rule)
   assert.throws(() => validateTrack(t, { kinkRule: 'nonsense' }), /unknown kinkRule/);
   // a corner polygon that turns equally everywhere is not a kink (outlier rule judges against the surroundings)
   const square = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 400 }, { x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }];

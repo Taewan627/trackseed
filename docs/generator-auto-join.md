@@ -1,6 +1,6 @@
 # Auto generator: the straight-to-arc join (`autoJoin`)
 
-Scope: the defect of the v1.0.0 Auto generator at straight segments, the `autoJoin` option that fixes it, the compatibility guarantees, the pre-registered evaluation E7 and the limits. Evidence: `experiments/e7/` ([PROTOCOL.md](../experiments/e7/PROTOCOL.md), [SUMMARY.md](../experiments/e7/SUMMARY.md)), `tests/autojoin.test.ts`, `experiments/e6/results/e2-recheck/`.
+Scope: the defect of the v1.0.0 Auto generator at straight segments, the `autoJoin` option that fixes it, the compatibility guarantees, the evaluation E7 (protocol committed before the results in the local git history) and the limits. Evidence: `experiments/e7/` ([PROTOCOL.md](../experiments/e7/PROTOCOL.md), [SUMMARY.md](../experiments/e7/SUMMARY.md)), `tests/autojoin.test.ts`, `experiments/e6/results/e2-recheck/`.
 
 ## The defect
 
@@ -13,7 +13,7 @@ Waypoints, RNG stream, straight selection, 60 samples per segment and the elevat
 - A waypoint with no adjacent straight keeps the Catmull-Rom tangent. A curve between two such waypoints is evaluated with the original `catmull()`, so with `straight = 0` both joins produce bit-identical points.
 - A waypoint next to exactly one straight takes that straight's chord direction. The straight is then tangent to the arc: it stays an exact straight line over its whole length and the heading is continuous.
 - A waypoint between two straights takes the bisector of the two chords. Each of the two straights then spends `JOIN_BLEND = 0.35` of its samples (21 of 60) at that end on a Hermite blend from the chord direction to the bisector, and the rest remains straight.
-- Every re-aimed tangent has `JOIN_GAIN = 1.75` times the Catmull-Rom magnitude (a larger value gives a gentler bend near the join). `JOIN_BLEND` and `JOIN_GAIN` were chosen on exploratory seeds before the pre-registration (see the protocol) and are not parameters of the document.
+- Every re-aimed tangent has `JOIN_GAIN = 1.75` times the Catmull-Rom magnitude (a larger value gives a gentler bend near the join). `JOIN_BLEND` and `JOIN_GAIN` were chosen on exploratory seeds before the protocol was committed (see the protocol) and are not parameters of the document.
 
 Why this construction: it is the least invasive one that is correct everywhere. Making only the straight tangent to the arcs is impossible when two straights are adjacent (their chords differ), and re-aiming the arcs alone leaves that case with a corner; the bisector blend handles it. No sample is added or removed, so vertex indices, `straightSegments`, coin/prop/obstacle indexing and the document layout keep their meaning.
 
@@ -43,7 +43,7 @@ A raw parameter object passed to `generateTrack` is merged with `DEFAULTS` like 
 
 ## E7 results
 
-Pre-registered (protocol committed alone), DEV then freeze then one HELD-OUT run, every evaluation executed twice with identical SHA-256. Grid: Auto part of E2 (243 parameter sets) x 30 HELD-OUT seeds, validator v1.1 defaults.
+Protocol committed alone before the results in the local git history, DEV then freeze then one HELD-OUT run, every evaluation executed twice with identical SHA-256. Grid: Auto part of E2 (243 parameter sets) x 30 HELD-OUT seeds, validator v1.1 defaults.
 
 | | legacy | tangent |
 |---|---|---|
@@ -52,7 +52,7 @@ Pre-registered (protocol committed alone), DEV then freeze then one HELD-OUT run
 | ok, straight > 0 | 0.00% (0/4860) | 80.06% [78.91, 81.16] |
 | default parameters | not run | 30/30 |
 
-All ten predictions held on DEV and HELD-OUT (see SUMMARY.md for each number). On an exploratory measurement (default parameters, seeds 0..199, not a pre-registered prediction) the tangent join gives 200/200 ok against 0/200.
+All ten predictions held on DEV and HELD-OUT (see SUMMARY.md for each number). On an exploratory measurement (default parameters, seeds 0..199, not one of the protocol's predictions) the tangent join gives 200/200 ok against 0/200.
 
 ## Limitations
 

@@ -1,0 +1,33 @@
+TrackSeed WP13 (branch wp13, from master bac95a0): validator v1.3 (SHARP_VERTEX, UNDERSAMPLED), packaging, test and reproduction hygiene. Summaries of the runs only.
+Machine: Linux x86_64, 2 vCPUs, node v22 (uname -a and node -v of the run; no committed environment file describes this machine). Version string stays 1.2.0 (unreleased).
+Tree: commit 459c58a (validator v1.3, tests, runner pins) plus the commit that adds this record; the runs below were made on that tree (package.json, CI, scripts and documents of the second commit do not enter the Node tests).
+
+npm test                       : tests 143, pass 143, fail 0, cancelled 0, skipped 0   (130 existing + 13 in tests/sharp-vertex.test.ts; duration 155.0 s)
+npm run test:browser           : 46 passed (7.0 min), 0 failed   (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers; ports 5173 and 5174 free before the run; Playwright started its own servers)
+  port check                   : with a foreign server on 127.0.0.1:5173, `playwright test` stops with "http://127.0.0.1:5173 is already used" instead of attaching; TRACKSEED_REUSE_SERVER=1 restores reuse
+node cli-dist/cli.js generate --seed 42 | sha256sum : ca9df87d94fc3f914592509f9c680b088bbfb0f4eeef6ed72fc6bf2d40ac10d7 (unchanged)
+node scripts/ci-digests.mjs --check tests/fixtures/ci-golden-digests.json                          : all 8 digests match
+node scripts/ci-digests.mjs --auto-join tangent --check tests/fixtures/ci-golden-digests-v1.1.json : all 8 digests match
+
+scripts/reproduce-check.sh /tmp/wp13/repro e2 amend e6 e7 e5 e9   (group e1 not run: nothing in generation, schema or the exchange format changed; the two goldens and the seed-42 hash above are unchanged)
+  All runners that call validateTrack with defaults pass experiments/_v12-validator.mjs (sharpVertexDegrees: Infinity, undersampledCheck: false).
+  E2 validity (48,600 cases)                          : raw sha256 identical to the committed file
+  AMENDMENT-01 E2 validity (ratio)                    : identical
+  E6 DEV candidates.csv, FROZEN.json, DEV_SUMMARY.md  : identical
+  E6 DEV candidates.json                              : differs, as documented in REPRODUCE.md: 39 of 711 candidates differ in opts (keys kinkWindow, kinkQuantile, kinkFloorDegrees only), no other field; no key of v1.3 appears
+  E6 HELD-OUT heldout.json, instances.csv.gz, auto-straight.json : identical
+  E6 E2 recheck validity-v1.1.csv.gz, SUMMARY.json, SUMMARY.md   : identical
+  E7 repro, dev, heldout (cases.csv.gz, SUMMARY.json, SUMMARY.md) and exploratory.txt : identical (10 files)
+  E5 node22.json cases, analysis validity.jsonl       : identical
+  E5 analysis SUMMARY.json, SUMMARY.md                : differ, as documented in REPRODUCE.md (polyline blocks of engines not re-run); byte-identical (cmp) to the output of master bac95a0 run the same way (scripts/reproduce-check.sh e5 in a detached worktree)
+  E9 tracks.csv.gz, SUMMARY.json, SUMMARY.md, sources.json, env.json : identical (network: seven pinned third-party repositories fetched)
+  Result: 28 of 31 compared files identical to the committed files; the 3 others are the documented differences, and the two E5 files equal the master baseline output. No committed result changed (git status after the run shows no change under experiments/*/results/).
+
+Fresh-install check (npm pack, then `npm i <tgz>` in an empty directory):
+  tarball trackseed-1.2.0.tgz, 33 files, 90.2 kB; package.json of the tarball has no dependencies and no peerDependencies; node_modules holds `trackseed` alone (three is not installed and not resolvable);
+  no file of the package imports three; ESM import of trackseed, trackseed/core, /validate, /metrics, /schema, /polyline, /detmath and trackseed/schema.json works; `npx trackseed --help` works;
+  generateTrack({ seed: 42 }) validates ok with the 10 checks; a 4-vertex square gives SHARP_VERTEX x4 and UNDERSAMPLED.
+
+npm run release-check          : fails with the items that need the maintainer only: 3 PI tokens (CITATION.cff REPO-URL, README AI-DISCLOSURE, README PROVENANCE) and 2 old repository identity values (schema $id, CITATION.cff repository-code); package is 33 files.
+
+Exploration (docs/validator-v1.3-exploration.md, scripts/validator-v1.3-exploration.mjs, about 6 minutes): 60,290 clean generated tracks (E6 DEV, held-out and E2 seeds, legacy and tangent join) plus 60 analytic N3 polylines; largest per-vertex turn 17.43 degrees (13.85 on pattern modes), largest share of vertices above 12 degrees 4.44 %.

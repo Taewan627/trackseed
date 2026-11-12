@@ -5,7 +5,7 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
 ./build.sh || { echo "build failed" >&2; exit 1; }
-rm -rf results; mkdir -p results
+git clean -fdq -- results; mkdir -p results # only untracked leftovers are removed: committed files (NOTES.md, other versions) stay
 fail() { echo "ENGINE FAILED: $1" >&2; }
 
 node_like() { # label, command...
@@ -17,10 +17,10 @@ node_like() { # label, command...
 }
 node_like node22 node
 node_like node22-repeat node
-node_like node20 npx -y -p node@20 node
-node_like node24 npx -y -p node@24 node
-node_like deno npx -y deno run --allow-read
-node_like bun npx -y bun@1 run
+node_like node20 npx -y -p node@20.20.2 node
+node_like node24 npx -y -p node@24.22.2 node
+node_like deno npx -y deno@2.9.6 run --allow-read
+node_like bun npx -y bun@1.4.4 run
 
 # Browsers run the self-contained page.html through playwright-core (Chrome: /usr/bin/google-chrome; Firefox: Playwright build,
 # installed once beforehand with `npx -y playwright@1.64.1 install firefox`, see the report).

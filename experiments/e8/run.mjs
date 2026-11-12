@@ -3,6 +3,7 @@
 // Seeds: SEEDS[100..199] of experiments/e1/cases.mjs. Writes cases.csv, SUMMARY.json, SUMMARY.md (deterministic: no timestamps, no timings).
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { SEEDS } from '../e1/cases.mjs';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs'; // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here)
 const core = await import(new URL('../../cli-dist/core.js', import.meta.url));
 const val = await import(new URL('../../cli-dist/validate.js', import.meta.url));
 const outDir = process.argv[2];
@@ -21,7 +22,7 @@ function evaluate(label, height) { // height === undefined: the default path gen
   for (const seed of seeds) {
     let t;
     try { t = height === undefined ? core.generateTrack({ seed }) : core.generateTrack({ seed, height }); } catch (e) { rows.push({ label, seed, generated: 0 }); continue; }
-    const r = val.validateTrack(t);
+    const r = val.validateTrack(t, V12_VALIDATOR_PIN);
     rows.push({ label, seed, generated: 1, height: t.params.height, ok: r.ok ? 1 : 0, maxSlopeWarn: r.violations.some(v => v.code === 'MAX_SLOPE') ? 1 : 0,
       maxAbsSlope: r.checks.find(c => c.id === 'max-slope').stats.maxAbsSlope, range: t.bounds.maxY - t.bounds.minY });
   }

@@ -36,14 +36,14 @@
     "prepack": "npm run build:cli",
     "release-check": "node scripts/release-check.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run build:cli && tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js .test-build/tests/validate.test.js .test-build/tests/metrics.test.js .test-build/tests/cli.test.js .test-build/tests/polyline.test.js .test-build/tests/autojoin.test.js .test-build/tests/schema-json.test.js .test-build/tests/strict.test.js .test-build/tests/robust.test.js",
+    "test": "npm run build:cli && tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js .test-build/tests/validate.test.js .test-build/tests/metrics.test.js .test-build/tests/cli.test.js .test-build/tests/polyline.test.js .test-build/tests/autojoin.test.js .test-build/tests/schema-json.test.js .test-build/tests/strict.test.js .test-build/tests/robust.test.js .test-build/tests/sharp-vertex.test.js",
     "test:browser": "npm run build && playwright test"
   },
-  "dependencies": { "three": "0.187.0" },
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "@types/node": "^22.0.0",
     "@types/three": "^0.185.0",
+    "three": "0.187.0",
     "typescript": "5.9.3",
     "vite": "8.3.5"
   },

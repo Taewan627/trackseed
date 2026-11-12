@@ -27,7 +27,20 @@ jobs:
         run: |
           node cli-dist/cli.js generate --seed 42 --out "$RUNNER_TEMP/t42.json"
           node cli-dist/cli.js validate "$RUNNER_TEMP/t42.json" --verify regenerate && rc=0 || rc=$?
-          test "$rc" -le 1
+          test "$rc" -eq 0
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Browser tests (Chromium, software WebGL; Playwright starts its own servers on 5173 and 5174)
+        run: npm run test:browser
 
   determinism:
     strategy:
