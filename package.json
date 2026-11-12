@@ -3,7 +3,7 @@
   "description": "TrackSeed: a deterministic procedural racing-track generator with a validator, geometric metrics and a self-verifying exchange format",
   "license": "MIT",
   "author": "Taewan Kim",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "main": "./cli-dist/index.js",
   "types": "./cli-dist/index.d.ts",
