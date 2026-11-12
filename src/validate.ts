@@ -93,8 +93,10 @@ export interface ValidateOptions {
   maxViolationsPerCheck?: number;
 }
 export const DEFAULT_VALIDATE_OPTIONS: Required<ValidateOptions> = {
-  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'ratio', foldEpsilon: 1e-5,
-  kinkRule: 'outlier', kinkTurnDegrees: 20, kinkCurvature: 1, kinkWindow: 5, kinkQuantile: 0.5, kinkRatio: 3, kinkFloorDegrees: 20,
+  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'kink', foldEpsilon: 1e-5,
+  // kink* defaults = the rule frozen on DEV in experiments/e6 (results/dev/FROZEN.json): rule 'outlier', window 3, maximum, ratio 3, floor 12 degrees.
+  // kinkTurnDegrees, kinkCurvature, kinkSpike* belong to the other candidate rules and are inert under the default kinkRule.
+  kinkRule: 'outlier', kinkTurnDegrees: 20, kinkCurvature: 1, kinkWindow: 3, kinkQuantile: 1, kinkRatio: 3, kinkFloorDegrees: 12,
   kinkSpikeSpacing: 0.2, kinkSpikeHalfWidth: 0.1,
   minRadiusToHalfWidth: 1, maxSlope: 0.3, maxViolationsPerCheck: 20,
 };
