@@ -18,11 +18,16 @@ export class TrackDocumentError extends Error {
 }
 
 export interface TrackBounds { minX: number; maxX: number; minZ: number; maxZ: number; minY: number; maxY: number }
+/**
+ * Document params: all DEFAULTS keys, except that `autoJoin` is optional. Absent means 'legacy' (what v1.0.0 wrote and
+ * what a legacy track is still written as, so legacy documents are byte-identical to v1.0.0); only 'tangent' is ever stored.
+ */
+export type DocumentParams = Omit<Params, 'autoJoin'> & { autoJoin?: 'tangent' };
 export interface TrackDocumentV1 {
   schema: typeof SCHEMA_NAME;
   schemaVersion: 1;
   generator: { name: string; version: string };
-  params: Params;
+  params: DocumentParams;
   geometry: {
     points: Point[]; normals: { x: number; z: number }[]; roadEdges: [Point[], Point[]];
     straightSegments: boolean[]; length: number; bounds: TrackBounds;
@@ -74,6 +79,15 @@ function plain<T>(value: T, path = '$'): T {
   return value;
 }
 
+/** Document params -> generator params: an absent `autoJoin` is the legacy (v1.0.0) join, never the current default. */
+export function generatorParams(params: DocumentParams): Params {
+  return { ...params, autoJoin: params.autoJoin ?? 'legacy' };
+}
+function documentParams(params: Params): DocumentParams {
+  const { autoJoin, ...rest } = params;
+  return autoJoin === 'legacy' ? rest : { ...rest, autoJoin };
+}
+
 const digestOf = (body: object) => sha256(canonicalStringify(body));
 /** Digest of the document without `integrity` and without `generator`: independent of which build stamped it. */
 const contentDigestOf = (body: object) => { const { generator: _generator, ...content } = body as Record<string, unknown>; return digestOf(content); };
@@ -81,7 +95,7 @@ const contentDigestOf = (body: object) => { const { generator: _generator, ...co
 // ---- export --------------------------------------------------------------
 function assemble(track: Track, generator: { name: string; version: string }): TrackDocumentV1 {
   const body = plain({
-    schema: SCHEMA_NAME, schemaVersion: SCHEMA_VERSION, generator, params: track.params,
+    schema: SCHEMA_NAME, schemaVersion: SCHEMA_VERSION, generator, params: documentParams(track.params),
     geometry: { points: track.points, normals: track.normals, roadEdges: track.roadEdges,
       straightSegments: track.straightSegments, length: track.length, bounds: track.bounds },
     props: track.props, obstacles: track.obstacles, coins: generateCoins(track),
@@ -129,15 +143,23 @@ const nums = (o: Obj, keys: readonly string[], path: string) => {
 const point = (v: unknown, p: string): Point => { nums(obj(v, p, ['x', 'y', 'z']), ['x', 'y', 'z'], p); return v as Point; };
 const KINDS = ['right-angle', 'hairpin', 's-curve'] as const;
 
-function validateParams(v: unknown, path: string): Params {
-  const o = obj(v, path, Object.keys(DEFAULTS));
-  for (const [k, d] of Object.entries(DEFAULTS)) {
-    if (typeof d === 'number') num(o[k], `${path}.${k}`); else str(o[k], `${path}.${k}`);
+function validateParams(v: unknown, path: string): DocumentParams {
+  const required = Object.keys(DEFAULTS).filter(k => k !== 'autoJoin');
+  const o = obj(v, path, required, ['autoJoin']);
+  for (const k of required) {
+    if (typeof DEFAULTS[k as keyof Params] === 'number') num(o[k], `${path}.${k}`); else str(o[k], `${path}.${k}`);
   }
-  // Params must already be in canonical (sanitized) form.
-  const clean = sanitize(o as unknown as Params) as unknown as Obj;
-  for (const k of Object.keys(DEFAULTS)) if (clean[k] !== o[k]) fail(`${path}.${k}`, `value ${JSON.stringify(o[k])} is not a sanitized parameter (expected ${JSON.stringify(clean[k])})`);
-  return o as unknown as Params;
+  if (o.autoJoin !== undefined) {
+    str(o.autoJoin, `${path}.autoJoin`);
+    if (o.autoJoin === 'legacy') fail(`${path}.autoJoin`, 'the legacy join is written by omitting the key (v1.0.0 documents have no autoJoin); only "tangent" may be stored');
+    oneOf(o.autoJoin, ['tangent'], `${path}.autoJoin`);
+  }
+  // Params must already be in canonical (sanitized) form; an absent autoJoin means 'legacy'.
+  const full = generatorParams(o as unknown as DocumentParams);
+  const clean = sanitize(full) as unknown as Obj;
+  for (const k of required) if (clean[k] !== o[k]) fail(`${path}.${k}`, `value ${JSON.stringify(o[k])} is not a sanitized parameter (expected ${JSON.stringify(clean[k])})`);
+  if (clean.autoJoin !== full.autoJoin) fail(`${path}.autoJoin`, `autoJoin ${JSON.stringify(o.autoJoin)} has no effect with this cornerPattern/cornerCount (canonical form omits it)`);
+  return o as unknown as DocumentParams;
 }
 
 function validateAudit(v: unknown, path: string): GeometryAudit | null {
@@ -232,13 +254,13 @@ export function importTrack(doc: unknown, options: { verify?: VerifyMode } = {})
   const d = parseTrackDocument(doc);
   if (verify === 'regenerate') {
     let fresh: TrackDocumentV1;
-    try { fresh = exportTrack(generateTrack(d.params)); }
+    try { fresh = exportTrack(generateTrack(generatorParams(d.params))); }
     catch (e) { return fail('$.params', `cannot regenerate track (${e instanceof Error ? e.message : String(e)})`); }
     if (fresh.integrity.contentDigest !== d.integrity.contentDigest) {
       fail('$.integrity.contentDigest', `regenerated content differs (regenerated ${fresh.integrity.contentDigest}, document ${d.integrity.contentDigest})`);
     }
   }
   const { points, normals, roadEdges, straightSegments, length, bounds } = d.geometry;
-  return { params: d.params, points, normals, roadEdges, straightSegments, length, bounds,
+  return { params: generatorParams(d.params), points, normals, roadEdges, straightSegments, length, bounds,
     props: d.props, obstacles: d.obstacles, coins: d.coins, patternReport: d.patternReport };
 }

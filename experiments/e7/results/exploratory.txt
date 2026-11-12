@@ -1,0 +1,6 @@
+default parameters, seeds 0..199, autoJoin legacy: 0/200 ok
+default parameters, seeds 0..199, autoJoin tangent: 200/200 ok
+curves 8, straight 0.3, seeds 0..299, autoJoin legacy: max turn over join vertices per track: median 38.01 deg, min 23.12, max 90.41
+curves 8, straight 0.3, seeds 0..299, autoJoin tangent: max turn over join vertices per track: median 1.36 deg, min 0.56, max 7.76
+default parameters, seeds 0..199, autoJoin legacy: totalTurningDegrees median 360.00, max 364.27
+default parameters, seeds 0..199, autoJoin tangent: totalTurningDegrees median 372.09, max 432.68

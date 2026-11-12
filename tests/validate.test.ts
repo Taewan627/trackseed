@@ -220,8 +220,10 @@ test('validator v1.1: clean circle, coarse circle, smooth generated tracks and a
     { cornerPattern: 's-curve' as const, cornerCount: 3, curves: 3, seed: 5 }, { cornerPattern: 'auto' as const, straight: 0, curves: 6, width: 80, seed: 9 }]) {
     const r = validateTrack(generateTrack(params)); assert.equal(codes(r).includes('LOCAL_KINK') || codes(r).includes('CLOSURE_TANGENT'), false, JSON.stringify(params));
   }
-  const auto = validateTrack(generateTrack({ cornerPattern: 'auto', straight: 0.3, curves: 6, seed: 5 }));
-  assert.ok(codes(auto).includes('LOCAL_KINK') || codes(auto).includes('CLOSURE_TANGENT')); // a genuine heading discontinuity of the original algorithm
+  const auto = validateTrack(generateTrack({ cornerPattern: 'auto', straight: 0.3, curves: 6, seed: 5, autoJoin: 'legacy' }));
+  assert.ok(codes(auto).includes('LOCAL_KINK') || codes(auto).includes('CLOSURE_TANGENT')); // a genuine heading discontinuity of the original (legacy) join
+  const tangent = validateTrack(generateTrack({ cornerPattern: 'auto', straight: 0.3, curves: 6, seed: 5, autoJoin: 'tangent' }));
+  assert.equal(tangent.ok, true); // the heading-continuous join removes it
 });
 
 test('validator v1.1: every E6 defect operator at a must-detect size is an error (flag inside the defect window)', () => {

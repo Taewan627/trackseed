@@ -1,0 +1,85 @@
+{
+ "protocol": "experiments/e7/PROTOCOL.md",
+ "set": "repro",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  7,
+  42,
+  100,
+  1234,
+  12345,
+  65535,
+  65536,
+  99999,
+  1000000,
+  16777216,
+  2147483646,
+  2147483647,
+  1211967129,
+  1976064911,
+  1436848794,
+  1437529530,
+  115781524,
+  791051882,
+  464855833,
+  1193808300,
+  1469734568,
+  1850946891,
+  1835407073,
+  832037625,
+  466535511,
+  837779550,
+  168280811,
+  523612261,
+  1489841039,
+  2072563558,
+  1684588142,
+  1994105342,
+  982219031,
+  623836359,
+  1457514757,
+  1630879510,
+  2001195855,
+  1656671393,
+  1074080347,
+  809006680,
+  1661750365,
+  45205163,
+  1007771946,
+  2087327001,
+  840556756,
+  1495767810
+ ],
+ "gridSize": 12150,
+ "joins": [
+  "legacy"
+ ],
+ "validator": {
+  "closureTangentMode": "kink",
+  "kinkRule": "outlier"
+ },
+ "exploratorySeedOverlapWithEvaluationSeeds": [],
+ "reproduction": {
+  "cases": 12150,
+  "okMismatches": 0,
+  "codeMismatches": 0,
+  "generatedMismatches": 0,
+  "reference": "experiments/e6/results/e2-recheck/validity-v1.1.csv.gz (Auto rows 0..12149)"
+ },
+ "predictions": {
+  "P9": {
+   "claim": "legacy join reproduces the committed E2 recheck v1.1 ok and code columns exactly",
+   "observed": {
+    "cases": 12150,
+    "okMismatches": 0,
+    "codeMismatches": 0,
+    "generatedMismatches": 0,
+    "reference": "experiments/e6/results/e2-recheck/validity-v1.1.csv.gz (Auto rows 0..12149)"
+   },
+   "held": true
+  }
+ }
+}
