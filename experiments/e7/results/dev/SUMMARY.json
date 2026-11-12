@@ -1,0 +1,540 @@
+{
+ "protocol": "experiments/e7/PROTOCOL.md",
+ "set": "dev",
+ "seeds": [
+  1626918237,
+  592432025,
+  1145611723,
+  1663827229,
+  144792869,
+  46027217,
+  510183774,
+  1771770287,
+  858674795,
+  1039756394,
+  1761574689,
+  661805818,
+  32561668,
+  566458712,
+  1506273959,
+  981618145,
+  189361622,
+  1643738806,
+  392270510,
+  1479275609
+ ],
+ "gridSize": 4860,
+ "joins": [
+  "legacy",
+  "tangent"
+ ],
+ "validator": {
+  "closureTangentMode": "kink",
+  "kinkRule": "outlier"
+ },
+ "exploratorySeedOverlapWithEvaluationSeeds": [],
+ "generationFailures": {
+  "legacy": 0,
+  "tangent": 0
+ },
+ "okOverall": {
+  "legacy": {
+   "k": 1443,
+   "n": 4860,
+   "p": 0.296914,
+   "lo": 0.284233,
+   "hi": 0.309915
+  },
+  "tangent": {
+   "k": 4056,
+   "n": 4860,
+   "p": 0.834568,
+   "lo": 0.823858,
+   "hi": 0.844749
+  }
+ },
+ "okStraightZero": {
+  "legacy": {
+   "k": 1443,
+   "n": 1620,
+   "p": 0.890741,
+   "lo": 0.874615,
+   "hi": 0.905018
+  },
+  "tangent": {
+   "k": 1443,
+   "n": 1620,
+   "p": 0.890741,
+   "lo": 0.874615,
+   "hi": 0.905018
+  }
+ },
+ "okStraightPositive": {
+  "legacy": {
+   "k": 0,
+   "n": 3240,
+   "p": 0,
+   "lo": 0,
+   "hi": 0.001184
+  },
+  "tangent": {
+   "k": 2613,
+   "n": 3240,
+   "p": 0.806481,
+   "lo": 0.792519,
+   "hi": 0.819718
+  }
+ },
+ "okByCurvesStraight": {
+  "legacy": {
+   "curves3_straight0": {
+    "k": 372,
+    "n": 540,
+    "p": 0.688889,
+    "lo": 0.648623,
+    "hi": 0.726486
+   },
+   "curves3_straight0.3": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   },
+   "curves3_straight0.6": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   },
+   "curves6_straight0": {
+    "k": 540,
+    "n": 540,
+    "p": 1,
+    "lo": 0.992936,
+    "hi": 1
+   },
+   "curves6_straight0.3": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   },
+   "curves6_straight0.6": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   },
+   "curves10_straight0": {
+    "k": 531,
+    "n": 540,
+    "p": 0.983333,
+    "lo": 0.968631,
+    "hi": 0.991207
+   },
+   "curves10_straight0.3": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   },
+   "curves10_straight0.6": {
+    "k": 0,
+    "n": 540,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.007064
+   }
+  },
+  "tangent": {
+   "curves3_straight0": {
+    "k": 372,
+    "n": 540,
+    "p": 0.688889,
+    "lo": 0.648623,
+    "hi": 0.726486
+   },
+   "curves3_straight0.3": {
+    "k": 333,
+    "n": 540,
+    "p": 0.616667,
+    "lo": 0.574972,
+    "hi": 0.656713
+   },
+   "curves3_straight0.6": {
+    "k": 360,
+    "n": 540,
+    "p": 0.666667,
+    "lo": 0.625853,
+    "hi": 0.705126
+   },
+   "curves6_straight0": {
+    "k": 540,
+    "n": 540,
+    "p": 1,
+    "lo": 0.992936,
+    "hi": 1
+   },
+   "curves6_straight0.3": {
+    "k": 540,
+    "n": 540,
+    "p": 1,
+    "lo": 0.992936,
+    "hi": 1
+   },
+   "curves6_straight0.6": {
+    "k": 516,
+    "n": 540,
+    "p": 0.955556,
+    "lo": 0.934721,
+    "hi": 0.969954
+   },
+   "curves10_straight0": {
+    "k": 531,
+    "n": 540,
+    "p": 0.983333,
+    "lo": 0.968631,
+    "hi": 0.991207
+   },
+   "curves10_straight0.3": {
+    "k": 474,
+    "n": 540,
+    "p": 0.877778,
+    "lo": 0.847452,
+    "hi": 0.902767
+   },
+   "curves10_straight0.6": {
+    "k": 390,
+    "n": 540,
+    "p": 0.722222,
+    "lo": 0.682976,
+    "hi": 0.758329
+   }
+  }
+ },
+ "okByCurvesStraightPositive": {
+  "legacy": {
+   "curves3": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   },
+   "curves6": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   },
+   "curves10": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   }
+  },
+  "tangent": {
+   "curves3": {
+    "k": 693,
+    "n": 1080,
+    "p": 0.641667,
+    "lo": 0.612613,
+    "hi": 0.669716
+   },
+   "curves6": {
+    "k": 1056,
+    "n": 1080,
+    "p": 0.977778,
+    "lo": 0.967147,
+    "hi": 0.985022
+   },
+   "curves10": {
+    "k": 864,
+    "n": 1080,
+    "p": 0.8,
+    "lo": 0.775099,
+    "hi": 0.822774
+   }
+  }
+ },
+ "okByWidthStraightPositive": {
+  "legacy": {
+   "width20": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   },
+   "width40": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   },
+   "width80": {
+    "k": 0,
+    "n": 1080,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.003544
+   }
+  },
+  "tangent": {
+   "width20": {
+    "k": 1080,
+    "n": 1080,
+    "p": 1,
+    "lo": 0.996456,
+    "hi": 1
+   },
+   "width40": {
+    "k": 1026,
+    "n": 1080,
+    "p": 0.95,
+    "lo": 0.935332,
+    "hi": 0.961478
+   },
+   "width80": {
+    "k": 507,
+    "n": 1080,
+    "p": 0.469444,
+    "lo": 0.439841,
+    "hi": 0.499264
+   }
+  }
+ },
+ "errorCodeCounts": {
+  "legacy": {
+   "EDGE_FOLD": 3243,
+   "SELF_INTERSECTION_EDGE": 3180,
+   "LOCAL_KINK": 3240,
+   "CLOSURE_TANGENT": 2052
+  },
+  "tangent": {
+   "EDGE_FOLD": 804,
+   "SELF_INTERSECTION_EDGE": 792
+  }
+ },
+ "errorCodeCountsStraightPositive": {
+  "legacy": {
+   "EDGE_FOLD": 3066,
+   "LOCAL_KINK": 3240,
+   "SELF_INTERSECTION_EDGE": 3003,
+   "CLOSURE_TANGENT": 2052
+  },
+  "tangent": {
+   "EDGE_FOLD": 627,
+   "SELF_INTERSECTION_EDGE": 615
+  }
+ },
+ "paired": {
+  "cross": {
+   "legacyOk_tangentOk": 1443,
+   "legacyOk_tangentNotOk": 0,
+   "legacyNotOk_tangentOk": 2613,
+   "legacyNotOk_tangentNotOk": 804
+  }
+ },
+ "straightZeroEquivalence": {
+  "cases": 1620,
+  "pointsBitIdentical": 1620,
+  "okSame": 1620,
+  "codesSame": 1620
+ },
+ "geometryStraightPositive": {
+  "cases": 3240,
+  "absRelativeLengthChange": {
+   "n": 3240,
+   "median": 0.03694,
+   "min": 0.004546,
+   "max": 0.080835
+  },
+  "realisedStraightFractionRatioTangentOverLegacy": {
+   "n": 3240,
+   "median": 0.615276,
+   "min": 0.395073,
+   "max": 0.982351
+  },
+  "requestedStraightParameter": {
+   "n": 3240,
+   "median": 0.45,
+   "min": 0.3,
+   "max": 0.6
+  },
+  "quantisedStraightFraction": {
+   "n": 3240,
+   "median": 0.466667,
+   "min": 0.3,
+   "max": 0.666667
+  },
+  "realisedStraightFractionLegacy": {
+   "n": 3240,
+   "median": 0.455043,
+   "min": 0.250177,
+   "max": 0.680961
+  },
+  "realisedStraightFractionTangent": {
+   "n": 3240,
+   "median": 0.2992,
+   "min": 0.141192,
+   "max": 0.422177
+  },
+  "maxVertexTurnDegreesLegacy": {
+   "n": 3240,
+   "median": 68.295981,
+   "min": 26.113677,
+   "max": 131.715198
+  },
+  "maxVertexTurnDegreesTangent": {
+   "n": 3240,
+   "median": 6.798542,
+   "min": 2.752508,
+   "max": 18.206114
+  },
+  "verticesOver12DegreesLegacy": {
+   "n": 3240,
+   "median": 4,
+   "min": 2,
+   "max": 8
+  },
+  "verticesOver12DegreesTangent": {
+   "n": 3240,
+   "median": 0,
+   "min": 0,
+   "max": 8
+  }
+ },
+ "defaultParameters": {
+  "autoJoinOfDefaults": "tangent",
+  "ok": {
+   "k": 20,
+   "n": 20,
+   "p": 1,
+   "lo": 0.838875,
+   "hi": 1
+  },
+  "failures": [],
+  "generationFailures": 0
+ },
+ "predictions": {
+  "P1": {
+   "claim": "default parameters, tangent join: >= 99% ok",
+   "observed": {
+    "k": 20,
+    "n": 20,
+    "p": 1,
+    "lo": 0.838875,
+    "hi": 1
+   },
+   "held": true
+  },
+  "P2": {
+   "claim": "legacy join at straight > 0: ok rate <= 2%",
+   "observed": {
+    "k": 0,
+    "n": 3240,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.001184
+   },
+   "held": true
+  },
+  "P3": {
+   "claim": "tangent join at straight > 0: ok >= 75% overall; curves 6 >= 95%, curves 10 >= 75%, curves 3 >= 55%",
+   "observed": {
+    "overall": {
+     "k": 2613,
+     "n": 3240,
+     "p": 0.806481,
+     "lo": 0.792519,
+     "hi": 0.819718
+    },
+    "curves3": {
+     "k": 693,
+     "n": 1080,
+     "p": 0.641667,
+     "lo": 0.612613,
+     "hi": 0.669716
+    },
+    "curves6": {
+     "k": 1056,
+     "n": 1080,
+     "p": 0.977778,
+     "lo": 0.967147,
+     "hi": 0.985022
+    },
+    "curves10": {
+     "k": 864,
+     "n": 1080,
+     "p": 0.8,
+     "lo": 0.775099,
+     "hi": 0.822774
+    }
+   },
+   "held": true
+  },
+  "P4": {
+   "claim": "no tangent-join track carries LOCAL_KINK or CLOSURE_TANGENT",
+   "observed": {
+    "tracks": 0,
+    "of": 4860
+   },
+   "held": true
+  },
+  "P5": {
+   "claim": "every failing tangent-join track fails only with SELF_INTERSECTION_EDGE and/or EDGE_FOLD",
+   "observed": {
+    "failingTracksWithOtherErrorCodes": 0
+   },
+   "held": true
+  },
+  "P6": {
+   "claim": "straight = 0: bit-identical points, identical ok and codes in 100% of cases",
+   "observed": {
+    "cases": 1620,
+    "pointsBitIdentical": 1620,
+    "okSame": 1620,
+    "codesSame": 1620
+   },
+   "held": true
+  },
+  "P7": {
+   "claim": "no case ok under legacy and not ok under tangent",
+   "observed": {
+    "cases": 0
+   },
+   "held": true
+  },
+  "P8": {
+   "claim": "median |relative length change| <= 10%; median straight-fraction ratio >= 0.5; median max per-vertex turn (tangent) <= 15 degrees",
+   "observed": {
+    "medianAbsRelativeLengthChange": 0.03694,
+    "medianStraightFractionRatio": 0.615276,
+    "medianMaxTurnTangent": 6.798542,
+    "medianMaxTurnLegacy": 68.295981
+   },
+   "held": true
+  },
+  "P10": {
+   "claim": "no Auto generation throws under either join (byte-identity of two runs is checked by run-twice.mjs)",
+   "observed": {
+    "grid": {
+     "legacy": 0,
+     "tangent": 0
+    },
+    "defaults": 0
+   },
+   "held": true
+  }
+ }
+}
