@@ -37,7 +37,7 @@ test('cli: generate -> validate -> metrics round trip, exit codes, stdout vs --o
     const v = run(['validate', file, '--verify', 'regenerate']);
     assert.ok(v.code === 0 || v.code === 1, `validate exit ${v.code}: ${v.err}`);
     const report = JSON.parse(v.out) as { ok: boolean; digest: string; violations: { severity: string }[]; checks: unknown[] };
-    assert.equal(report.digest, doc.integrity.digest); assert.equal(report.checks.length, 7);
+    assert.equal(report.digest, doc.integrity.digest); assert.equal(report.checks.length, 8); // seven v1.0.0 checks plus local-kink (default closureTangentMode 'kink')
     assert.equal(v.code === 0, report.ok);
     assert.equal(report.ok, !report.violations.some(x => x.severity === 'error'));
 
@@ -142,13 +142,14 @@ test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () =>
     assert.equal(run(['generate', '--seed', '36', '--set', 'cornerPattern=hairpin', 'curves=10', 'cornerCount=2', '--out', file]).code, 0);
     const codes = (r: { out: string }) => (JSON.parse(r.out) as { violations: { code: string }[] }).violations.map(v => v.code);
     const def = run(['validate', file]), ratio = run(['validate', file, '--closure-tangent-mode', 'ratio']);
-    assert.equal(def.out, ratio.out, 'ratio is the default'); assert.equal(def.code, 0);
+    assert.equal(ratio.code, 0); assert.equal(def.code, 0); // the default is now 'kink' (not selectable by the CLI yet); both accept this track
     assert.ok(!codes(def).includes('CLOSURE_TANGENT'));
     const abs = run(['validate', file, '--closure-tangent-mode=absolute']);
     assert.equal(abs.code, 1); assert.ok(codes(abs).includes('CLOSURE_TANGENT'));
     // seam-ratio 0 makes the ratio rule equal to the absolute limit; a large ratio never fires; same as --limit seamRatio=
-    assert.equal(run(['validate', file, '--seam-ratio', '0']).code, 1);
-    assert.equal(run(['validate', file, '--seam-ratio', '2']).out, def.out);
+    const R = ['--closure-tangent-mode', 'ratio'];
+    assert.equal(run(['validate', file, ...R, '--seam-ratio', '0']).code, 1);
+    assert.equal(run(['validate', file, ...R, '--seam-ratio', '2']).out, ratio.out);
     assert.equal(run(['validate', file, '--seam-ratio', '5']).out, run(['validate', file, '--limit', 'seamRatio=5']).out);
     // Errors: bad mode, bad ratio, conflicting spec, non-numeric limit
     for (const bad of [['--closure-tangent-mode', 'sloppy'], ['--seam-ratio', 'x'], ['--seam-ratio', '-1'],
@@ -163,7 +164,7 @@ test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () =>
       const r = run(['batch', '--grid', grid, '--out', out, '--jsonl', jl, '--no-timing', ...args]); assert.equal(r.code, 0, r.err);
       return JSON.parse(readFileSync(jl, 'utf8').trim()) as { ok: boolean; violationCodes: string[]; digest: string; checkFailures: Record<string, number> };
     };
-    const d = line([]), a = line(['--closure-tangent-mode', 'absolute']), s0 = line(['--seam-ratio', '0']);
+    const d = line([]), a = line(['--closure-tangent-mode', 'absolute']), s0 = line(['--closure-tangent-mode', 'ratio', '--seam-ratio', '0']);
     assert.equal(d.ok, true); assert.equal(a.ok, false); assert.ok(a.violationCodes.includes('CLOSURE_TANGENT'));
     assert.equal(s0.ok, false); assert.equal(a.digest, d.digest);
     assert.equal(run(['batch', '--grid', grid, '--out', join(dir, 'x'), '--closure-tangent-mode', 'nope']).code, 2);

@@ -1,0 +1,62 @@
+{
+  "criterionMet": true,
+  "id": 53,
+  "family": "B",
+  "label": "outlier K=3 q=1 r=3 F=12",
+  "options": {
+    "closureTangentMode": "kink",
+    "kinkRule": "outlier",
+    "kinkTurnDegrees": 20,
+    "kinkCurvature": 1,
+    "kinkWindow": 3,
+    "kinkQuantile": 1,
+    "kinkRatio": 3,
+    "kinkFloorDegrees": 12,
+    "kinkSpikeSpacing": 0.2,
+    "kinkSpikeHalfWidth": 0.1
+  },
+  "dev": {
+    "fp": {
+      "N1": 0,
+      "N2": 0,
+      "N3": 0
+    },
+    "nClean": 10798,
+    "fpRateClean": 0,
+    "recall": {
+      "seamSpike": 1,
+      "interiorSpike": 1,
+      "corner": 1,
+      "tangent": 1
+    },
+    "mustDetectCounts": {
+      "seamSpike": [
+        4288,
+        4288
+      ],
+      "interiorSpike": [
+        4045,
+        4045
+      ],
+      "corner": [
+        4535,
+        4535
+      ],
+      "tangent": [
+        3780,
+        3780
+      ]
+    },
+    "macroRecall": 1,
+    "tiedConfigurations": 33,
+    "bestMacroAmongAdmissible": 1
+  },
+  "perFamilyBestIds": {
+    "A1": 11,
+    "A2": 17,
+    "C": 115,
+    "B": 53,
+    "B+A2": 213,
+    "B+C": 487
+  }
+}

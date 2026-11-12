@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { generateTrack, type Params, type Point } from '../src/core.js';
 import { exportTrack, importTrack, serializeTrack } from '../src/schema.js';
-import { DEFAULT_VALIDATE_OPTIONS, validateTrack, type ValidatableTrack } from '../src/validate.js';
+import { DEFAULT_VALIDATE_OPTIONS, kinkFlags, kinkProfile, validateTrack, type ValidatableTrack } from '../src/validate.js';
 
 /** Build a validator input from a closed centerline, offsetting edges like core.ts (neighbour-difference normals, float32 edges). */
 function build(points: Point[], width = 40): ValidatableTrack {
@@ -27,7 +27,7 @@ const check = (r: ReturnType<typeof validateTrack>, id: string) => r.checks.find
 test('validator: a circle is ok, every check is reported as passed with counts', () => {
   const r = validateTrack(build(circle(400, 360)));
   assert.equal(r.ok, true); assert.deepEqual(r.violations, []);
-  assert.deepEqual(r.checks.map(c => c.id), ['structure', 'finite', 'closure', 'self-intersection', 'edge-fold', 'min-turn-radius', 'max-slope']);
+  assert.deepEqual(r.checks.map(c => c.id), ['structure', 'finite', 'closure', 'local-kink', 'self-intersection', 'edge-fold', 'min-turn-radius', 'max-slope']);
   for (const c of r.checks) { assert.equal(c.passed, true, c.id); assert.equal(c.skipped, false); assert.equal(c.failures, 0); assert.ok(c.checked > 0, c.id); }
   assert.equal(check(r, 'self-intersection').checked, 3 * 360);
   assert.ok(Math.abs(check(r, 'min-turn-radius').stats.minRadius - 400) < 1e-6);
@@ -58,22 +58,24 @@ test('validator: an open polyline is a closure error; a broken seam height and t
   assert.ok(codes(h).includes('CLOSURE_POSITION') && codes(h).includes('CLOSURE_HEIGHT'));
   // a corner at the seam: 90 degree turn between the segment entering and leaving point 0
   const square = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 400 }, { x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }];
-  const sq = validateTrack(build(square, 20));
+  const RATIO = { closureTangentMode: 'ratio' as const };
+  const sq = validateTrack(build(square, 20), RATIO);
   // v0.5.0 behaviour (closureTangentMode 'absolute'): every 90 degree corner, including the one at the seam, fails
   const abs = { closureTangentMode: 'absolute' as const };
   const sqAbs = validateTrack(build(square, 20), abs);
   assert.ok(codes(sqAbs).includes('CLOSURE_TANGENT')); assert.ok(Math.abs(check(sqAbs, 'closure').stats.tangentDegrees - 90) < 1e-9);
   assert.equal(validateTrack(build(square, 20), { ...abs, tangentToleranceDegrees: 91 }).violations.some(v => v.code === 'CLOSURE_TANGENT'), false);
-  // default 'ratio' mode: the seam of a square turns exactly as much as its neighbouring corners, so it is not an outlier
+  // 'ratio' mode: the seam of a square turns exactly as much as its neighbouring corners, so it is not an outlier
   assert.equal(codes(sq).includes('CLOSURE_TANGENT'), false);
   assert.ok(Math.abs(check(sq, 'closure').stats.tangentRatio - 1) < 1e-9);
 });
 
 test('validator: CLOSURE_TANGENT is a seam-continuity outlier test (v0.5.1)', () => {
-  assert.equal(DEFAULT_VALIDATE_OPTIONS.closureTangentMode, 'ratio'); assert.equal(DEFAULT_VALIDATE_OPTIONS.seamRatio, 2);
+  assert.equal(DEFAULT_VALIDATE_OPTIONS.closureTangentMode, 'kink'); assert.equal(DEFAULT_VALIDATE_OPTIONS.seamRatio, 2);
+  const RATIO = { closureTangentMode: 'ratio' as const };
   // smooth circle sampled coarsely: 12 points, 30 degrees per vertex everywhere. Old rule fails it, new rule passes it.
   const coarse = build(circle(400, 12), 40);
-  const r = validateTrack(coarse);
+  const r = validateTrack(coarse, RATIO);
   assert.equal(r.ok, true, codes(r).join());
   assert.ok(Math.abs(check(r, 'closure').stats.tangentDegrees - 30) < 1e-6);
   assert.ok(Math.abs(check(r, 'closure').stats.neighbourhoodMaxDegrees - 30) < 1e-6);
@@ -85,18 +87,18 @@ test('validator: CLOSURE_TANGENT is a seam-continuity outlier test (v0.5.1)', ()
   for (let a = -90; a <= 90; a++) d.push({ x: R * Math.cos(a * Math.PI / 180), y: 0, z: R * Math.sin(a * Math.PI / 180) });
   for (let z = R - 8; z > -R + 4; z -= 8) d.push({ x: 0, y: 0, z });
   const kinked = d; // d[0] = (0, -R) is a corner
-  const k = validateTrack(build([...kinked, { ...kinked[0] }], 20));
+  const k = validateTrack(build([...kinked, { ...kinked[0] }], 20), RATIO);
   assert.ok(codes(k).includes('CLOSURE_TANGENT'), codes(k).join());
   const ks = check(k, 'closure').stats;
   assert.ok(ks.tangentDegrees > 85 && ks.neighbourhoodMaxDegrees < 2 && ks.tangentRatio > 40);
   assert.ok(codes(validateTrack(build([...kinked, { ...kinked[0] }], 20), { closureTangentMode: 'absolute' })).includes('CLOSURE_TANGENT'));
   // the same loop started 40 vertices later has a smooth seam (the corners are now interior): no CLOSURE_TANGENT
   const away = [...d.slice(40), ...d.slice(0, 40)];
-  const aw = validateTrack(build([...away, { ...away[0] }], 20));
+  const aw = validateTrack(build([...away, { ...away[0] }], 20), RATIO);
   assert.equal(codes(aw).includes('CLOSURE_TANGENT'), false, codes(aw).join());
   assert.ok(check(aw, 'closure').stats.tangentDegrees < 2);
   // options: a huge seamRatio or tangentToleranceDegrees disables the failure; the limit reported is the effective one
-  assert.equal(codes(validateTrack(build([...kinked, { ...kinked[0] }], 20), { seamRatio: 1000, tangentToleranceDegrees: 5 })).includes('CLOSURE_TANGENT'), false);
+  assert.equal(codes(validateTrack(build([...kinked, { ...kinked[0] }], 20), { ...RATIO, seamRatio: 1000, tangentToleranceDegrees: 5 })).includes('CLOSURE_TANGENT'), false);
   const lim = k.violations.find(v => v.code === 'CLOSURE_TANGENT')!;
   assert.ok(Math.abs(lim.limit! - Math.max(5, 2 * ks.neighbourhoodMaxDegrees)) < 1e-9 && lim.value === ks.tangentDegrees);
 });
@@ -106,7 +108,7 @@ test("validator: 'absolute' mode reproduces the v0.5.0 CLOSURE_TANGENT verdict o
   const t = generateTrack({ cornerPattern: 'hairpin', cornerCount: 1, cornerStrength: 80, curves: 3, width: 20, seed: 42 });
   const a = validateTrack(t, { closureTangentMode: 'absolute' }), s = check(a, 'closure').stats;
   assert.equal(codes(a).includes('CLOSURE_TANGENT'), s.tangentDegrees > 5);
-  const r = validateTrack(t); // ratio mode never fails where absolute passes
+  const r = validateTrack(t, { closureTangentMode: 'ratio' }); // ratio mode never fails where absolute passes
   if (!codes(a).includes('CLOSURE_TANGENT')) assert.equal(codes(r).includes('CLOSURE_TANGENT'), false);
 });
 
@@ -174,4 +176,99 @@ test('validator: golden cases are deterministic, and track == imported regenerat
   }
   // Recorded, deliberately not asserted to be zero: Auto mode can produce overlaps (see README).
   t.diagnostic(`golden violation counts: ${JSON.stringify(summary)}`);
+});
+
+// ---- E6 (post-RT1): local-kink rule, closureTangentMode 'kink' (default) -------------------------------------------------------
+const LEGACY_RATIO = { closureTangentMode: 'ratio' as const }, LEGACY_ABS = { closureTangentMode: 'absolute' as const };
+const errorCodes = (r: ReturnType<typeof validateTrack>) => [...new Set(r.violations.filter(v => v.severity === 'error').map(v => v.code))].sort();
+const rtTrack = () => generateTrack({ seed: 7, cornerPattern: 'hairpin', curves: 8, straight: 0 });
+/** The red-team probe: displace centreline vertices (and the edge points, by the same vector) along the generator's normal. */
+function spike(t: ReturnType<typeof rtTrack>, indices: number[], d: number) {
+  const c = structuredClone(t), i0 = indices[0];
+  for (const i of indices) for (const arr of [c.points, c.roadEdges[0], c.roadEdges[1]]) { arr[i].x += t.normals[i0].x * d; arr[i].z += t.normals[i0].z * d; }
+  return c;
+}
+
+test('validator v1.1: red-team probes. A seam spike d >= 2 and an interior spike of 30 units on a 40-wide road are errors; the clean track is ok', () => {
+  assert.equal(DEFAULT_VALIDATE_OPTIONS.closureTangentMode, 'kink');
+  const t = rtTrack(), n = t.points.length - 1;
+  const clean = validateTrack(t); assert.equal(clean.ok, true, errorCodes(clean).join()); assert.equal(check(clean, 'local-kink').passed, true);
+  for (const d of [2, 4, 8, 16]) {
+    const r = validateTrack(spike(t, [0, n], d));
+    assert.equal(r.ok, false, `seam spike d=${d}`); assert.ok(errorCodes(r).includes('CLOSURE_TANGENT'), `d=${d}: ${errorCodes(r).join()}`);
+    // the seam is reported as CLOSURE_TANGENT, not as LOCAL_KINK; its neighbours (also bent by the spike) may be
+    assert.ok(!r.violations.some(v => v.code === 'LOCAL_KINK' && v.index === 0));
+    assert.equal(check(r, 'local-kink').stats.seamFlagged, 1);
+  }
+  for (const d of [4, 8, 16, 30]) {
+    const r = validateTrack(spike(t, [100], d));
+    assert.equal(r.ok, false, `interior spike d=${d}`);
+    const v = r.violations.find(x => x.code === 'LOCAL_KINK' && x.index === 100)!; assert.ok(v && v.severity === 'error' && v.value! > v.limit!, `d=${d}`);
+  }
+  // the legacy rules reproduce the v1.0.0 verdicts: 'ratio' accepts the seam spike d = 2 and every interior spike; 'absolute' fails only the seam
+  assert.equal(validateTrack(spike(t, [0, n], 2), LEGACY_RATIO).ok, true);
+  assert.equal(validateTrack(spike(t, [100], 30), LEGACY_RATIO).ok, true);
+  assert.equal(validateTrack(spike(t, [100], 30), LEGACY_ABS).ok, true);
+  assert.ok(errorCodes(validateTrack(spike(t, [0, n], 2), LEGACY_ABS)).includes('CLOSURE_TANGENT'));
+  assert.equal(validateTrack(t, LEGACY_RATIO).checks.length, 7); // legacy modes run no local-kink check
+});
+
+test('validator v1.1: clean circle, coarse circle, smooth generated tracks and a stadium pass; Auto with straight > 0 is flagged at its joins', () => {
+  assert.equal(validateTrack(build(circle(400, 360))).ok, true);
+  assert.equal(validateTrack(build(circle(400, 12), 40)).ok, true); // 30 degrees at every vertex: uniform, not a kink
+  for (const params of [{ cornerPattern: 'right-angle' as const, cornerCount: 2, curves: 6, width: 20, seed: 3 }, { cornerPattern: 'hairpin' as const, cornerCount: 1, cornerStrength: 80, curves: 10, straight: 0.6, seed: 11 },
+    { cornerPattern: 's-curve' as const, cornerCount: 3, curves: 3, seed: 5 }, { cornerPattern: 'auto' as const, straight: 0, curves: 6, width: 80, seed: 9 }]) {
+    const r = validateTrack(generateTrack(params)); assert.equal(codes(r).includes('LOCAL_KINK') || codes(r).includes('CLOSURE_TANGENT'), false, JSON.stringify(params));
+  }
+  const auto = validateTrack(generateTrack({ cornerPattern: 'auto', straight: 0.3, curves: 6, seed: 5 }));
+  assert.ok(codes(auto).includes('LOCAL_KINK') || codes(auto).includes('CLOSURE_TANGENT')); // a genuine heading discontinuity of the original algorithm
+});
+
+test('validator v1.1: every E6 defect operator at a must-detect size is an error (flag inside the defect window)', () => {
+  const t = generateTrack({ seed: 21, cornerPattern: 'right-angle', cornerCount: 2, curves: 6, straight: 0 });
+  const n = t.points.length - 1, width = t.params.width, pts0 = t.points.map(p => ({ ...p }));
+  assert.equal(validateTrack(build(pts0, width)).ok, true);
+  const flaggedAt = (pts: Point[], window: number[]) => {
+    const r = validateTrack(build(pts, width)); return r.violations.filter(v => (v.code === 'LOCAL_KINK' || v.code === 'CLOSURE_TANGENT') && window.includes(v.index!)).length > 0;
+  };
+  const turnAtIdx = (pts: Point[], i: number) => { const a = pts[(i - 1 + n) % n], b = pts[i], c = pts[(i + 1) % n];
+    return Math.abs(Math.atan2((b.x - a.x) * (c.z - b.z) - (b.z - a.z) * (c.x - b.x), (b.x - a.x) * (c.x - b.x) + (b.z - a.z) * (c.z - b.z))) * 180 / Math.PI; };
+  const lnorm = (a: Point, b: Point) => { const dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz); return { x: -dz / l, z: dx / l }; };
+  // 1. seam spike, d = 8
+  { const p = pts0.map(q => ({ ...q })), u = lnorm(p[n - 1], p[1]); for (const j of [0, n]) { p[j].x += 8 * u.x; p[j].z += 8 * u.z; }
+    assert.ok(Math.max(turnAtIdx(p, 0), turnAtIdx(p, 1), turnAtIdx(p, n - 1)) >= 30); assert.ok(flaggedAt(p, [n - 1, 0, 1])); }
+  // 2. interior spike, d = 8
+  { const i = 120, p = pts0.map(q => ({ ...q })), u = lnorm(p[i - 1], p[i + 1]); p[i].x += 8 * u.x; p[i].z += 8 * u.z;
+    assert.ok(turnAtIdx(p, i) >= 30); assert.ok(flaggedAt(p, [i - 1, i, i + 1])); }
+  // 3. interior corner, alpha = 45 degrees (k = 4: symmetric triangle A-P-B)
+  { const i = 140, k = 4, p = pts0.map(q => ({ ...q })), A = pts0[i - k], B = pts0[i + k], L = Math.hypot(B.x - A.x, B.z - A.z), v = lnorm(A, B);
+    const h = L / 2 * Math.tan(45 / 2 * Math.PI / 180), P = { x: (A.x + B.x) / 2 + h * v.x, z: (A.z + B.z) / 2 + h * v.z };
+    p[i].x = P.x; p[i].z = P.z;
+    for (let j = 1; j < k; j++) { p[i - k + j].x = A.x + j / k * (P.x - A.x); p[i - k + j].z = A.z + j / k * (P.z - A.z); p[i + j].x = P.x + j / k * (B.x - P.x); p[i + j].z = P.z + j / k * (B.z - P.z); }
+    assert.ok(Math.abs(turnAtIdx(p, i) - 45) < 20); assert.ok(flaggedAt(p, Array.from({ length: 2 * k + 1 }, (_, j) => i - k + j))); }
+  // 4. tangent break at the seam, phi = 45 degrees (points 1..8 rotated about point 0)
+  { const p = pts0.map(q => ({ ...q })), c = Math.cos(Math.PI / 4), s = Math.sin(Math.PI / 4);
+    for (let j = 1; j <= 8; j++) { const dx = pts0[j].x - pts0[0].x, dz = pts0[j].z - pts0[0].z; p[j].x = pts0[0].x + c * dx - s * dz; p[j].z = pts0[0].z + s * dx + c * dz; }
+    assert.ok(flaggedAt(p, [n - 1, 0, 1, 7, 8, 9])); }
+});
+
+test('validator v1.1: rule options, API and errors', () => {
+  const t = rtTrack(), n = t.points.length - 1, bad = spike(t, [100], 8);
+  const prof = kinkProfile(bad.points, 40), flags = kinkFlags(prof, { ...DEFAULT_VALIDATE_OPTIONS });
+  assert.equal(flags.length, n); assert.equal(flags[100], 1); assert.equal(flags[10], 0);
+  assert.ok(prof.theta[100] > 30 && prof.theta[10] < 14);
+  // every named rule and an AND-combination flag the spike and pass the clean track
+  for (const kinkRule of ['turn', 'curvature', 'outlier', 'spike', 'outlier+curvature', 'outlier+spike']) {
+    assert.equal(validateTrack(bad, { kinkRule }).ok, false, kinkRule); assert.equal(validateTrack(t, { kinkRule }).ok, true, kinkRule);
+  }
+  // thresholds are options; a huge floor disables the outlier rule
+  assert.equal(validateTrack(bad, { kinkFloorDegrees: 1000 }).ok, true);
+  assert.throws(() => validateTrack(t, { kinkRule: 'nonsense' }), /unknown kinkRule/);
+  // a corner polygon that turns equally everywhere is not a kink (outlier rule judges against the surroundings)
+  const square = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 400 }, { x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }];
+  assert.equal(errorCodes(validateTrack(build(square, 20))).some(c => c === 'LOCAL_KINK' || c === 'CLOSURE_TANGENT'), false);
+  // determinism and structure problems in the new mode
+  assert.deepEqual(validateTrack(bad), validateTrack(structuredClone(bad)));
+  const broken = build(circle(400, 360)); broken.roadEdges[0] = broken.roadEdges[0].slice(1);
+  assert.deepEqual(codes(validateTrack(broken)), ['STRUCTURE']); assert.equal(check(validateTrack(broken), 'local-kink').skipped, true);
 });

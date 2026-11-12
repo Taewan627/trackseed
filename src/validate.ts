@@ -26,7 +26,7 @@ export interface Violation {
   limit?: number;
 }
 export interface CheckSummary {
-  id: 'structure' | 'finite' | 'closure' | 'self-intersection' | 'edge-fold' | 'min-turn-radius' | 'max-slope';
+  id: 'structure' | 'finite' | 'closure' | 'local-kink' | 'self-intersection' | 'edge-fold' | 'min-turn-radius' | 'max-slope';
   /** Severity carried by this check's violations. */
   severity: Severity;
   /** True when the check ran and found nothing. */
@@ -55,10 +55,34 @@ export interface ValidateOptions {
   /** Seam-continuity outlier factor of closureTangentMode 'ratio'. Default 2. */
   seamRatio?: number;
   /**
-   * 'ratio' (default since 0.5.1): CLOSURE_TANGENT iff theta0 > max(tangentToleranceDegrees, seamRatio x max neighbourhood turn).
-   * 'absolute' (0.5.0 behaviour): iff theta0 > tangentToleranceDegrees. Library option only (the CLI --limit takes numbers).
+   * 'kink' (default since the E6 amendment): CLOSURE_TANGENT iff the seam vertex is flagged by the local-kink rule
+   * (`kinkRule` and its parameters), the same rule that LOCAL_KINK applies to every other vertex.
+   * 'ratio' (0.5.1 behaviour): CLOSURE_TANGENT iff theta0 > max(tangentToleranceDegrees, seamRatio x max neighbourhood turn);
+   * 'absolute' (0.5.0 behaviour): iff theta0 > tangentToleranceDegrees. The two legacy modes run no LOCAL_KINK check
+   * and reproduce the earlier results exactly. Library option only (the CLI --limit takes numbers).
    */
-  closureTangentMode?: 'ratio' | 'absolute';
+  closureTangentMode?: 'kink' | 'ratio' | 'absolute';
+  /**
+   * Local-kink rule of mode 'kink': 'turn' | 'curvature' | 'outlier' | 'spike', or an AND-combination joined by '+'
+   * (for example 'outlier+curvature'): a vertex is flagged only if every listed rule flags it.
+   */
+  kinkRule?: string;
+  /** Rule 'turn': flag a vertex whose heading change (degrees, x/z) exceeds this. */
+  kinkTurnDegrees?: number;
+  /** Rule 'curvature': flag if (heading change in radians / mean adjacent segment length) x (width / 2) exceeds this (1 = local radius equals half width). */
+  kinkCurvature?: number;
+  /** Rule 'outlier': the reference is a quantile of the turns at vertices i +- 2 .. i +- kinkWindow (i +- 1 are excluded because a single-vertex spike bends them too). */
+  kinkWindow?: number;
+  /** Rule 'outlier': quantile of the reference turns, in (0, 1]; 0.5 is the (lower) median, 1 the maximum. */
+  kinkQuantile?: number;
+  /** Rule 'outlier': flag if turn > max(kinkFloorDegrees, kinkRatio x reference). */
+  kinkRatio?: number;
+  /** Rule 'outlier': absolute floor in degrees. */
+  kinkFloorDegrees?: number;
+  /** Rule 'spike': flag if the deviation of the vertex from the chord of its two neighbours exceeds this fraction of the mean adjacent segment length ... */
+  kinkSpikeSpacing?: number;
+  /** ... AND exceeds this fraction of the road half width. */
+  kinkSpikeHalfWidth?: number;
   /** A ribbon triangle whose x/z cross product is <= this (units^2) counts as flipped or degenerate. Default 1e-5. */
   foldEpsilon?: number;
   /** Warn when the local radius 1/|kappa| < factor * (width / 2). Default 1. */
@@ -69,13 +93,103 @@ export interface ValidateOptions {
   maxViolationsPerCheck?: number;
 }
 export const DEFAULT_VALIDATE_OPTIONS: Required<ValidateOptions> = {
-  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'ratio', foldEpsilon: 1e-5,
+  closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'kink', foldEpsilon: 1e-5,
+  // kink* defaults = the rule frozen on DEV in experiments/e6 (results/dev/FROZEN.json): rule 'outlier', window 3, maximum, ratio 3, floor 12 degrees.
+  // kinkTurnDegrees, kinkCurvature, kinkSpike* belong to the other candidate rules and are inert under the default kinkRule.
+  kinkRule: 'outlier', kinkTurnDegrees: 20, kinkCurvature: 1, kinkWindow: 3, kinkQuantile: 1, kinkRatio: 3, kinkFloorDegrees: 12,
+  kinkSpikeSpacing: 0.2, kinkSpikeHalfWidth: 0.1,
   minRadiusToHalfWidth: 1, maxSlope: 0.3, maxViolationsPerCheck: 20,
 };
 
 const RAD_TO_DEG = 180 / Math.PI;
 /** Vertices on each side of the seam whose turns form the neighbourhood of the 'ratio' seam test. */
 const SEAM_WINDOW = 3;
+
+/** Per-vertex measures of the closed loop of n = points.length - 1 distinct vertices (x/z plane). */
+export interface KinkProfile {
+  n: number; halfWidth: number;
+  /** Heading change at vertex i, degrees, >= 0 (0 where an adjacent segment has zero length). */
+  theta: Float64Array;
+  /** Mean length of the two segments adjacent to vertex i. */
+  spacing: Float64Array;
+  /** Distance of vertex i from the chord joining its two neighbours (distance to the neighbour if the chord has zero length). */
+  dev: Float64Array;
+  /** Memo of outlier references by window and quantile. */
+  refs: Map<string, Float64Array>;
+}
+export function kinkProfile(points: Point[], width: number): KinkProfile {
+  const n = points.length - 1;
+  const theta = new Float64Array(n), spacing = new Float64Array(n), dev = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    const a = points[(i - 1 + n) % n], b = points[i], c = points[(i + 1) % n];
+    const ax = b.x - a.x, az = b.z - a.z, bx = c.x - b.x, bz = c.z - b.z;
+    const l1 = dhypot(ax, az), l2 = dhypot(bx, bz), chord = dhypot(c.x - a.x, c.z - a.z);
+    spacing[i] = (l1 + l2) / 2;
+    theta[i] = l1 > 0 && l2 > 0 ? Math.abs(datan2(ax * bz - az * bx, ax * bx + az * bz)) * RAD_TO_DEG : 0;
+    dev[i] = chord > 0 ? Math.abs(ax * (c.z - a.z) - az * (c.x - a.x)) / chord : l1;
+  }
+  return { n, halfWidth: width / 2, theta, spacing, dev, refs: new Map() };
+}
+/** Reference turn of the 'outlier' rule at every vertex: the `quantile` of theta at i +- 2 .. i +- window (distinct vertices other than i, i - 1, i + 1). */
+function outlierReference(p: KinkProfile, window: number, quantile: number): Float64Array {
+  const key = `${window}|${quantile}`, hit = p.refs.get(key);
+  if (hit) return hit;
+  const n = p.n, out = new Float64Array(n), vals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    vals.length = 0;
+    const seen = new Set<number>([i, (i + 1) % n, (i - 1 + n) % n]);
+    for (let k = 2; k <= window; k++) for (const j of [(i + k) % n, (i - k % n + n) % n]) {
+      if (seen.has(j)) continue;
+      seen.add(j); vals.push(p.theta[j]);
+    }
+    if (vals.length === 0) { out[i] = 0; continue; }
+    vals.sort((x, y) => x - y);
+    out[i] = vals[Math.min(vals.length - 1, Math.max(0, Math.ceil(quantile * vals.length) - 1))];
+  }
+  p.refs.set(key, out);
+  return out;
+}
+export type KinkParams = Pick<Required<ValidateOptions>, 'kinkRule' | 'kinkTurnDegrees' | 'kinkCurvature' | 'kinkWindow' | 'kinkQuantile'
+  | 'kinkRatio' | 'kinkFloorDegrees' | 'kinkSpikeSpacing' | 'kinkSpikeHalfWidth'>;
+const KINK_RULES = ['turn', 'curvature', 'outlier', 'spike'];
+/** The single rules of a (possibly '+'-combined) kinkRule name; throws on an unknown name. */
+export function kinkParts(rule: string): string[] {
+  const parts = rule.split('+');
+  if (parts.length === 0 || parts.some(r => !KINK_RULES.includes(r))) throw new Error(`unknown kinkRule "${rule}" (use ${KINK_RULES.join(', ')} or '+' combinations)`);
+  return parts;
+}
+/** Does single rule `r` flag vertex i? `ref` is the outlier reference array when r is 'outlier'. */
+function kinkHit(p: KinkProfile, r: string, i: number, k: KinkParams, ref: Float64Array | null): boolean {
+  const th = p.theta[i];
+  if (r === 'turn') return th > k.kinkTurnDegrees;
+  if (r === 'curvature') return p.spacing[i] > 0 && (th / RAD_TO_DEG) / p.spacing[i] * p.halfWidth > k.kinkCurvature;
+  if (r === 'outlier') return th > Math.max(k.kinkFloorDegrees, k.kinkRatio * (ref as Float64Array)[i]);
+  return p.spacing[i] > 0 && p.dev[i] / p.spacing[i] > k.kinkSpikeSpacing && p.dev[i] > k.kinkSpikeHalfWidth * p.halfWidth;
+}
+const refFor = (p: KinkProfile, parts: string[], k: KinkParams) => parts.includes('outlier') ? outlierReference(p, k.kinkWindow, k.kinkQuantile) : null;
+/** Does the rule (given as `parts` = kinkParts(k.kinkRule)) flag vertex i (closed-loop index 0 .. n - 1)? */
+export function kinkFlagAt(p: KinkProfile, parts: string[], k: KinkParams, i: number): boolean {
+  const ref = refFor(p, parts, k);
+  for (const r of parts) if (!kinkHit(p, r, i, k, ref)) return false;
+  return true;
+}
+/** 1 where the local-kink rule flags the vertex, 0 elsewhere; indices are closed-loop vertices 0 .. n - 1 (0 is the seam). */
+export function kinkFlags(p: KinkProfile, k: KinkParams): Uint8Array {
+  const parts = kinkParts(k.kinkRule), out = new Uint8Array(p.n), ref = refFor(p, parts, k);
+  for (let i = 0; i < p.n; i++) {
+    let hit = true;
+    for (const r of parts) if (!kinkHit(p, r, i, k, ref)) { hit = false; break; }
+    out[i] = hit ? 1 : 0;
+  }
+  return out;
+}
+/** The turn limit equivalent to a single-rule verdict at vertex i (degrees), or undefined for 'spike' and combinations. */
+function kinkLimit(p: KinkProfile, i: number, k: KinkParams): number | undefined {
+  if (k.kinkRule === 'turn') return k.kinkTurnDegrees;
+  if (k.kinkRule === 'curvature') return k.kinkCurvature * p.spacing[i] / p.halfWidth * RAD_TO_DEG;
+  if (k.kinkRule === 'outlier') return Math.max(k.kinkFloorDegrees, k.kinkRatio * outlierReference(p, k.kinkWindow, k.kinkQuantile)[i]);
+  return undefined;
+}
 const cross = (a: Point, b: Point, c: Point) => (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
 
 interface Segment { a: Point; b: Point; ring: number; index: number; minX: number; maxX: number; minZ: number; maxZ: number }
@@ -138,6 +252,8 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   const record = (c: Omit<CheckSummary, 'passed' | 'skipped'> & { skipped?: boolean }) =>
     checks.push({ ...c, skipped: c.skipped ?? false, passed: !c.skipped && c.failures === 0 });
 
+  const kinkMode = o.closureTangentMode === 'kink';
+  if (kinkMode) kinkParts(o.kinkRule); // reject an unknown rule name up front
   const pts = track.points, n = pts.length - 1, width = track.params.width;
   const edges = track.roadEdges;
   const structureProblems: string[] = [];
@@ -147,9 +263,9 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   if (structureProblems.length) {
     for (const message of structureProblems) add({ code: 'STRUCTURE', severity: 'error', message });
     record({ id: 'structure', severity: 'error', skipped: false, checked: 1, failures: structureProblems.length, stats: {} });
-    for (const [id, severity] of [['finite', 'error'], ['closure', 'error'], ['self-intersection', 'error'],
+    for (const [id, severity] of [['finite', 'error'], ['closure', 'error'], ['local-kink', 'error'], ['self-intersection', 'error'],
       ['edge-fold', 'error'], ['min-turn-radius', 'warning'], ['max-slope', 'warning']] as const)
-      record({ id, severity, skipped: true, checked: 0, failures: 0, stats: {} });
+      if (id !== 'local-kink' || kinkMode) record({ id, severity, skipped: true, checked: 0, failures: 0, stats: {} });
     return { ok: false, violations, checks };
   }
   record({ id: 'structure', severity: 'error', checked: 1, failures: 0, stats: {} });
@@ -172,6 +288,7 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   const finite = nonFinite === 0;
 
   // 1. closure ------------------------------------------------------------
+  let kink: { profile: KinkProfile; flags: Uint8Array } | null = null;
   if (!finite) record({ id: 'closure', severity: 'error', skipped: true, checked: 0, failures: 0, stats: {} });
   else {
     let failures = 0;
@@ -191,7 +308,8 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
     near.delete(0);
     let neighbourhood = 0;
     for (const i of near) neighbourhood = Math.max(neighbourhood, turnAt(i));
-    const tangentLimit = o.closureTangentMode === 'absolute' ? o.tangentToleranceDegrees
+    if (kinkMode) { const profile = kinkProfile(pts, width); kink = { profile, flags: kinkFlags(profile, o) }; }
+    const tangentLimit = kink ? kinkLimit(kink.profile, 0, o) : o.closureTangentMode === 'absolute' ? o.tangentToleranceDegrees
       : Math.max(o.tangentToleranceDegrees, o.seamRatio * neighbourhood);
     if (gap > o.closureTolerance) { failures++; add({ code: 'CLOSURE_POSITION', severity: 'error', index: n, value: gap, limit: o.closureTolerance,
       message: `last point is ${gap} units from the first point (limit ${o.closureTolerance})` }); }
@@ -199,11 +317,30 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
       message: `a road edge's last point is ${edgeGap} units from its first point (limit ${o.closureTolerance})` }); }
     if (heightGap > o.heightTolerance) { failures++; add({ code: 'CLOSURE_HEIGHT', severity: 'error', index: n, value: heightGap, limit: o.heightTolerance,
       message: `height differs by ${heightGap} across the seam (limit ${o.heightTolerance})` }); }
-    if (tangent > tangentLimit) { failures++; add({ code: 'CLOSURE_TANGENT', severity: 'error', index: 0, value: tangent, limit: tangentLimit,
-      message: `heading changes by ${tangent} degrees across the seam (limit ${tangentLimit}; neighbourhood maximum ${neighbourhood} degrees, mode ${o.closureTangentMode})` }); }
+    const tangentFails = kink ? kink.flags[0] === 1 : tangent > (tangentLimit as number);
+    if (tangentFails) { failures++; add({ code: 'CLOSURE_TANGENT', severity: 'error', index: 0, value: tangent, ...(tangentLimit !== undefined ? { limit: tangentLimit } : {}),
+      message: `heading changes by ${tangent} degrees across the seam (${kink ? `local-kink rule ${o.kinkRule}` : `limit ${tangentLimit}`}; neighbourhood maximum ${neighbourhood} degrees, mode ${o.closureTangentMode})` }); }
     record({ id: 'closure', severity: 'error', checked: 4, failures,
       stats: { positionGap: gap, edgeGap, heightGap, tangentDegrees: tangent, neighbourhoodMaxDegrees: neighbourhood,
         ...(neighbourhood > 0 ? { tangentRatio: tangent / neighbourhood } : {}) } });
+  }
+
+  // 2b. local kink (mode 'kink' only): the same rule at every vertex of the closed loop; the seam vertex is reported as CLOSURE_TANGENT
+  if (kinkMode) {
+    if (!kink) record({ id: 'local-kink', severity: 'error', skipped: true, checked: 0, failures: 0, stats: {} });
+    else {
+      const { profile, flags } = kink;
+      let failures = 0, maxTurn = 0;
+      for (let i = 1; i < n; i++) {
+        maxTurn = Math.max(maxTurn, profile.theta[i]);
+        if (!flags[i]) continue;
+        failures++;
+        const limit = kinkLimit(profile, i, o);
+        add({ code: 'LOCAL_KINK', severity: 'error', index: i, value: profile.theta[i], ...(limit !== undefined ? { limit } : {}),
+          message: `heading changes by ${profile.theta[i]} degrees at vertex ${i} (local-kink rule ${o.kinkRule}${limit !== undefined ? `, limit ${limit}` : ''})` });
+      }
+      record({ id: 'local-kink', severity: 'error', checked: n, failures, stats: { maxTurnDegrees: maxTurn, seamFlagged: flags[0] } });
+    }
   }
 
   // 3. self-intersection (centerline, each edge, edge vs edge) -------------

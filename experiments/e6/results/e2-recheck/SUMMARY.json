@@ -1,0 +1,159 @@
+{
+ "label": "post-RT1 validator v1.1 (default closureTangentMode kink)",
+ "protocol": "experiments/e6/PROTOCOL.md section 9",
+ "reproduction": {
+  "ratioOkMatchesAmendment01Csv": true,
+  "mismatches": 0
+ },
+ "defaults": {
+  "closureTangentMode": "kink",
+  "kinkRule": "outlier"
+ },
+ "perMode": {
+  "auto": {
+   "generated": 12150,
+   "generationFailures": 0,
+   "okRatio": {
+    "k": 3792,
+    "n": 12150,
+    "p": 0.312099,
+    "lo": 0.30392,
+    "hi": 0.320396
+   },
+   "okV11": {
+    "k": 3615,
+    "n": 12150,
+    "p": 0.297531,
+    "lo": 0.289467,
+    "hi": 0.305723
+   },
+   "okToNotOk": {
+    "k": 177,
+    "n": 12150,
+    "p": 0.0145679,
+    "lo": 0.0125857,
+    "hi": 0.016857
+   },
+   "notOkToOk": {
+    "k": 0,
+    "n": 12150,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.00031607
+   },
+   "v11CodeCounts": {
+    "MAX_SLOPE": 8100,
+    "EDGE_FOLD": 8073,
+    "MIN_TURN_RADIUS": 8508,
+    "SELF_INTERSECTION_EDGE": 7881,
+    "CLOSURE_TANGENT": 5427,
+    "LOCAL_KINK": 8100
+   }
+  },
+  "right-angle": {
+   "generated": 12150,
+   "generationFailures": 0,
+   "okRatio": {
+    "k": 12150,
+    "n": 12150,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okV11": {
+    "k": 12150,
+    "n": 12150,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okToNotOk": {
+    "k": 0,
+    "n": 12150,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.00031607
+   },
+   "notOkToOk": {
+    "k": 0,
+    "n": 12150,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.00031607
+   },
+   "v11CodeCounts": {
+    "MAX_SLOPE": 8100
+   }
+  },
+  "hairpin": {
+   "generated": 12144,
+   "generationFailures": 6,
+   "okRatio": {
+    "k": 12144,
+    "n": 12144,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okV11": {
+    "k": 12144,
+    "n": 12144,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okToNotOk": {
+    "k": 0,
+    "n": 12144,
+    "p": 0,
+    "lo": 2.71051e-20,
+    "hi": 0.000316226
+   },
+   "notOkToOk": {
+    "k": 0,
+    "n": 12144,
+    "p": 0,
+    "lo": 2.71051e-20,
+    "hi": 0.000316226
+   },
+   "v11CodeCounts": {
+    "MAX_SLOPE": 8096
+   }
+  },
+  "s-curve": {
+   "generated": 12150,
+   "generationFailures": 0,
+   "okRatio": {
+    "k": 12150,
+    "n": 12150,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okV11": {
+    "k": 12150,
+    "n": 12150,
+    "p": 1,
+    "lo": 0.999684,
+    "hi": 1
+   },
+   "okToNotOk": {
+    "k": 0,
+    "n": 12150,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.00031607
+   },
+   "notOkToOk": {
+    "k": 0,
+    "n": 12150,
+    "p": 0,
+    "lo": 0,
+    "hi": 0.00031607
+   },
+   "v11CodeCounts": {
+    "MAX_SLOPE": 8100
+   }
+  }
+ }
+}
