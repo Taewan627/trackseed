@@ -1,0 +1,13 @@
+TrackLab 1.1.0 test counts. Run on the working tree of branch wp6 after commit 14cca2f, with the test fix in tests/browser/io.spec.mjs and the documentation changes of this commit set (no change under src/ or experiments/).
+Machine: Linux 6.18.44-fc-v378 x86_64, node v22.23.4 (uname and node -v of the run; no committed environment file describes this machine).
+
+npm test                                  : tests 113, pass 113, fail 0, cancelled 0, skipped 0   (duration 144.2 s)
+npm run test:browser (build, then playwright test; PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers) :
+    46 passed (9.1 min), 0 failed
+    npx playwright test --list: Total: 46 tests in 7 files
+
+Earlier run before the test fix (same src/ and experiments/, tests/browser/io.spec.mjs unchanged): 45 passed, 1 failed at tests/browser/io.spec.mjs:137.
+    cause: the import test compared the whole-document digest with the stored v1.0.0 fixture value; that digest covers the generator stamp (README, "Exchange format v1"), so it changes with the version.
+    fix: the test now compares integrity.contentDigest, asserts generator.version equal to VERSION (1.1.0), and asserts that the digest differs from the fixture.
+
+Scripts run for the documentation of this change: scripts/cli-example.sh (docs/cli-example-output.txt, version 1.1.0 defaults: height 20, tangent join).

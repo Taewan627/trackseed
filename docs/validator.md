@@ -1,4 +1,4 @@
-# Validator rules (`validateTrack`), including the post-RT1 local-kink rule ("v1.1")
+# Validator rules (`validateTrack`), including the local-kink rule added after an internal review ("v1.1")
 
 Scope: this file documents the rules, defaults, rationale and evidence of the geometry validator in `src/validate.ts`. The version number is not changed by the commit that adds it (versioning is handled separately). The README and the CLI describe this rule (see "Known follow-ups" for the remaining gaps).
 
@@ -33,14 +33,14 @@ Legacy modes (`closureTangentMode: 'ratio' | 'absolute'`) reproduce v0.5.1 / v0.
 
 All numbers: `experiments/e6/` (pre-registered in `PROTOCOL.md`, committed alone before any evaluation).
 
-- Defect (red team RT1): the 'ratio' rule misses seam kinks; there was no interior kink check.
+- Defect (found in an internal review before v1.1): the 'ratio' rule misses seam kinks; there was no interior kink check.
 - DEV (20 seeds, `results/dev/`): 711 configurations of four detector families (bare turn, curvature x half width, outlier, geometric spike, and combinations) were scored on clean generated tracks (pattern modes N1, Auto straight 0 N2), a synthetic stress set (N3: circles of 12..384 points, ellipses, stadiums) and five defect operators. The selection criterion fixed in the protocol (admissible = FPR <= 1% and no flag on N3; then maximum macro recall; then ties by fewest false positives, family simplicity, plateau centre) chose `outlier`, window 3, maximum, ratio 3, floor 12: DEV false positives 0/9718 (N1), 0/1080 (N2), 0/60 (N3); recall on must-detect instances 100% for all four planar operators. Bare-turn thresholds <= 30 degrees flag the coarse circles of N3; curvature-times-half-width cannot separate narrow-road Auto curves from kinks.
 - HELD-OUT (40 other seeds, evaluated once, `results/heldout/SUMMARY.md`): recall on must-detect instances (heading change >= 30 degrees at the defect) 100% [99.95, 100] for the seam spike, interior spike, interior corner and seam tangent break (8553, 8153, 9111, 7560 instances); false positives 0/19436 on N1, 0/2160 on N2, 0/60 on N3. For comparison, 'ratio' catches 54.2% of must-detect seam spikes and 0% of interior defects; 'absolute' catches all seam spikes but flags 17.5% of clean pattern-mode tracks, 33.3% of clean Auto (straight 0) tracks and 55% of N3. Results are reproducible bit for bit (two runs, identical SHA-256).
 - Auto with straight > 0 contains genuine heading discontinuities of the original algorithm (up to 134 degrees); the rule flags 696/696 of the tracks with a join >= 30 degrees (the 'ratio' rule 77.2%).
 
 Limits (stated in advance in the protocol): the kink rule is planar; height steps are not detected by any error-severity check (MAX_SLOPE warns on 55.8% of height-step instances, but also on many clean tracks); the 12 degree floor sits just below the largest clean per-vertex turn seen (13.6 degrees) and relies on the ratio term there; defects are synthetic operators and the generator's sample spacing is 8 units (pattern modes) or 2.5-18 units (Auto), so behaviour on very differently sampled imported tracks is covered only by the analytic N3 set; the must-detect size (30 degrees) is a stated design choice.
 
-## E2 recheck (post-RT1 validator v1.1)
+## E2 recheck (validator v1.1)
 
 See `experiments/e6/results/e2-recheck/SUMMARY.md` (outputs separate from all earlier result files).
 
