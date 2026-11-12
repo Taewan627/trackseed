@@ -237,14 +237,17 @@ input[type=range]::-moz-range-thumb {
   justify-content: space-between;
   font-size: 11px;
   color: #a4b1ac;
-  margin-top: 10px
+  margin-top: 10px;
+  white-space: nowrap;
+  gap: 6px
 }
 .select-field select {
-  width: 140px;
+  width: 150px;
+  min-width: 0;
   background: #1d292b;
   border: 1px solid #34413f;
   color: #c7d2c7;
-  padding: 7px 5px;
+  padding: 7px 2px;
   border-radius: 3px;
   font-size: 11px
 }
@@ -981,3 +984,9 @@ input[type=range]::-moz-range-thumb {
 .validation-violations .violation-warning { color:#ffcf8c; border-color:#8c693b; background:#362c21; border-left-style:dashed }
 .validation-violations .violation-more { color:#86958a; border-color:transparent }
 .validation-violations code { font-weight:650 }
+
+/* Language toggle (EN / Korean) in the header; local-badge keeps margin-left:auto, the toggle follows it. */
+.lang-toggle { display:flex; gap:2px; border:1px solid #35423d; padding:3px; border-radius:4px; margin-left:-12px }
+.lang-toggle button { background:transparent; border:0; border-radius:2px; color:#8d9d94; padding:4px 10px; font-size:10px; cursor:pointer }
+.lang-toggle button.active { background:#36473c; color:#d8edc3 }
+.lang-toggle button:focus-visible { outline:1px solid #677e59 }

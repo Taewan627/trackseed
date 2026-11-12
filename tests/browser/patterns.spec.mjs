@@ -14,7 +14,7 @@ async function edit(page, values) {
 for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['overview', 'chase']) {
   test(`v0.4: ${kind} automatically updates 3D/map/boundaries/coins in ${mode}`, async ({ page }) => {
     const errors = []; page.on('pageerror', e => errors.push(e.message));
-    await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('생성 완료');
+    await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('Generated');
     await page.evaluate(() => {
       const s = window.__tracklab, c = s.coins.positions[0];
       Object.assign(s.pose, { x: c.x, y: c.y, z: c.z, speed: 0, vx: 0, vz: 0 });
@@ -26,8 +26,8 @@ for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['o
     const old3D = await page.locator('#viewport > canvas').screenshot();
     await edit(page, { cornerPattern: kind, cornerCount: 3, cornerStrength: 60 });
     await expect.poll(() => page.evaluate(() => window.__tracklab.generation)).toBe(generation + 1);
-    await expect(page.locator('#pattern-status')).toContainText('3 / 3개 적용');
-    await expect(page.locator('#pattern-status')).toContainText('도로/보도 검사 통과');
+    await expect(page.locator('#pattern-status')).toContainText('3 / 3 applied');
+    await expect(page.locator('#pattern-status')).toContainText('road/sidewalk checks passed');
     await expect(page.locator('#pattern-warning')).toBeHidden();
     const state = await page.evaluate(async () => {
       const { roadContact, mapTransform } = await import('/src/core.ts');
@@ -61,7 +61,7 @@ for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['o
 }
 
 test('v0.4: real rejected layout warns, preserves previous scene/coins and recovers with zero count', async ({ page }) => {
-  await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('생성 완료');
+  await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('Generated');
   await page.evaluate(() => {
     const s = window.__tracklab, c = s.coins.positions[0];
     Object.assign(s.pose, { x: c.x, y: c.y, z: c.z, speed: 0, vx: 0, vz: 0 });
@@ -72,8 +72,9 @@ test('v0.4: real rejected layout warns, preserves previous scene/coins and recov
   await edit(page, { cornerPattern: 'hairpin', cornerCount: 1, curves: 3, width: 80, straight: 0.6,
     size: 1, cornerStrength: 20, seed: 0, height: 200, density: 0, obstacles: 8 });
   await expect(page.locator('#pattern-warning')).toBeVisible();
+  // message text originates in src/patterns.ts (Korean in both UI languages; out of scope for the i18n dictionary)
   await expect(page.locator('#pattern-warning')).toContainText('6회 시도');
-  await expect(page.locator('#status')).toHaveText('패턴 적용 실패 · 이전 트랙 유지');
+  await expect(page.locator('#status')).toHaveText('Pattern application failed · previous track kept');
   const after = await page.evaluate(() => ({ generation: window.__tracklab.generation,
     track: JSON.stringify(window.__tracklab.track), coins: window.__tracklab.coins }));
   expect(after).toEqual(before);
@@ -82,7 +83,7 @@ test('v0.4: real rejected layout warns, preserves previous scene/coins and recov
   await edit(page, { cornerCount: 0 });
   await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.cornerCount)).toBe(0);
   await expect(page.locator('#pattern-warning')).toBeHidden();
-  await expect(page.locator('#pattern-status')).toContainText('0개 · 기존 생성');
+  await expect(page.locator('#pattern-status')).toContainText('0 patterns · original generation');
   await expect(page.locator('#coin-count')).toHaveText('0 / 10');
   expect(await page.evaluate(() => window.__tracklab.track.patternReport.inserted)).toBe(0);
 });

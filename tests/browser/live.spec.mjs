@@ -10,7 +10,7 @@ async function freezeClock(page) {
 for (const mode of ['overview', 'chase']) {
   test(`v0.3: real slider input updates 3D and minimap automatically in ${mode}`, async ({ page }) => {
     await page.goto('/?test=1');
-    await expect(page.locator('#status')).toContainText('생성 완료');
+    await expect(page.locator('#status')).toContainText('Generated');
     await page.locator(`#${mode}`).click();
     const generation = await page.evaluate(() => window.__tracklab.generation);
     const before3D = await page.locator('#viewport > canvas').screenshot();
@@ -24,14 +24,14 @@ for (const mode of ['overview', 'chase']) {
     expect(state.pose.speed).toBe(0);
     expect(await page.locator('#minimap').evaluate(c => c.toDataURL())).not.toBe(beforeMap);
     expect((await page.locator('#viewport > canvas').screenshot()).equals(before3D)).toBe(false);
-    await expect(page.locator('#status')).toContainText('차량 안전 재배치 / 속도 0');
+    await expect(page.locator('#status')).toContainText('vehicle safely respawned / speed 0');
     await page.screenshot({ path: `test-results/v03-live-${mode}.png` });
   });
 }
 
 test('v0.3: rapid slider inputs debounce once, retain the final value and cancel on manual Generate', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   // Virtual timers make the 149/150ms boundary deterministic even on a slow GPU.
   await freezeClock(page);
   const before = await page.evaluate(() => window.__tracklab.generation);
@@ -41,7 +41,7 @@ test('v0.3: rapid slider inputs debounce once, retain the final value and cancel
     }
   });
   await expect(page.locator('#width-value')).toHaveValue('37');
-  await expect(page.locator('#status')).toContainText('자동 갱신 대기');
+  await expect(page.locator('#status')).toContainText('Update pending');
   expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
   await page.clock.runFor(149);
   expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
@@ -60,7 +60,7 @@ test('v0.3: rapid slider inputs debounce once, retain the final value and cancel
 
 test('v0.3: numeric, Seed and theme edits share one deterministic track and safely stop Drive', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await page.locator('#chase').click();
   await page.locator('#viewport > canvas').focus(); await page.keyboard.down('ArrowUp');
   await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBeGreaterThan(10);
@@ -71,7 +71,7 @@ test('v0.3: numeric, Seed and theme edits share one deterministic track and safe
   expect(await page.evaluate(() => window.__tracklab.mode)).toBe('chase');
   await page.locator('#seed').fill('');
   const before = await page.evaluate(() => window.__tracklab.generation);
-  await expect(page.locator('#status')).toContainText('입력 대기');
+  await expect(page.locator('#status')).toContainText('Waiting for input');
   // Prove an unfinished numeric edit cannot accidentally become Seed 0.
   await freezeClock(page); await page.clock.runFor(300);
   expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
@@ -149,7 +149,7 @@ test('v0.3: repeated high-speed curb attempts keep the hull on rendered asphalt 
 
 test('v0.3: 100 live parameter regenerations retain bounded scene resources and heap', async ({ page }) => {
   test.setTimeout(90000);
-  await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('생성 완료');
+  await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('Generated');
   await freezeClock(page);
   const client = await page.context().newCDPSession(page);
   const snapshots = [];

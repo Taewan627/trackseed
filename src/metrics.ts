@@ -22,7 +22,35 @@ export const TURN_KAPPA = 4e-3;
  */
 export const CURVATURE_BIN_EDGES: readonly number[] = [0, 5e-4, 1e-3, 2e-3, 4e-3, 8e-3, 1.6e-2, 3.2e-2];
 
-export interface MetricsOptions { straightKappa?: number; turnKappa?: number }
+/**
+ * Scale-normalised ("dimensionless") curvature: kappaHat = kappa * L / (2 pi), L = closed
+ * centreline length (field `length`). A circle of any radius R has L = 2 pi R and
+ * therefore kappaHat = 1 exactly in the continuum limit; kappaHat is invariant under
+ * uniform scaling of the track. See docs/metrics.md.
+ *
+ * Thresholds are the legacy absolute thresholds expressed at the reference length
+ * L_ref = 2 pi * 500 (a circle of radius 500): 5e-4 * 500 = 0.25 and 4e-3 * 500 = 2.
+ */
+export const STRAIGHT_KAPPA_NORM = 0.25;
+/** kappaHat above which a sample belongs to a turn (radius < R_eq / 2, R_eq = L / 2 pi). */
+export const TURN_KAPPA_NORM = 2;
+const SQRT2 = Math.sqrt(2);
+/**
+ * Lower edges of the fixed |kappaHat| histogram bins (dimensionless), 8 bins as for the
+ * legacy histogram. Bin k is [EDGES[k], EDGES[k+1]); the last bin is [EDGES.at(-1), +inf).
+ * Edges are 2^(j - 1/2) for j = -1 .. 4, i.e. a factor-2 log scale whose bin
+ * [sqrt(1/2), sqrt(2)) is centred (geometrically) on the circle value 1, so a circle is
+ * never on a bin boundary and its bin does not depend on discretisation bias. In units of
+ * R_eq = L / 2 pi the bins are radius > 2.83, 1.41-2.83, 0.71-1.41, 0.35-0.71, ..., < 0.044.
+ * Products of sqrt(2) with powers of two: exact, no transcendental function involved.
+ */
+export const CURVATURE_NORM_BIN_EDGES: readonly number[] = [0, SQRT2 / 4, SQRT2 / 2, SQRT2, 2 * SQRT2, 4 * SQRT2, 8 * SQRT2, 16 * SQRT2];
+
+export interface MetricsOptions {
+  straightKappa?: number; turnKappa?: number;
+  /** Thresholds on |kappaHat| for the normalised classification (default STRAIGHT_KAPPA_NORM / TURN_KAPPA_NORM). */
+  straightKappaNorm?: number; turnKappaNorm?: number;
+}
 
 export interface TrackMetrics {
   /** Number of distinct centerline samples (points.length - 1). */
@@ -53,6 +81,21 @@ export interface TrackMetrics {
   totalTurningDegrees: number;
   /** Signed discrete curvature per sample (1/unit), length sampleCount. */
   curvature: number[];
+
+  // ---- Scale-normalised counterparts (dimensionless; kappaHat = kappa * length / (2 pi)) ----
+  /** Mean |kappaHat| over samples. */
+  meanAbsCurvatureNorm: number;
+  /** 95th percentile of |kappaHat| (nearest rank, as p95AbsCurvature). */
+  p95AbsCurvatureNorm: number;
+  maxAbsCurvatureNorm: number;
+  /** Shannon entropy (bits) of the |kappaHat| histogram defined by CURVATURE_NORM_BIN_EDGES (0 .. 3 bits). */
+  curvatureEntropyBitsNorm: number;
+  /** Sample counts per |kappaHat| bin (length CURVATURE_NORM_BIN_EDGES.length). */
+  curvatureHistogramNorm: number[];
+  /** Arc-length fraction of segments whose two end samples both have |kappaHat| < straightKappaNorm. */
+  straightLengthFractionNorm: number;
+  /** Maximal same-sign runs of samples with |kappaHat| > turnKappaNorm (seam-merged). */
+  turnCountNorm: number;
 }
 
 const RAD_TO_DEG = 180 / Math.PI;
@@ -116,9 +159,21 @@ function countTurns(kappa: number[], threshold: number): number {
   return runs;
 }
 
+function histogramOf(values: number[], edges: readonly number[]): number[] {
+  const h = edges.map(() => 0);
+  for (const k of values) {
+    let bin = 0;
+    while (bin + 1 < edges.length && k >= edges[bin + 1]) bin++;
+    h[bin]++;
+  }
+  return h;
+}
+
 export function computeMetrics(track: MetricsInput, options: MetricsOptions = {}): TrackMetrics {
   const straightKappa = options.straightKappa ?? STRAIGHT_KAPPA;
   const turnKappa = options.turnKappa ?? TURN_KAPPA;
+  const straightKappaNorm = options.straightKappaNorm ?? STRAIGHT_KAPPA_NORM;
+  const turnKappaNorm = options.turnKappaNorm ?? TURN_KAPPA_NORM;
   const pts = track.points, n = pts.length - 1;
   const kappa = curvatureSamples(pts);
   const abs = kappa.map(Math.abs);
@@ -157,6 +212,22 @@ export function computeMetrics(track: MetricsInput, options: MetricsOptions = {}
   for (const k of abs) total += k;
   for (const t of headingChangesDegrees(pts)) turning += Math.abs(t);
 
+  // Scale-normalised block: kappaHat = kappa * L / (2 pi); degenerate (L = 0) gives 0.
+  const norm = length > 0 ? length / (2 * Math.PI) : 0;
+  const kappaHat = kappa.map(k => k * norm), absHat = kappaHat.map(Math.abs);
+  const histogramHat = histogramOf(absHat, CURVATURE_NORM_BIN_EDGES);
+  let entropyHat = 0;
+  for (const count of histogramHat) if (count > 0) { const p = count / n; entropyHat -= p * dlog2(p); }
+  const sortedHat = [...absHat].sort((a, b) => a - b);
+  let totalHat = 0, straightHat = 0;
+  for (const k of absHat) totalHat += k;
+  for (let i = 0; i < n; i++) {
+    if (absHat[i] < straightKappaNorm && absHat[(i + 1) % n] < straightKappaNorm) {
+      const a = pts[i], b = pts[i + 1];
+      straightHat += dhypot(b.x - a.x, b.y - a.y, b.z - a.z);
+    }
+  }
+
   return {
     sampleCount: n, length, boundingBoxArea: (maxX - minX) * (maxZ - minZ),
     straightLengthFraction: length > 0 ? straight / length : 0,
@@ -165,5 +236,11 @@ export function computeMetrics(track: MetricsInput, options: MetricsOptions = {}
     turnCount: countTurns(kappa, turnKappa),
     elevationRange: maxY - minY, maxAbsSlope: maxSlope, meanAbsSlope: run > 0 ? rise / run : 0,
     totalTurningDegrees: turning, curvature: kappa,
+    meanAbsCurvatureNorm: n > 0 ? totalHat / n : 0,
+    p95AbsCurvatureNorm: n > 0 ? sortedHat[Math.ceil(95 * n / 100) - 1] : 0,
+    maxAbsCurvatureNorm: n > 0 ? sortedHat[n - 1] : 0,
+    curvatureEntropyBitsNorm: entropyHat === 0 ? 0 : entropyHat, curvatureHistogramNorm: histogramHat,
+    straightLengthFractionNorm: length > 0 ? straightHat / length : 0,
+    turnCountNorm: countTurns(kappaHat, turnKappaNorm),
   };
 }

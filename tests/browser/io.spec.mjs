@@ -5,7 +5,7 @@ import { join } from 'node:path';
 
 async function ready(page) {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
 }
 async function exportFile(page) {
   const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#export-json').click()]);
@@ -41,7 +41,7 @@ test('io: export downloads a parseable document whose digest matches name and di
   });
   expect(file.text).toBe(live.json);
   expect(live.digest).toBe(parsed.digest);
-  await expect(page.locator('#io-message')).toContainText('내보내기 완료');
+  await expect(page.locator('#io-message')).toContainText('Exported');
   expect(errors).toEqual([]);
 });
 
@@ -56,7 +56,7 @@ test('io: importing an exported file into a fresh page reproduces params and dig
   expect(await fresh.evaluate(() => window.__tracklab.track.params.seed)).toBe(42);
   const generation = await fresh.evaluate(() => window.__tracklab.generation);
   await fresh.locator('#import-file').setInputFiles(file.path);
-  await expect(fresh.locator('#status')).toContainText('가져오기 완료');
+  await expect(fresh.locator('#status')).toContainText('Imported');
   expect(await fresh.evaluate(() => window.__tracklab.generation)).toBeGreaterThan(generation);
   const state = await fresh.evaluate(async () => {
     const { exportTrack } = await import('/src/schema.ts');
@@ -84,7 +84,7 @@ test('io: a tampered file shows the error and keeps the previous track', async (
   const before = await page.evaluate(() => ({ generation: window.__tracklab.generation,
     track: JSON.stringify(window.__tracklab.track) }));
   await page.locator('#import-file').setInputFiles(tampered);
-  await expect(page.locator('#status')).toContainText('가져오기 실패');
+  await expect(page.locator('#status')).toContainText('Import failed');
   await expect(page.locator('#status')).toContainText('digest mismatch');
   await expect(page.locator('#io-message')).toHaveClass(/error/);
   const after = await page.evaluate(() => ({ generation: window.__tracklab.generation,
@@ -113,7 +113,7 @@ test('io: validation panel is INVALID for default seed-42 Auto and OK for a patt
   await page.locator('#cornerCount-value').fill('3');
   await page.locator('#cornerStrength-value').fill('60');
   await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.cornerPattern)).toBe('right-angle');
-  await expect(page.locator('#pattern-status')).toContainText('3 / 3개 적용');
+  await expect(page.locator('#pattern-status')).toContainText('3 / 3 applied');
   await expect(page.locator('#validation-badge')).toHaveText('OK');
   expect((await page.evaluate(() => window.__tracklab.validation)).ok).toBe(true);
   await expect(page.locator('#validation-violations .violation-error')).toHaveCount(0);
@@ -125,7 +125,7 @@ test('io: keyboard driving still works after import', async ({ page }) => {
   await setParams(page, { seed: 9, height: 0, width: 80, obstacles: 0 });
   await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.seed)).toBe(9);
   await page.locator('#import-file').setInputFiles(file.path);
-  await expect(page.locator('#status')).toContainText('가져오기 완료');
+  await expect(page.locator('#status')).toContainText('Imported');
   expect(await page.evaluate(() => window.__tracklab.track.params.seed)).toBe(42);
   await page.locator('#viewport > canvas').focus();
   const start = await page.evaluate(() => ({ x: window.__tracklab.pose.x, z: window.__tracklab.pose.z }));

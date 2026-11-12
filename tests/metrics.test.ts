@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateTrack, type Point } from '../src/core.js';
-import { CURVATURE_BIN_EDGES, computeMetrics, curvatureSamples, dlog2 } from '../src/metrics.js';
+import { readFileSync } from 'node:fs';
+import { CURVATURE_BIN_EDGES, CURVATURE_NORM_BIN_EDGES, computeMetrics, curvatureSamples, dlog2 } from '../src/metrics.js';
 
 const close = (actual: number, expected: number, tolerance: number, label = '') =>
   assert.ok(Math.abs(actual - expected) <= tolerance, `${label} ${actual} vs ${expected} (tolerance ${tolerance})`);
@@ -104,5 +105,91 @@ test('metrics: deterministic, and finite on generated tracks', () => {
     close(a.length, t.length, 1e-9 * t.length, 'length equals track.length');
     assert.ok(a.straightLengthFraction >= 0 && a.straightLengthFraction <= 1);
     assert.ok(a.curvatureEntropyBits >= 0 && a.curvatureEntropyBits <= 3 + 1e-12);
+  }
+});
+
+// ---- scale-normalised curvature (WP3b) --------------------------------------------------
+
+const NORM_SCALAR_FIELDS = ['meanAbsCurvatureNorm', 'p95AbsCurvatureNorm', 'maxAbsCurvatureNorm', 'curvatureEntropyBitsNorm',
+  'straightLengthFractionNorm'] as const;
+/** Relative tolerance for scale invariance (only floating-point rounding of kappa * L under x -> s x). */
+const SCALE_REL_TOL = 1e-9;
+/** Circle: a regular n-gon has kappaHat = n sin(pi/n) / pi = 1 - O(1/n^2) (about 3.2e-6 at n = 720). */
+const CIRCLE_TOL = 1e-5;
+const scaled = (pts: Point[], s: number): Point[] => pts.map(p => ({ x: p.x * s, y: p.y * s, z: p.z * s }));
+
+test('metrics (norm): a circle of any radius gives kappaHat = 1 within 1e-5 (n = 720), with stated polygon bias', () => {
+  for (const R of [0.5, 7, 400, 12345]) {
+    const n = 720, m = computeMetrics({ points: circle(R, n) });
+    close(m.meanAbsCurvatureNorm, 1, CIRCLE_TOL, `mean R=${R}`);
+    close(m.p95AbsCurvatureNorm, 1, CIRCLE_TOL, `p95 R=${R}`);
+    close(m.maxAbsCurvatureNorm, 1, CIRCLE_TOL, `max R=${R}`);
+    close(m.meanAbsCurvatureNorm, n * Math.sin(Math.PI / n) / Math.PI, 1e-9, `analytic polygon value R=${R}`);
+    assert.equal(m.curvatureEntropyBitsNorm, 0);
+    assert.equal(m.curvatureHistogramNorm[2], n, 'all samples in the circle-centred bin [sqrt(1/2), sqrt(2))');
+    assert.equal(m.straightLengthFractionNorm, 0);
+    assert.equal(m.turnCountNorm, 0, 'circle (kappaHat 1) is not above the turn threshold 2');
+  }
+  assert.equal(CURVATURE_NORM_BIN_EDGES.length, 8);
+});
+
+test('metrics (norm): uniform scaling by 0.5, 2, 10 leaves every normalised field unchanged, old 1/unit fields change', () => {
+  const shapes: Array<[string, Point[]]> = [
+    ['stadium', stadium(400, 100)], ['seed1', generateTrack({ seed: 1 }).points], ['seed42', generateTrack({ seed: 42 }).points],
+    ['hilly circle', circle(300, 360).map((p, i) => ({ ...p, y: 5 * Math.sin(i / 20) }))],
+  ];
+  shapes[3][1][360] = { ...shapes[3][1][0] };
+  for (const [name, pts] of shapes) {
+    const base = computeMetrics({ points: pts });
+    for (const s of [0.5, 2, 10]) {
+      const m = computeMetrics({ points: scaled(pts, s) });
+      for (const f of NORM_SCALAR_FIELDS) {
+        const a = base[f], b = m[f];
+        assert.ok(Math.abs(a - b) <= SCALE_REL_TOL * Math.max(1, Math.abs(a)), `${name} s=${s} ${f}: ${a} vs ${b}`);
+      }
+      assert.deepEqual(m.curvatureHistogramNorm, base.curvatureHistogramNorm, `${name} s=${s} histogram`);
+      assert.equal(m.turnCountNorm, base.turnCountNorm, `${name} s=${s} turns`);
+      // legacy fields are scale dependent: kappa ~ 1/s, so the mean scales by 1/s (and the bin counts generally shift)
+      close(m.meanAbsCurvature * s, base.meanAbsCurvature, SCALE_REL_TOL * base.meanAbsCurvature, `${name} s=${s} legacy mean`);
+      assert.ok(Math.abs(m.meanAbsCurvature - base.meanAbsCurvature) > 0.1 * base.meanAbsCurvature, `${name} s=${s}: legacy mean should differ`);
+    }
+  }
+  // the legacy histogram / turn count do change for at least one shape and scale (the reviewer's point)
+  const s1 = generateTrack({ seed: 1 }).points;
+  assert.notDeepEqual(computeMetrics({ points: scaled(s1, 10) }).curvatureHistogram, computeMetrics({ points: s1 }).curvatureHistogram);
+});
+
+test('metrics (norm): deterministic and well-formed', () => {
+  for (const seed of [1, 2, 3, 42]) {
+    const a = computeMetrics(generateTrack({ seed })), b = computeMetrics(generateTrack({ seed }));
+    assert.deepEqual(a, b);
+    assert.equal(JSON.stringify(a), JSON.stringify(b));
+    assert.equal(a.curvatureHistogramNorm.reduce((x, y) => x + y, 0), a.sampleCount);
+    assert.ok(a.curvatureEntropyBitsNorm >= 0 && a.curvatureEntropyBitsNorm <= 3 + 1e-12);
+    assert.ok(a.straightLengthFractionNorm >= 0 && a.straightLengthFractionNorm <= 1);
+    assert.ok(a.p95AbsCurvatureNorm <= a.maxAbsCurvatureNorm);
+    for (const f of NORM_SCALAR_FIELDS) assert.ok(Number.isFinite(a[f]), f);
+  }
+  const degenerate = computeMetrics({ points: [{ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }] });
+  assert.equal(degenerate.meanAbsCurvatureNorm, 0); assert.equal(degenerate.straightLengthFractionNorm, 0);
+});
+
+test('metrics (norm): stadium classification is scale free (two turns, straight share by length)', () => {
+  const m = computeMetrics({ points: stadium(2000, 100) });
+  assert.equal(m.turnCountNorm, 2);
+  assert.ok(m.straightLengthFractionNorm > 0.6);
+  assert.ok(m.curvatureEntropyBitsNorm > 0);
+});
+
+test('metrics: existing fields are bit-identical to the values recorded on master 096a8ea (fixture)', () => {
+  const fixture = JSON.parse(readFileSync('tests/fixtures/metrics-master-096a8ea.json', 'utf8')) as
+    Record<string, { params: Record<string, number>; metrics: Record<string, unknown> }>;
+  const names = Object.keys(fixture);
+  assert.equal(names.length, 5);
+  for (const name of names) {
+    const { params, metrics: old } = fixture[name];
+    const now = computeMetrics(generateTrack(params)) as unknown as Record<string, unknown>;
+    for (const key of Object.keys(old)) assert.deepEqual(now[key], old[key], `${name}.${key}`);
+    assert.deepEqual(Object.keys(old).sort(), Object.keys(now).filter(k => !k.endsWith('Norm') && !k.endsWith('BitsNorm')).sort(), `${name}: only additive fields`);
   }
 });

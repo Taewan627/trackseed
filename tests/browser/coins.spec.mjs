@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 async function open(page) {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await expect(page.locator('#coin-count')).toHaveText('0 / 10');
 }
 
