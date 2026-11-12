@@ -1,0 +1,1 @@
+analysis deterministic: two consecutive analysis runs gave byte-identical SUMMARY.md, SUMMARY.json and validity.jsonl
