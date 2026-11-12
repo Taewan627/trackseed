@@ -1,0 +1,214 @@
+{
+ "e6_false_positives": {
+  "counts": {
+   "N1": [
+    0,
+    19436
+   ],
+   "N2": [
+    0,
+    2160
+   ],
+   "N3": [
+    0,
+    60
+   ]
+  },
+  "note": "clean-track outcomes are committed only as counts; 0 events in every set",
+  "seeds": 40
+ },
+ "e6_fp_seed_level_upper95": 8.81,
+ "e7_tangent_per_seed_ok": {
+  "max": 95.1,
+  "median": 84.0,
+  "min": 74.1
+ },
+ "intervals": [
+  {
+   "cluster_hi": 100.0,
+   "cluster_lo": 100.0,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 8553,
+   "n": 8553,
+   "note": "all clusters 100%: interval degenerate",
+   "quantity": "recall of the v1.1 kink rule, must-detect seam spike",
+   "rate": 100.0,
+   "wilson_hi": 100.0,
+   "wilson_lo": 99.96
+  },
+  {
+   "cluster_hi": 100.0,
+   "cluster_lo": 100.0,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 8153,
+   "n": 8153,
+   "note": "all clusters 100%: interval degenerate",
+   "quantity": "recall of the v1.1 kink rule, must-detect interior spike",
+   "rate": 100.0,
+   "wilson_hi": 100.0,
+   "wilson_lo": 99.95
+  },
+  {
+   "cluster_hi": 100.0,
+   "cluster_lo": 100.0,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 9111,
+   "n": 9111,
+   "note": "all clusters 100%: interval degenerate",
+   "quantity": "recall of the v1.1 kink rule, must-detect interior corner",
+   "rate": 100.0,
+   "wilson_hi": 100.0,
+   "wilson_lo": 99.96
+  },
+  {
+   "cluster_hi": 100.0,
+   "cluster_lo": 100.0,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 7560,
+   "n": 7560,
+   "note": "all clusters 100%: interval degenerate",
+   "quantity": "recall of the v1.1 kink rule, must-detect seam tangent break",
+   "rate": 100.0,
+   "wilson_hi": 100.0,
+   "wilson_lo": 99.95
+  },
+  {
+   "cluster_hi": 55.18,
+   "cluster_lo": 53.26,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 4637,
+   "n": 8553,
+   "note": "",
+   "quantity": "recall of the legacy 'ratio' rule, must-detect seam spike",
+   "rate": 54.21,
+   "wilson_hi": 55.27,
+   "wilson_lo": 53.16
+  },
+  {
+   "cluster_hi": 77.9,
+   "cluster_lo": 71.11,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 1881,
+   "n": 2520,
+   "note": "",
+   "quantity": "detection of the v1.1 kink rule, all seam spike instances, level 1",
+   "rate": 74.64,
+   "wilson_hi": 76.3,
+   "wilson_lo": 72.91
+  },
+  {
+   "cluster_hi": 80.32,
+   "cluster_lo": 77.82,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 1994,
+   "n": 2520,
+   "note": "",
+   "quantity": "detection of the v1.1 kink rule, all interior spike instances, level 1",
+   "rate": 79.13,
+   "wilson_hi": 80.67,
+   "wilson_lo": 77.5
+  },
+  {
+   "cluster_hi": 98.25,
+   "cluster_lo": 96.27,
+   "clusters": 40,
+   "exp": "E6",
+   "k": 2452,
+   "n": 2520,
+   "note": "",
+   "quantity": "detection of the v1.1 kink rule, all seam spike instances, level 2",
+   "rate": 97.3,
+   "wilson_hi": 97.87,
+   "wilson_lo": 96.59
+  },
+  {
+   "cluster_hi": 29.96,
+   "cluster_lo": 29.14,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 2154,
+   "n": 7290,
+   "note": "",
+   "quantity": "ok rate, legacy join, all Auto cases",
+   "rate": 29.55,
+   "wilson_hi": 30.61,
+   "wilson_lo": 28.51
+  },
+  {
+   "cluster_hi": 84.49,
+   "cluster_lo": 81.32,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 6045,
+   "n": 7290,
+   "note": "",
+   "quantity": "ok rate, tangent join, all Auto cases",
+   "rate": 82.92,
+   "wilson_hi": 83.77,
+   "wilson_lo": 82.04
+  },
+  {
+   "cluster_hi": 82.1,
+   "cluster_lo": 77.96,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 3891,
+   "n": 4860,
+   "note": "",
+   "quantity": "ok rate, tangent join, straight > 0",
+   "rate": 80.06,
+   "wilson_hi": 81.16,
+   "wilson_lo": 78.91
+  },
+  {
+   "cluster_hi": 89.88,
+   "cluster_lo": 87.41,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 2154,
+   "n": 2430,
+   "note": "",
+   "quantity": "ok rate, tangent join, straight = 0",
+   "rate": 88.64,
+   "wilson_hi": 89.84,
+   "wilson_lo": 87.32
+  },
+  {
+   "cluster_hi": 50.74,
+   "cluster_lo": 40.56,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 738,
+   "n": 1620,
+   "note": "",
+   "quantity": "ok rate, tangent join, straight > 0, width 80",
+   "rate": 45.56,
+   "wilson_hi": 47.99,
+   "wilson_lo": 43.14
+  },
+  {
+   "cluster_hi": 68.89,
+   "cluster_lo": 63.33,
+   "clusters": 30,
+   "exp": "E7",
+   "k": 1071,
+   "n": 1620,
+   "note": "",
+   "quantity": "ok rate, tangent join, straight > 0, curves 3",
+   "rate": 66.11,
+   "wilson_hi": 68.38,
+   "wilson_lo": 63.77
+  }
+ ],
+ "resamples": 10000,
+ "rev": "3765362",
+ "rng": "numpy PCG64",
+ "rng_seed": 20261113
+}
