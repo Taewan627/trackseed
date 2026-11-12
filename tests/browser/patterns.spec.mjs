@@ -16,23 +16,23 @@ for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['o
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('Generated');
     await page.evaluate(() => {
-      const s = window.__tracklab, c = s.coins.positions[0];
+      const s = window.__trackseed, c = s.coins.positions[0];
       Object.assign(s.pose, { x: c.x, y: c.y, z: c.z, speed: 0, vx: 0, vz: 0 });
     });
     await expect(page.locator('#coin-count')).toHaveText('1 / 10');
     await page.locator(`#${mode}`).click();
-    const generation = await page.evaluate(() => window.__tracklab.generation);
+    const generation = await page.evaluate(() => window.__trackseed.generation);
     const oldMap = await page.locator('#minimap').evaluate(c => c.toDataURL());
     const old3D = await page.locator('#viewport > canvas').screenshot();
     await edit(page, { cornerPattern: kind, cornerCount: 3, cornerStrength: 60 });
-    await expect.poll(() => page.evaluate(() => window.__tracklab.generation)).toBe(generation + 1);
+    await expect.poll(() => page.evaluate(() => window.__trackseed.generation)).toBe(generation + 1);
     await expect(page.locator('#pattern-status')).toContainText('3 / 3 applied');
     await expect(page.locator('#pattern-status')).toContainText('road/sidewalk checks passed');
     await expect(page.locator('#pattern-warning')).toBeHidden();
     const state = await page.evaluate(async () => {
       const { roadContact, mapTransform } = await import('/src/core.ts');
       const { generateCoins } = await import('/src/coins.ts');
-      const s = window.__tracklab, expected = mapTransform(s.track, 264, 204, 16).point(s.pose.x, s.pose.z);
+      const s = window.__trackseed, expected = mapTransform(s.track, 264, 204, 16).point(s.pose.x, s.pose.z);
       return { kind: s.track.params.cornerPattern, report: s.track.patternReport, speed: s.pose.speed, mode: s.mode,
         clearance: roadContact(s.track, s.pose.x, s.pose.z).clearance, coins: s.coins,
         expectedCoins: generateCoins(s.track), mapError: Math.hypot(expected.x - s.marker.x, expected.y - s.marker.y) };
@@ -47,7 +47,7 @@ for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['o
     if (mode === 'chase') {
       // Frame the actual inserted corner, rather than only photographing spawn.
       await page.evaluate(() => {
-        const s = window.__tracklab, i = s.track.patternReport.patterns[0].startIndex;
+        const s = window.__trackseed, i = s.track.patternReport.patterns[0].startIndex;
         const a = s.track.points[i], b = s.track.points[i + 1];
         Object.assign(s.pose, a, { speed: 0, vx: 0, vz: 0, roadIndex: i,
           heading: Math.atan2(b.x - a.x, b.z - a.z) });
@@ -63,29 +63,29 @@ for (const kind of ['right-angle', 'hairpin', 's-curve']) for (const mode of ['o
 test('v0.4: real rejected layout warns, preserves previous scene/coins and recovers with zero count', async ({ page }) => {
   await page.goto('/?test=1'); await expect(page.locator('#status')).toContainText('Generated');
   await page.evaluate(() => {
-    const s = window.__tracklab, c = s.coins.positions[0];
+    const s = window.__trackseed, c = s.coins.positions[0];
     Object.assign(s.pose, { x: c.x, y: c.y, z: c.z, speed: 0, vx: 0, vz: 0 });
   });
   await expect(page.locator('#coin-count')).toHaveText('1 / 10');
-  const before = await page.evaluate(() => ({ generation: window.__tracklab.generation,
-    track: JSON.stringify(window.__tracklab.track), coins: window.__tracklab.coins }));
+  const before = await page.evaluate(() => ({ generation: window.__trackseed.generation,
+    track: JSON.stringify(window.__trackseed.track), coins: window.__trackseed.coins }));
   await edit(page, { cornerPattern: 'hairpin', cornerCount: 1, curves: 3, width: 80, straight: 0.6,
     size: 1, cornerStrength: 20, seed: 0, height: 200, density: 0, obstacles: 8 });
   await expect(page.locator('#pattern-warning')).toBeVisible();
   // message text originates in src/patterns.ts (English in both UI languages; the i18n dictionary only wraps it)
   await expect(page.locator('#pattern-warning')).toContainText('6 attempts');
   await expect(page.locator('#status')).toHaveText('Pattern application failed · previous track kept');
-  const after = await page.evaluate(() => ({ generation: window.__tracklab.generation,
-    track: JSON.stringify(window.__tracklab.track), coins: window.__tracklab.coins }));
+  const after = await page.evaluate(() => ({ generation: window.__trackseed.generation,
+    track: JSON.stringify(window.__trackseed.track), coins: window.__trackseed.coins }));
   expect(after).toEqual(before);
   await page.locator('#cornerPattern').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'test-results/v04-rejected.png' });
   await edit(page, { cornerCount: 0 });
-  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.cornerCount)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.track.params.cornerCount)).toBe(0);
   await expect(page.locator('#pattern-warning')).toBeHidden();
   await expect(page.locator('#pattern-status')).toContainText('0 patterns · original generation');
   await expect(page.locator('#coin-count')).toHaveText('0 / 10');
-  expect(await page.evaluate(() => window.__tracklab.track.patternReport.inserted)).toBe(0);
+  expect(await page.evaluate(() => window.__trackseed.track.patternReport.inserted)).toBe(0);
 });
 
 async function harness(page) {

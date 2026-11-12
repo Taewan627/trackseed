@@ -12,14 +12,14 @@ for (const mode of ['overview', 'chase']) {
     await page.goto('/?test=1');
     await expect(page.locator('#status')).toContainText('Generated');
     await page.locator(`#${mode}`).click();
-    const generation = await page.evaluate(() => window.__tracklab.generation);
+    const generation = await page.evaluate(() => window.__trackseed.generation);
     const before3D = await page.locator('#viewport > canvas').screenshot();
     const beforeMap = await page.locator('#minimap').evaluate(c => c.toDataURL());
     await page.locator('#width').focus();
     await page.keyboard.press('End');
     await expect(page.locator('#width-value')).toHaveValue('80');
-    await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.width)).toBe(80);
-    const state = await page.evaluate(() => window.__tracklab);
+    await expect.poll(() => page.evaluate(() => window.__trackseed.track.params.width)).toBe(80);
+    const state = await page.evaluate(() => window.__trackseed);
     expect(state.generation).toBe(generation + 1); expect(state.mode).toBe(mode);
     expect(state.pose.speed).toBe(0);
     expect(await page.locator('#minimap').evaluate(c => c.toDataURL())).not.toBe(beforeMap);
@@ -34,7 +34,7 @@ test('v0.3: rapid slider inputs debounce once, retain the final value and cancel
   await expect(page.locator('#status')).toContainText('Generated');
   // Virtual timers make the 149/150ms boundary deterministic even on a slow GPU.
   await freezeClock(page);
-  const before = await page.evaluate(() => window.__tracklab.generation);
+  const before = await page.evaluate(() => window.__trackseed.generation);
   await page.locator('#width').evaluate(input => {
     for (const value of [20, 23, 41, 55, 80, 37]) {
       input.value = String(value); input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -42,20 +42,20 @@ test('v0.3: rapid slider inputs debounce once, retain the final value and cancel
   });
   await expect(page.locator('#width-value')).toHaveValue('37');
   await expect(page.locator('#status')).toContainText('Update pending');
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before);
   await page.clock.runFor(149);
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before);
   await page.clock.runFor(1);
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before + 1);
-  expect(await page.evaluate(() => window.__tracklab.track.params.width)).toBe(37);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before + 1);
+  expect(await page.evaluate(() => window.__trackseed.track.params.width)).toBe(37);
   await page.locator('#width').evaluate(input => {
     input.value = '65'; input.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector('#parameters').requestSubmit();
   });
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before + 2);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before + 2);
   await page.clock.runFor(500);
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before + 2);
-  expect(await page.evaluate(() => window.__tracklab.track.params.width)).toBe(65);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before + 2);
+  expect(await page.evaluate(() => window.__trackseed.track.params.width)).toBe(65);
 });
 
 test('v0.3: numeric, Seed and theme edits share one deterministic track and safely stop Drive', async ({ page }) => {
@@ -63,28 +63,28 @@ test('v0.3: numeric, Seed and theme edits share one deterministic track and safe
   await expect(page.locator('#status')).toContainText('Generated');
   await page.locator('#chase').click();
   await page.locator('#viewport > canvas').focus(); await page.keyboard.down('ArrowUp');
-  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBeGreaterThan(10);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.pose.speed)).toBeGreaterThan(10);
   await page.locator('#curves-value').fill('10');
   await page.keyboard.up('ArrowUp');
-  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.curves)).toBe(10);
-  await expect.poll(() => page.evaluate(() => window.__tracklab.pose.speed)).toBe(0);
-  expect(await page.evaluate(() => window.__tracklab.mode)).toBe('chase');
+  await expect.poll(() => page.evaluate(() => window.__trackseed.track.params.curves)).toBe(10);
+  await expect.poll(() => page.evaluate(() => window.__trackseed.pose.speed)).toBe(0);
+  expect(await page.evaluate(() => window.__trackseed.mode)).toBe('chase');
   await page.locator('#seed').fill('');
-  const before = await page.evaluate(() => window.__tracklab.generation);
+  const before = await page.evaluate(() => window.__trackseed.generation);
   await expect(page.locator('#status')).toContainText('Waiting for input');
   // Prove an unfinished numeric edit cannot accidentally become Seed 0.
   await freezeClock(page); await page.clock.runFor(300);
-  expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before);
+  expect(await page.evaluate(() => window.__trackseed.generation)).toBe(before);
   await page.locator('#seed').fill('123456');
   await page.locator('#scene').selectOption('city');
   await page.locator('#density-value').fill('20');
   await page.clock.runFor(150);
   const result = await page.evaluate(async () => {
     const core = await import('/src/core.ts');
-    const { track, pose, marker, mode } = window.__tracklab;
+    const { track, pose, marker, mode } = window.__trackseed;
     const expected = core.mapTransform(track, 264, 204, 16).point(pose.x, pose.z);
     return { matches: JSON.stringify(track) === JSON.stringify(core.generateTrack(track.params)),
-      params: track.params, speed: pose.speed, mode, input: window.__tracklab.input,
+      params: track.params, speed: pose.speed, mode, input: window.__trackseed.input,
       clearance: core.roadContact(track, pose.x, pose.z).clearance,
       mapError: Math.hypot(expected.x - marker.x, expected.y - marker.y) };
   });
@@ -165,7 +165,7 @@ test('v0.3: 100 live parameter regenerations retain bounded scene resources and 
     await client.send('HeapProfiler.collectGarbage');
     const heap = await client.send('Runtime.getHeapUsage');
     const state = await page.evaluate(() => {
-      const s = window.__tracklab;
+      const s = window.__trackseed;
       return { memory: s.memory, calls: s.calls, triangles: s.triangles, generation: s.generation };
     });
     snapshots.push({ ...state, usedSize: heap.usedSize, backingStorageSize: heap.backingStorageSize });

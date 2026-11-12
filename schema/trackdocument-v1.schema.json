@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Taewan627/tracklab/schema/trackdocument-v1.schema.json",
-  "title": "TrackLab TrackDocumentV1",
-  "description": "Structure of a TrackLab exchange document (src/schema.ts, schema 'tracklab.track', schemaVersion 1) as validated by importTrack(). Not expressible here and checked only by importTrack(): the integrity digests (SHA-256 over the canonical sorted-keys JSON), that params equal their sanitized canonical form beyond the ranges below, that geometry.normals and geometry.roadEdges have the same length as geometry.points, that geometry.straightSegments has params.curves entries, and (with verify 'regenerate') that generateTrack(params) reproduces the content. The integrity digest is unkeyed: it gives integrity, not authenticity of provenance.",
+  "title": "TrackSeed TrackDocumentV1",
+  "description": "Structure of a TrackSeed exchange document (src/schema.ts, schema 'tracklab.track', schemaVersion 1) as validated by importTrack(). Not expressible here and checked only by importTrack(): the integrity digests (SHA-256 over the canonical sorted-keys JSON), that params equal their sanitized canonical form beyond the ranges below, that geometry.normals and geometry.roadEdges have the same length as geometry.points, that geometry.straightSegments has params.curves entries, and (with verify 'regenerate') that generateTrack(params) reproduces the content. The integrity digest is unkeyed: it gives integrity, not authenticity of provenance.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "schemaVersion", "generator", "params", "geometry", "props", "obstacles", "coins", "patternReport", "integrity"],

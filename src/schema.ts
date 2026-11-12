@@ -1,4 +1,4 @@
-// TrackLab exchange format v1: a self-describing, integrity-protected JSON
+// TrackSeed exchange format v1: a self-describing, integrity-protected JSON
 // document holding the full deterministic output of generateTrack().
 import { DEFAULTS, generateTrack, sanitize, type Obstacle, type Params, type Point, type Prop, type Track } from './core.js';
 import { generateCoins, type Coin } from './coins.js';

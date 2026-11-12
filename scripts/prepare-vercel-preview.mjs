@@ -36,7 +36,7 @@ const allowed = new Set(['.html', '.js', '.css', '.svg']);
 for (const file of built) {
   if (!allowed.has(extname(file))) throw new Error(`Unexpected deployment file: ${relative(dist, file)}`);
   if (/sourceMappingURL\s*=/.test(readFileSync(file, 'utf8'))) throw new Error('Source maps must not be deployed.');
-  if (readFileSync(file, 'utf8').includes('__tracklab')) throw new Error('Development diagnostic API is present in the build.');
+  if (readFileSync(file, 'utf8').includes('__trackseed')) throw new Error('Development diagnostic API is present in the build.');
 }
 const source = [...files(local('src')), ...files(local('public')), local('index.html')];
 const findings = [...inspect(source), ...inspect(built)];

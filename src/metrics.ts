@@ -8,7 +8,7 @@
 import { datan2, dhypot } from './detmath.js';
 import type { Point } from './core.js';
 
-/** Minimal input: the closed centerline in TrackLab convention (last point repeats the first). */
+/** Minimal input: the closed centerline in TrackSeed convention (last point repeats the first). */
 export interface MetricsInput { points: Point[] }
 
 /** |curvature| (1/unit) below which a segment counts as straight (radius >= 2000 units). */

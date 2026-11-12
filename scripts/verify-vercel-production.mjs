@@ -6,8 +6,8 @@ import { generateTrack, project } from '../.test-build/src/core.js';
 import { generateCoins } from '../.test-build/src/coins.js';
 import { spawnVehicle, updateVehicle, NO_INPUT } from '../.test-build/src/vehicle.js';
 
-const url = process.env.TRACKLAB_VERIFY_URL;
-const secret = process.env.TRACKLAB_VERIFY_AUTH;
+const url = process.env.TRACKSEED_VERIFY_URL;
+const secret = process.env.TRACKSEED_VERIFY_AUTH;
 assert.ok(url?.startsWith('https://') && secret, 'Authenticated HTTPS verification requires URL and a temporary credential.');
 const origin = new URL(url).origin;
 assert.ok(new URL(origin).hostname.endsWith('.vercel.app'), 'Expected a Vercel deployment.');
@@ -55,7 +55,7 @@ try {
   await page.clock.pauseAt(new Date(time.getTime() + 1000));
   await page.goto(origin, { waitUntil: 'load' });
   assert.match(await page.locator('#status').innerText(), /생성 완료/);
-  assert.equal(await page.evaluate(() => '__tracklab' in window), false);
+  assert.equal(await page.evaluate(() => '__trackseed' in window), false);
   assert.equal(await page.locator('#coin-count').innerText(), '0 / 10');
   const screenshot = async name => {
     await page.clock.fastForward(100);

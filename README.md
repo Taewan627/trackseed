@@ -1,6 +1,6 @@
-# TrackLab
+# TrackSeed
 
-TrackLab is a procedural racing-track generator written in TypeScript. From a small parameter set (number of Catmull-Rom spans, straight-span ratio, road width, scale, elevation amplitude, scenery, seed, and an optional corner pattern: 90-degree, hairpin or S-curve) it produces a closed, elevated track with road edges, scenery, obstacles and coins. The same parameters give the same document, which is serialised in a self-describing, integrity-checked JSON exchange format. The package contains a browser front end (Three.js, with a kinematic driving preview), a headless validator and metric library, and a command-line interface for batch generation. It is intended for experiments on procedural level generation that need reproducible tracks, automatic validity checks and interpretable geometric metrics.
+TrackSeed is a procedural racing-track generator written in TypeScript. From a small parameter set (number of Catmull-Rom spans, straight-span ratio, road width, scale, elevation amplitude, scenery, seed, and an optional corner pattern: 90-degree, hairpin or S-curve) it produces a closed, elevated track with road edges, scenery, obstacles and coins. The same parameters give the same document, which is serialised in a self-describing, integrity-checked JSON exchange format. The package contains a browser front end (Three.js, with a kinematic driving preview), a headless validator and metric library, and a command-line interface for batch generation. It is intended for experiments on procedural level generation that need reproducible tracks, automatic validity checks and interpretable geometric metrics.
 
 The web front end is in English by default, with a Korean toggle (or `?lang=ko` in the URL); the library, CLI and this document are English. The earlier Korean README (v0.4) is kept in [docs/history/README_v0.4_ko.md](docs/history/README_v0.4_ko.md), together with the historical development reports in [docs/history/](docs/history/).
 
@@ -12,7 +12,7 @@ The web front end is in English by default, with a Korean toggle (or `?lang=ko` 
 - Exchange format v1 (`exportTrack`, `serializeTrack`, `parseTrackDocument`, `importTrack`) with canonical JSON and two SHA-256 digests; import can verify by regeneration.
 - Validator (`validateTrack`): eight checks in the default mode (structure, finiteness, closure, local kink, planar self-intersection, ribbon fold, turning radius, slope), reported, never repaired; the rules and their evidence are in [docs/validator.md](docs/validator.md).
 - Metrics (`computeMetrics`): length, curvature statistics, curvature entropy, turn count, elevation and slope statistics, total turning.
-- CLI (`generate`, `batch`, `validate`, `metrics`, `validate-polyline`, `metrics-polyline`) with deterministic JSONL summaries; the polyline commands check a closed x/z polyline (JSON or CSV) that TrackLab did not generate.
+- CLI (`generate`, `batch`, `validate`, `metrics`, `validate-polyline`, `metrics-polyline`) with deterministic JSONL summaries; the polyline commands check a closed x/z polyline (JSON or CSV) that TrackSeed did not generate.
 - Web UI: 3D view, minimap, drive/overview cameras, coins, JSON export and import, validation panel, and a "Straight joins" selector that feeds `autoJoin` (English by default, Korean with the toggle).
 
 ## Install
@@ -20,7 +20,7 @@ The web front end is in English by default, with a Korean toggle (or `?lang=ko` 
 Node.js 20.19 or newer (`engines` in `package.json`; CI runs Node 20, 22 and 24 on Ubuntu, Windows and macOS).
 
 ```bash
-git clone <repository-url> tracklab && cd tracklab
+git clone <repository-url> trackseed && cd trackseed
 npm ci
 ```
 
@@ -50,7 +50,7 @@ node cli-dist/cli.js batch --grid examples/grid-small.json --out out/ --jsonl ou
 Real output of exactly these commands (trimmed; produced by `bash scripts/cli-example.sh`, full file [docs/cli-example-output.txt](docs/cli-example-output.txt)):
 
 ```text
-$ tracklab validate track.json --verify regenerate
+$ trackseed validate track.json --verify regenerate
 {
   "file": "track.json",
   "verify": "regenerate",
@@ -68,7 +68,7 @@ $ tracklab validate track.json --verify regenerate
   ... (violations list trimmed)
 checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: true, 0
 
-$ tracklab metrics track.json
+$ trackseed metrics track.json
 {
   "sampleCount": 325,
   "length": 2606.746448590328,
@@ -76,8 +76,8 @@ $ tracklab metrics track.json
   "straightLengthFraction": 0.05224851801553694,
   ...
 
-$ tracklab batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
-tracklab batch: 48 cases, 48 generated, 0 generation failures, 48 ok
+$ trackseed batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
+trackseed batch: 48 cases, 48 generated, 0 generation failures, 48 ok
 ```
 
 CLI reference:
@@ -88,7 +88,7 @@ CLI reference:
 | `batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing] [--closure-tangent-mode kink\|ratio\|absolute] [--seam-ratio N]` | One document per case plus one JSONL summary line per case. | 0 completed, 2 invalid grid or usage |
 | `validate file.json [--verify digest\|regenerate] [--limit key=value ...] [--strict] [--closure-tangent-mode kink\|ratio\|absolute] [--seam-ratio N]` | Parses the document (schema, both digests, optional regeneration), runs the validator, prints the report as JSON. | 0 no error-severity violation, 1 at least one (`--strict`: warnings too), 2 invalid document or options |
 | `metrics file.json [--samples]` | Metrics as JSON (`--samples` adds the per-sample curvature array). | 0, or 2 invalid document |
-| `validate-polyline file.json\|file.csv --width W [--resample-spacing S \| --resample-smooth S] [--strict] [--limit key=value ...] [--closure-tangent-mode kink\|ratio\|absolute] [--seam-ratio N] [--absolute-tolerances]` | Builds a track from a closed polyline that TrackLab did not generate (`.csv`: one `x,z` or `x,z,y` per line, optional header; otherwise JSON `{\"points\": [...]}` or a bare array) and runs the validator. The report has the form of `validate` plus the input summary. Nothing is repaired, except that consecutive duplicate points are removed and counted (`input.duplicatePointsRemoved`); `--resample-spacing` (linear) and `--resample-smooth` (spline, exclusive with it) are off unless given. | 0 no error-severity violation, 1 at least one (`--strict`: warnings too), 2 unreadable or invalid input or options |
+| `validate-polyline file.json\|file.csv --width W [--resample-spacing S \| --resample-smooth S] [--strict] [--limit key=value ...] [--closure-tangent-mode kink\|ratio\|absolute] [--seam-ratio N] [--absolute-tolerances]` | Builds a track from a closed polyline that TrackSeed did not generate (`.csv`: one `x,z` or `x,z,y` per line, optional header; otherwise JSON `{\"points\": [...]}` or a bare array) and runs the validator. The report has the form of `validate` plus the input summary. Nothing is repaired, except that consecutive duplicate points are removed and counted (`input.duplicatePointsRemoved`); `--resample-spacing` (linear) and `--resample-smooth` (spline, exclusive with it) are off unless given. | 0 no error-severity violation, 1 at least one (`--strict`: warnings too), 2 unreadable or invalid input or options |
 | `metrics-polyline file.json\|file.csv --width W [--resample-spacing S \| --resample-smooth S] [--samples]` | Metrics of such a polyline, with the definitions of `metrics`. `--width` is required for symmetry with `validate-polyline` and does not change the metrics. | 0, or 2 unreadable or invalid input |
 
 `--limit key=value` overrides a numeric validator limit (see "Validator checks"); `--seam-ratio N` is the same as `--limit seamRatio=N` (giving both is an error) and applies only to `--closure-tangent-mode ratio`: without it, as with the default `kink`, the option is rejected with exit 2 instead of being ignored. `validate-polyline` takes the same validator options as `validate`. Grid file: `seeds` is `{ "from": a, "to": b }` (inclusive) or an array; array-valued entries of `params` are swept (Cartesian product, parameter names sorted alphabetically, first name slowest, seeds innermost), scalars are fixed. `examples/grid-small.json` expands to 48 cases. Case `k` is written to `case-<k, 4+ digits>-seed<seed>.json`. A case whose generation throws is recorded with `"generated": false` and the error message; the batch continues. Deterministic JSONL fields: `case`, `file`, `seed`, `params`, `generated`, `digest`, `ok`, `violationCodes`, `checkFailures`, `metrics` (without the per-sample array), `error`. Wall-clock data appears only under `timing.generation_ms`; `--no-timing` omits it so two runs give byte-identical JSONL.
@@ -125,6 +125,8 @@ const back = importTrack(doc, { verify: 'regenerate' });                        
 
 `exportTrack` writes a `tracklab.track` document; `serializeTrack` writes it as canonical JSON (keys sorted, no whitespace, finite numbers only, `-0` written as `0`).
 
+The format identifiers keep the project's former name (TrackLab) for document and digest continuity: the schema name `tracklab.track` and the generator name `tracklab` are part of every document and of its digests, so renaming them would change every digest and break the reproduction of the committed results. They are format identifiers, not the product name.
+
 | Field | Content |
 | --- | --- |
 | `schema`, `schemaVersion` | `"tracklab.track"`, `1` (the format is unreleased before 1.0.0, so adding `contentDigest` kept version 1) |
@@ -148,7 +150,7 @@ JSON Schema. [schema/trackdocument-v1.schema.json](schema/trackdocument-v1.schem
 | --- | --- | --- | --- |
 | `structure` | `STRUCTURE` | error | at least 4 points; both `roadEdges` have one entry per point |
 | `finite` | `NON_FINITE` | error | all coordinates and `params.width` finite; on failure later checks are `skipped` |
-| `closure` | `CLOSURE_POSITION`, `CLOSURE_EDGE`, `CLOSURE_HEIGHT`, `CLOSURE_TANGENT` | error | last point equals first within `closureTolerance` = 1e-6 (3D; each edge too); height gap <= `heightTolerance` = 1e-6 (both multiplied by the scale factor f, which is 1 for every track of TrackLab's size; see "Scale-relative tolerances" below); `CLOSURE_TANGENT`: see below |
+| `closure` | `CLOSURE_POSITION`, `CLOSURE_EDGE`, `CLOSURE_HEIGHT`, `CLOSURE_TANGENT` | error | last point equals first within `closureTolerance` = 1e-6 (3D; each edge too); height gap <= `heightTolerance` = 1e-6 (both multiplied by the scale factor f, which is 1 for every track of TrackSeed's size; see "Scale-relative tolerances" below); `CLOSURE_TANGENT`: see below |
 | `local-kink` | `LOCAL_KINK` | error | mode `kink` only (the default since validator v1.1; not run in the legacy modes). The heading change theta_i at each vertex of the closed loop fails iff theta_i > max(`kinkFloorDegrees` = 12, `kinkRatio` = 3 x the largest theta_j with j = i±2 .. i±3) (outlier rule, window 3, maximum); the immediate neighbours i±1 are not in the reference. The seam (vertex 0) is reported as `CLOSURE_TANGENT`, the other vertices as `LOCAL_KINK` |
 | `self-intersection` | `SELF_INTERSECTION_CENTERLINE`, `SELF_INTERSECTION_EDGE`, `EDGE_EDGE_INTERSECTION` | error | planar (x/z) segment intersection (spatial hash) of the centerline, of each edge with itself and of the two edges with each other; segments sharing a vertex are skipped, touching counts. A grade-separated crossing is reported too |
 | `edge-fold` | `EDGE_FOLD` | error | both ribbon triangles of every segment need x/z cross product > `foldEpsilon` = 1e-5 (times f^2, see below) |
@@ -163,7 +165,7 @@ JSON Schema. [schema/trackdocument-v1.schema.json](schema/trackdocument-v1.schem
 
 The legacy modes return the seven checks of v1.0.0 (no `local-kink`); the default returns eight.
 
-**Scale-relative tolerances.** `closureTolerance`, `heightTolerance` and `foldEpsilon` were absolute, so a valid track scaled together with its width by 1e-4 failed with `EDGE_FOLD`. The defaults are now multiplied by f (f^2 for `foldEpsilon`), where f = D / 10 if the bounding-box diagonal D of the centreline is below 10, f = D / 100000 if it is above 100000, and f = 1 otherwise. TrackLab's own tracks (D about 600 to 1600) are inside the band, so every result at that scale, including all committed experiment results, is unchanged (checked by the reproduce check, `docs/test-run-wp7a.txt`). Values given with `--limit` or in `options` are used literally; `--absolute-tolerances` / `absoluteTolerances: true` restores the absolute defaults. Formula, evidence and the list of what was not changed: [docs/validator.md](docs/validator.md).
+**Scale-relative tolerances.** `closureTolerance`, `heightTolerance` and `foldEpsilon` were absolute, so a valid track scaled together with its width by 1e-4 failed with `EDGE_FOLD`. The defaults are now multiplied by f (f^2 for `foldEpsilon`), where f = D / 10 if the bounding-box diagonal D of the centreline is below 10, f = D / 100000 if it is above 100000, and f = 1 otherwise. TrackSeed's own tracks (D about 600 to 1600) are inside the band, so every result at that scale, including all committed experiment results, is unchanged (checked by the reproduce check, `docs/test-run-wp7a.txt`). Values given with `--limit` or in `options` are used literally; `--absolute-tolerances` / `absoluteTolerances: true` restores the absolute defaults. Formula, evidence and the list of what was not changed: [docs/validator.md](docs/validator.md).
 
 On the CLI: `--closure-tangent-mode kink|ratio|absolute`; `--seam-ratio N` (only with `ratio`) or `--limit key=value` for the numeric options. `MIN_TURN_RADIUS` and `MAX_SLOPE` are warnings and do not affect `ok`; `--strict` turns them into exit code 1.
 

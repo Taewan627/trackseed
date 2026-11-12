@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata from this file."
-title: "TrackLab: a reproducible procedural racing-track generator with validation and metrics"
+title: "TrackSeed: a reproducible procedural racing-track generator with validation and metrics"
 version: 1.1.0
 type: software
 license: MIT
@@ -13,7 +13,7 @@ authors:
     given-names: "Taehoon"
     orcid: "https://orcid.org/0000-0003-4788-4651"
     affiliation: "Graduate School of Virtual Convergence, Sogang University"
-# TODO(PI): confirm repository name before release
+# [PI: REPO-URL] confirm the final repository URL before release (the URL below is the former repository name)
 repository-code: "https://github.com/Taewan627/tracklab"
 keywords:
   - procedural content generation

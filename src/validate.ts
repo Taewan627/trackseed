@@ -111,7 +111,7 @@ export const DEFAULT_VALIDATE_OPTIONS: Required<Omit<ValidateOptions, 'absoluteT
 const RAD_TO_DEG = 180 / Math.PI;
 /**
  * Band of track sizes (diagonal of the 3D bounding box of the centreline, coordinate units) in which the default absolute
- * tolerances closureTolerance (1e-6), heightTolerance (1e-6) and foldEpsilon (1e-5) are used exactly as written. TrackLab's
+ * tolerances closureTolerance (1e-6), heightTolerance (1e-6) and foldEpsilon (1e-5) are used exactly as written. TrackSeed's
  * own tracks (diagonal about 600 to 1600 over the parameter ranges sampled in docs/validator.md) are far inside the band.
  */
 export const TOLERANCE_BAND_LO = 10, TOLERANCE_BAND_HI = 1e5;

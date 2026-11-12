@@ -2,11 +2,20 @@
 
 ## Unreleased
 
-Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackLab's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
+This entry combines two changes made after the 1.1.0 tree was frozen: the rename to TrackSeed, and the validator and polyline-path robustness work (WP7a, described below).
 
-### Changed (behaviour only outside TrackLab's scale, or for inputs that crashed or were misreported)
+### Renamed
 
-- **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackLab's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
+- **The project is now called TrackSeed** (it was TrackLab, and TrackLab Lite in the web UI). Package name `trackseed`; CLI command `trackseed` (`cli-dist/cli.js`), usage and error text, web UI title, header, `<title>` and the English and Korean strings, README, documentation and CITATION.cff title were renamed. The command `tracklab` stays as a deprecated second `bin` entry for one release; `trackseed --help` says so.
+- **Document format identifiers keep the former name.** The schema name `tracklab.track` and the generator name `tracklab` in exported documents are unchanged on purpose: both are inside the digests, so renaming them would change every `digest` and `contentDigest` and break the reproduction of the committed results. `schemaVersion` stays 1.
+- Smaller user-visible changes: the exported file name is `trackseed-<seed>-<digest8>.json` (was `tracklab-...`), the language preference is stored under the `trackseed-lang` key (a stored `tracklab-lang` value is ignored, so a returning browser starts in English), the development diagnostic object is `window.__trackseed` (was `__tracklab`; absent from production builds as before), and the environment variables of `scripts/verify-vercel-production.mjs` are `TRACKSEED_VERIFY_URL` and `TRACKSEED_VERIFY_AUTH`.
+- No change to generated geometry, validator results, metrics or document bytes: the committed determinism goldens (`tests/fixtures/ci-golden-digests.json`, `ci-golden-digests-v1.1.json`) pass unchanged.
+
+Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackSeed's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
+
+### Changed (behaviour only outside TrackSeed's scale, or for inputs that crashed or were misreported)
+
+- **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackSeed's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
 - **Segment intersection test** uses the product of signs instead of the product of cross products (same result, no underflow at small scale). The spatial-hash cell floor scales with f, and above 50,000 vertices the cell is also capped at 4 mean segment lengths (200,000 vertices: about 1 s instead of 15 s; the set of reported pairs is the same).
 - **Polyline path removes consecutive duplicate vertices** (distance <= 1e-9 x bounding-box diagonal, last against first too) and reports `duplicatePointsRemoved` (CLI: `input.duplicatePointsRemoved`). A duplicated vertex used to give `SELF_INTERSECTION_CENTERLINE`, `SELF_INTERSECTION_EDGE` and `EDGE_FOLD` on a clean circle. Fewer than 3 distinct vertices is a `RangeError` (CLI exit 2). Generated tracks have no duplicates and do not use this path.
 

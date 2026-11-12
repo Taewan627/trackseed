@@ -40,7 +40,7 @@ test('tolerances: toleranceScale is 1 on the band, continuous at its edges, prop
   assert.equal(toleranceScale([{ x: 0, y: 0, z: 0 }, { x: NaN, y: 0, z: 0 }] as never), 1);
 });
 
-test('tolerances: every TrackLab track gives bit-identical reports with and without the scale-relative tolerances', () => {
+test('tolerances: every TrackSeed track gives bit-identical reports with and without the scale-relative tolerances', () => {
   for (const seed of [0, 1, 2, 3, 7, 42, 99, 123, 500, 2024]) for (const params of [{}, { size: 1 }, { size: 3, width: 80 }, { cornerPattern: 'hairpin' as const }, { autoJoin: 'legacy' as const, curves: 10, straight: 0.5 }]) {
     const t = generateTrack({ seed, ...params });
     assert.ok(toleranceScale(t.points) === 1);
@@ -113,7 +113,7 @@ test('large input: 200,000 vertices (library): no stack overflow, linear-time ha
 });
 
 test('large input: 200,000 vertices through the CLI (validate-polyline, metrics-polyline); absurd resample requests are errors, not crashes', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'tracklab-big-'));
+  const dir = mkdtempSync(join(tmpdir(), 'trackseed-big-'));
   try {
     const f = join(dir, 'big.json');
     writeFileSync(f, JSON.stringify(circle(200_000, 1000).map(p => [p.x, p.z])));
@@ -154,7 +154,7 @@ test('duplicates: consecutive duplicate vertices are removed and counted; the ve
   assert.equal(nan.duplicatePointsRemoved, 0); assert.ok(codes(validateTrack(nan)).includes('NON_FINITE'));
 });
 
-test('duplicates: TrackLab-generated tracks contain none, so the generated-track path and the round trip are unchanged', () => {
+test('duplicates: TrackSeed-generated tracks contain none, so the generated-track path and the round trip are unchanged', () => {
   let minSegment = Infinity;
   for (let seed = 0; seed < 150; seed++) for (const p of [{}, { cornerPattern: 'right-angle' as const }, { cornerPattern: 'hairpin' as const }, { cornerPattern: 's-curve' as const }, { autoJoin: 'legacy' as const, straight: 0.5 }]) {
     const t = generateTrack({ seed, ...p }), pl = trackFromPolyline({ points: t.points, width: t.params.width, closed: true });
@@ -165,7 +165,7 @@ test('duplicates: TrackLab-generated tracks contain none, so the generated-track
 });
 
 test('duplicates: CLI reports the number removed', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'tracklab-dup-'));
+  const dir = mkdtempSync(join(tmpdir(), 'trackseed-dup-'));
   try {
     const clean = circle(120, 300), dup = [...clean.slice(0, 30), { ...clean[29] }, { ...clean[29] }, ...clean.slice(30)], f = join(dir, 'd.json');
     writeFileSync(f, JSON.stringify(dup.map(p => [p.x, p.z])));
@@ -230,7 +230,7 @@ test('smooth resampling: deterministic, passes through the input vertices, close
 });
 
 test('smooth resampling: CLI --resample-smooth, exclusivity with --resample-spacing', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'tracklab-smooth-'));
+  const dir = mkdtempSync(join(tmpdir(), 'trackseed-smooth-'));
   try {
     const f = join(dir, 'rr.json');
     writeFileSync(f, JSON.stringify(roundedRect(300, 30, 47).map(p => [p.x, p.z])));

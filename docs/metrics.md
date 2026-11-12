@@ -1,10 +1,10 @@
 # Geometric track metrics (`src/metrics.ts`)
 
-`computeMetrics(track)` (CLI: `tracklab metrics`, `tracklab metrics-polyline`) returns purely geometric
+`computeMetrics(track)` (CLI: `trackseed metrics`, `trackseed metrics-polyline`) returns purely geometric
 quantities of the closed centreline. Nothing here estimates "fun" or "difficulty". The module is
 deterministic: it uses only `+ - * /`, `Math.sqrt`, exact operations and `src/detmath.ts`
 (`dhypot`, `datan2`), plus a local deterministic `dlog2` for the entropies. Input is `{ points }` with the
-closing point repeating the first (TrackLab convention); n = `points.length - 1` samples.
+closing point repeating the first (TrackSeed convention); n = `points.length - 1` samples.
 
 ## 1. Definitions
 

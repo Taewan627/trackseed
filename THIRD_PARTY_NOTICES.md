@@ -1,6 +1,6 @@
 # Third-party notices
 
-TrackLab is released under the licence in `LICENSE` (the same text is in `Licence.txt`). This file lists third-party code and packages used by the project and the notices they require.
+TrackSeed is released under the licence in `LICENSE` (the same text is in `Licence.txt`). This file lists third-party code and packages used by the project and the notices they require.
 
 ## 1. fdlibm / FreeBSD msun (Sun Microsystems, Inc.)
 

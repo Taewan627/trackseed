@@ -1,5 +1,5 @@
 {
-  "name": "tracklab-lite",
+  "name": "trackseed",
   "private": true,
   "license": "MIT",
   "author": "Taewan Kim",
@@ -9,7 +9,7 @@
   },
   "version": "1.1.0",
   "type": "module",
-  "bin": { "tracklab": "cli-dist/cli.js" },
+  "bin": { "trackseed": "cli-dist/cli.js", "tracklab": "cli-dist/cli.js" },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",

@@ -22,7 +22,7 @@ test('detmath: sin/cos agree with Math.* within 1e-14 on 200k seeded inputs, |x|
   t_diag({ maxSin, maxCos });
 });
 
-test('detmath: sin/cos stay within 1e-14 for the whole range TrackLab can feed them (seed*0.02 <= 4.3e7) and up to 2^33', () => {
+test('detmath: sin/cos stay within 1e-14 for the whole range TrackSeed can feed them (seed*0.02 <= 4.3e7) and up to 2^33', () => {
   const r = stream(31337);
   for (const range of [1e5, 1e6, 4.3e7, 1e9, 8e9]) {
     let m = 0;
