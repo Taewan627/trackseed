@@ -1,7 +1,9 @@
 // Release gate: exits non-zero while anything is left that must be resolved before a release.
-//   1. no unresolved PI tokens (the marker "[PI:" followed by a topic) in any tracked file outside experiments/
+//   1. no unresolved PI tokens (the marker "[PI" + ":" followed by a topic) in any tracked file outside experiments/
 //   2. package.json, src/version.ts and CITATION.cff carry the same version
 //   3. `npm pack --dry-run` lists only the intended files (no node_modules, test-results, .env*, tmp, ...)
+//   4. the repository identity (schema $id, CITATION.cff repository-code, package.json repository and homepage if present)
+//      carries neither a placeholder nor the former repository name Taewan627/tracklab
 // Usage (repository root): node scripts/release-check.mjs      (or: npm run release-check)
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -32,14 +34,29 @@ for (const file of scanned) {
 if (hits.length) problems.push(`${hits.length} unresolved PI token(s) in ${new Set(hits.map(h => h.split(':')[0])).size} file(s):\n    ${hits.join('\n    ')}`);
 
 // 2. Versions.
+const pkgJson = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 const versions = {
-  'package.json': JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version,
+  'package.json': pkgJson.version,
   'src/version.ts': /VERSION\s*=\s*'([^']+)'/.exec(readFileSync(resolve(root, 'src/version.ts'), 'utf8'))?.[1],
   'CITATION.cff': /^version:\s*"?([^"\s#]+)"?/m.exec(readFileSync(resolve(root, 'CITATION.cff'), 'utf8'))?.[1],
 };
 if (new Set(Object.values(versions)).size !== 1 || Object.values(versions).some(v => !v)) {
   problems.push(`version mismatch: ${Object.entries(versions).map(([f, v]) => `${f}=${v}`).join(', ')}`);
 }
+
+// 4. Repository identity. A value still holding a placeholder, or the former repository name, is printed as unresolved.
+const oldRepo = /github\.com\/Taewan627\/tracklab(?=[/"'\s#]|$)/i;
+const placeholder = /\[PI\b|PLACEHOLDER|<[^>]*>|\bOWNER\b|REPO-URL|example\.(com|org)|\bTODO\b/i;
+const cffRepo = /^repository-code:\s*"?([^"\n#]+?)"?\s*$/m.exec(readFileSync(resolve(root, 'CITATION.cff'), 'utf8'))?.[1];
+const pkgRepo = typeof pkgJson.repository === 'object' ? pkgJson.repository?.url : pkgJson.repository;
+const identity = [
+  ['schema/trackdocument-v1.schema.json $id', JSON.parse(readFileSync(resolve(root, 'schema/trackdocument-v1.schema.json'), 'utf8')).$id],
+  ['CITATION.cff repository-code', cffRepo],
+  ...('repository' in pkgJson ? [['package.json repository', pkgRepo]] : []),
+  ...('homepage' in pkgJson ? [['package.json homepage', pkgJson.homepage]] : []),
+];
+const unresolvedIdentity = identity.filter(([, v]) => !v || oldRepo.test(v) || placeholder.test(v));
+if (unresolvedIdentity.length) problems.push(`${unresolvedIdentity.length} unresolved repository identity value(s):\n    ${unresolvedIdentity.map(([f, v]) => `${f}: ${v ?? '(missing)'}`).join('\n    ')}`);
 
 // 3. Package contents. Build first (as `npm pack` does through prepack) and list without running scripts, so that
 // script output cannot corrupt the JSON.
