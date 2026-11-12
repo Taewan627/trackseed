@@ -1,0 +1,135 @@
+{
+  "addendum": "ADDENDUM-01",
+  "validator": "default options of src/validate.ts (closureTangentMode kink) via cli-dist",
+  "node": "v22.23.4",
+  "cases": 1000,
+  "outputs": 1000,
+  "inputs": {
+    "seedsInSameOrder": true,
+    "scriptSha256Equal": true,
+    "digestsEqualToCommittedNode22": 1000,
+    "outcomes": {
+      "ok": 1000
+    }
+  },
+  "baselineReproduction": {
+    "checked": 3000,
+    "mismatches": 0,
+    "firstMismatchSeeds": []
+  },
+  "Q2": {
+    "4": {
+      "pass": 987,
+      "failing": 13,
+      "passShareOfOutputs": 98.7,
+      "wilson95": [
+        97.79,
+        99.24
+      ],
+      "errorCodeCases": {
+        "SELF_INTERSECTION_EDGE": 13,
+        "EDGE_EDGE_INTERSECTION": 3,
+        "SELF_INTERSECTION_CENTERLINE": 3
+      },
+      "warningCodeCases": {},
+      "localKinkOrClosureTangentCases": 0,
+      "localKinkCases": 0,
+      "closureTangentCases": 0
+    },
+    "8": {
+      "pass": 964,
+      "failing": 36,
+      "passShareOfOutputs": 96.4,
+      "wilson95": [
+        95.06,
+        97.39
+      ],
+      "errorCodeCases": {
+        "SELF_INTERSECTION_EDGE": 36,
+        "EDGE_EDGE_INTERSECTION": 3,
+        "SELF_INTERSECTION_CENTERLINE": 3
+      },
+      "warningCodeCases": {},
+      "localKinkOrClosureTangentCases": 0,
+      "localKinkCases": 0,
+      "closureTangentCases": 0
+    },
+    "14": {
+      "pass": 915,
+      "failing": 85,
+      "passShareOfOutputs": 91.5,
+      "wilson95": [
+        89.61,
+        93.07
+      ],
+      "errorCodeCases": {
+        "SELF_INTERSECTION_EDGE": 85,
+        "EDGE_EDGE_INTERSECTION": 3,
+        "SELF_INTERSECTION_CENTERLINE": 3
+      },
+      "warningCodeCases": {},
+      "localKinkOrClosureTangentCases": 0,
+      "localKinkCases": 0,
+      "closureTangentCases": 0
+    }
+  },
+  "transition": {
+    "4": {
+      "okToNotOk": [],
+      "notOkToOk": [],
+      "okStays": 987,
+      "notOkStays": 13,
+      "codeAdded": {},
+      "codeRemoved": {}
+    },
+    "8": {
+      "okToNotOk": [],
+      "notOkToOk": [],
+      "okStays": 964,
+      "notOkStays": 36,
+      "codeAdded": {},
+      "codeRemoved": {}
+    },
+    "14": {
+      "okToNotOk": [],
+      "notOkToOk": [],
+      "okStays": 915,
+      "notOkStays": 85,
+      "codeAdded": {},
+      "codeRemoved": {}
+    }
+  },
+  "predictions": [
+    {
+      "id": "P-A1",
+      "prediction": "pass share at W = 4 >= 95% of outputs",
+      "observed": "987 of 1000 (98.7%)",
+      "holds": true
+    },
+    {
+      "id": "P-A2",
+      "prediction": "outputs with LOCAL_KINK or CLOSURE_TANGENT at W = 4 <= 2% of outputs",
+      "observed": "0 of 1000 (0%)",
+      "holds": true
+    },
+    {
+      "id": "P-A3",
+      "prediction": "every output failing under v1.0 still fails under v1.1, at W = 4, 8, 14",
+      "observed": [
+        {
+          "W": 4,
+          "v10FailV11Pass": 0
+        },
+        {
+          "W": 8,
+          "v10FailV11Pass": 0
+        },
+        {
+          "W": 14,
+          "v10FailV11Pass": 0
+        }
+      ],
+      "holds": true
+    }
+  ]
+}
