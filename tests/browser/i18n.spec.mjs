@@ -5,7 +5,7 @@ const ready = page => expect(page.locator('#status')).toContainText(/Generated|�
 test('English is the default; the toggle shows EN pressed', async ({ page }) => {
   await page.goto('/?test=1'); await ready(page);
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('.panel-title h1')).toContainText('Track Lab');
+  await expect(page.locator('.panel-title h1')).toContainText('TrackSeed');
   await expect(page.locator('label[for="cornerPattern"]')).toContainText('Corner pattern');
   await expect(page.locator('#cornerPattern option[value="auto"]')).toHaveText('Auto (original generator)');
   await expect(page.locator('label[for="straight"]')).toHaveText('Straight ratio');
@@ -21,7 +21,7 @@ test('English is the default; the toggle shows EN pressed', async ({ page }) => 
 test('?lang=ko forces Korean and keeps the original Korean strings', async ({ page }) => {
   await page.goto('/?test=1&lang=ko'); await ready(page);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-  await expect(page.locator('.panel-title h1')).toContainText('트랙 실험실');
+  await expect(page.locator('.panel-title h1')).toContainText('TrackSeed');
   await expect(page.locator('label[for="cornerPattern"]')).toContainText('코너 패턴');
   await expect(page.locator('#cornerPattern option[value="auto"]')).toHaveText('Auto · 기존 생성');
   await expect(page.locator('label[for="straight"]')).toHaveText('직선 비율');
