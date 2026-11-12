@@ -2,7 +2,7 @@
 Input  tracks/<Name>.csv: '# x_m,y_m,w_tr_right_m,w_tr_left_m' (metres, local Cartesian, centre line smoothed by the authors, ~5 m spacing,
        open vertex list, the loop closes implicitly: last->first gap is also ~5 m).
 Output points (x, y) -> (x, z) unchanged, unit m. Width: ONE value per circuit = median over the points of (w_tr_right + w_tr_left);
-       the per-point widths (min/median/max) are recorded in the note column because TrackSeed's polyline path takes a single width.
+       the per-point widths (min/median/max) are recorded in the note column and, for E9, in the JSON key meta.width_min/width_median/width_max because TrackSeed's polyline path takes a single width.
 """
 import csv, glob, os, statistics, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,5 +18,6 @@ for f in sorted(glob.glob(os.path.join(src, "*.csv"))):
     widths = [p[2] + p[3] for p in P]
     width = round(statistics.median(widths), 3)
     note = f"width per point min/median/max = {min(widths):.2f}/{statistics.median(widths):.2f}/{max(widths):.2f}"
-    w.add(name, [(p[0], p[1]) for p in P], width, note)
+    w.add(name, [(p[0], p[1]) for p in P], width, note,
+          extra={"width_min": round(min(widths), 3), "width_median": width, "width_max": round(max(widths), 3)})
 w.close()

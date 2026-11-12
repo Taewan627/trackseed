@@ -17,6 +17,7 @@ python3 -I adapters/gen_amz.py           --build build --limit "$n"
 python3 -I adapters/gen_carracing.py     --build build --limit "$n"
 python3 -I adapters/gen_zzangupenn.py    --build build --limit "$n"
 for stage in 0 1 2 3 4; do node adapters/gen_driftschool.mjs --build build --limit "$n" --stage "$stage"; done
+node adapters/gen_e5.mjs --build build
 python3 -I adapters/summarize.py build
 (cd ../.. && npm run build:cli > /dev/null)   # parse check uses the built src/polyline.ts (cli-dist/, gitignored)
 node adapters/parse_check.mjs build
