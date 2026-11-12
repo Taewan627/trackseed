@@ -22,6 +22,8 @@ Validator and polyline-path robustness (WP7a), from the second red team's findin
 
 - **Public demo.** `vercel.json` no longer sends `X-Robots-Tag: noindex, nofollow, noarchive`; `X-Content-Type-Options: nosniff` stays. `scripts/prepare-vercel-preview.mjs`, `scripts/verify-vercel-production.mjs` and `.vercelignore` are removed: they implemented a private, access-protected prebuilt deployment (robots exclusion, a content audit with a pattern list naming the maintainer's employer and products, a protection-bypass check) that does not apply to a public demo. A normal Vercel deployment of the repository builds with `npm run build` (`vercel.json`).
 
+- **`scripts/release-check.mjs`** (`npm run release-check`) fails while any tracked file outside `experiments/` still contains a PI token (an open decision for the maintainer), while `package.json`, `src/version.ts` and `CITATION.cff` disagree on the version, or while `npm pack --dry-run` lists a file outside the package whitelist (node_modules, test-results, `.env*`, tmp, sources, ...).
+
 ### Changed (behaviour only outside TrackSeed's scale, or for inputs that crashed or were misreported)
 
 - **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackSeed's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
