@@ -1,0 +1,4 @@
+TrackSeed 1.2.0 test run (2026-11-13)
+Unit (npm test): 130/130 passed
+Browser (npx playwright test, PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers): 46/46 passed
+CLI hash (node cli-dist/cli.js generate --seed 42 | sha256sum): ca9df87d94fc3f914592509f9c680b088bbfb0f4eeef6ed72fc6bf2d40ac10d7 (matches)
