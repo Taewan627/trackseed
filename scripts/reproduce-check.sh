@@ -13,7 +13,7 @@ scratch="${1:?usage: scripts/reproduce-check.sh <scratch-dir> [group ...]}"; shi
 groups=("$@"); [ ${#groups[@]} -eq 0 ] && groups=(e1 e2 amend e6 e7)
 mkdir -p "$scratch/logs"; scratch="$(cd "$scratch" && pwd)"
 tsv="$scratch/reproduce-check.tsv"; : > "$tsv"
-E="npx -y esbuild@0.25 --bundle --format=esm --platform=neutral --target=es2020 --log-level=warning"
+E="npx -y esbuild@0.25.12 --bundle --format=esm --platform=neutral --target=es2020 --log-level=warning"
 
 cd "$repo" || exit 1 # committed paths in compare() are repo-relative
 note() { echo "[$(date +%T)] $*" >&2; }

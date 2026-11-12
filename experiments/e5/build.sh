@@ -4,7 +4,7 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 "$here/fetch.sh" > /dev/null
 mkdir -p "$here/build"
-npx -y esbuild@0.25 --bundle --format=esm --platform=neutral --target=es2020 --log-level=warning \
+npx -y esbuild@0.25.12 --bundle --format=esm --platform=neutral --target=es2020 --log-level=warning \
   "$here/adapter.mjs" --outfile="$here/build/e5.mjs"
 node "$here/make-page.mjs"
 { cat "$here/build/THIRD_PARTY.txt"; echo; sha256sum "$here/build/e5.mjs" | sed "s#$here/##"; } > "$here/build/BUNDLE_SHA256.txt"

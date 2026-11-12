@@ -7,7 +7,7 @@ old=/tmp/tlsx-v050
 [ "$(git -C "$old" rev-parse --short=7 HEAD)" = "145277e" ] || { echo "v0.5.0 worktree is not at 145277e" >&2; exit 1; }
 mkdir -p "$here/build"
 common=(--bundle --format=esm --platform=neutral --target=es2020 --log-level=warning)
-npx -y esbuild@0.25 "${common[@]}" "$here/entry-v100.mjs" --outfile="$here/build/v100.mjs"
-npx -y esbuild@0.25 "${common[@]}" --alias:@v050="$old/src" "$here/entry-v050.mjs" --outfile="$here/build/v050.mjs"
+npx -y esbuild@0.25.12 "${common[@]}" "$here/entry-v100.mjs" --outfile="$here/build/v100.mjs"
+npx -y esbuild@0.25.12 "${common[@]}" --alias:@v050="$old/src" "$here/entry-v050.mjs" --outfile="$here/build/v050.mjs"
 node "$here/make-page.mjs"
 sha256sum "$here/build/v100.mjs" "$here/build/v050.mjs" | sed "s#$here/##" | tee "$here/build/BUNDLE_SHA256.txt"

@@ -9,6 +9,8 @@ trim() { local n="$1"; shift; "$@" | head -n "$n"; echo "  ... (output trimmed)"
 {
 echo "\$ trackseed generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out track.json"
 $cli generate --seed 7 --set curves=8 --set cornerPattern=hairpin --out "$tmp/track.json"; echo "exit 0; track.json: $(wc -c < "$tmp/track.json") bytes"
+echo; echo "\$ integrity of track.json (digest covers the generator version stamp, contentDigest does not)"
+node -e 'const d=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));console.log(JSON.stringify({generator:d.generator,integrity:d.integrity},null,2))' "$tmp/track.json"
 echo; echo "\$ trackseed validate track.json --verify regenerate"
 node cli-dist/cli.js validate "$tmp/track.json" --verify regenerate | sed "s#$tmp/##" | head -n 14; echo "  ... (violations list trimmed)"
 node -e 'const r=JSON.parse(require("fs").readFileSync(0,"utf8"));console.log("checks (id: passed, failures):",r.checks.map(c=>c.id+": "+c.passed+", "+c.failures).join(" | "))' < <($cli validate "$tmp/track.json" --verify regenerate)

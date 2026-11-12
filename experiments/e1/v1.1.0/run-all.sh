@@ -7,7 +7,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
 ./build.sh || { echo "build failed" >&2; exit 1; }
 out="$here/../results/v1.1.0"
-rm -rf "$out"; mkdir -p "$out"
+git clean -fdq -- "$out"; mkdir -p "$out" # only untracked leftovers are removed: committed files (NOTES.md, ...) stay
 fail() { echo "ENGINE FAILED: $1" >&2; }
 node_like() { # label, command...
   local label="$1"; shift
@@ -18,10 +18,10 @@ node_like() { # label, command...
 }
 node_like node22 node
 node_like node22-repeat node
-node_like node20 npx -y -p node@20 node
-node_like node24 npx -y -p node@24 node
-node_like deno npx -y deno run --allow-read
-node_like bun npx -y bun@1 run
+node_like node20 npx -y -p node@20.20.2 node
+node_like node24 npx -y -p node@24.22.2 node
+node_like deno npx -y deno@2.9.6 run --allow-read
+node_like bun npx -y bun@1.4.4 run
 for br in chrome firefox webkit; do
   if ! node run-browser.mjs $br 2> "$out/$br.err"; then { echo "$br failed"; tail -20 "$out/$br.err"; } > "$out/$br.error.txt"; fail $br; fi
   rm -f "$out/$br.err"
