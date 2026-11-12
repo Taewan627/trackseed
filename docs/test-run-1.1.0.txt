@@ -1,15 +1,13 @@
-TrackLab 1.1.0 test counts, run on the tree of commit 7b3fac8 (version 1.1.0, before the documentation commits of this change; no file under src/, tests/ or experiments/ differs from it).
+TrackLab 1.1.0 test counts. Run on the working tree of branch wp6 after commit 14cca2f, with the test fix in tests/browser/io.spec.mjs and the documentation changes of this commit set (no change under src/ or experiments/).
 Machine: Linux 6.18.44-fc-v378 x86_64, node v22.23.4 (uname and node -v of the run; no committed environment file describes this machine).
 
-npm test                                  : tests 113, pass 113, fail 0, cancelled 0, skipped 0   (duration 145.7 s)
-npm run build                             : exit 0 (tsc --noEmit and vite build)
-npm run build:cli                         : exit 0
-npx playwright test --list                : Total: 46 tests in 7 files
-PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright test (after npm run build) :
-    45 passed (7.3 min), 1 failed
-    failed: tests/browser/io.spec.mjs:137 "io: importing a v1.0.0 Auto document keeps the legacy join and re-exports the same digest"
-    cause: line 155 expects the re-exported whole-document digest to equal the digest stored in tests/fixtures/v1.0.0-auto-seed42.json.
-           That fixture has generator.version 1.0.0; the digest covers the generator stamp (README, "Exchange format v1"),
-           so the 1.1.0 export has a different digest (received b6f0800f..., expected 28c55e16...). The contentDigest check on the next line was not reached.
+npm test                                  : tests 113, pass 113, fail 0, cancelled 0, skipped 0   (duration 144.2 s)
+npm run test:browser (build, then playwright test; PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers) :
+    46 passed (9.1 min), 0 failed
+    npx playwright test --list: Total: 46 tests in 7 files
 
-Scripts rerun for this change: scripts/cli-example.sh rewrote docs/cli-example-output.txt (version 1.1.0 defaults: height 20, tangent join).
+Earlier run before the test fix (same src/ and experiments/, tests/browser/io.spec.mjs unchanged): 45 passed, 1 failed at tests/browser/io.spec.mjs:137.
+    cause: the import test compared the whole-document digest with the stored v1.0.0 fixture value; that digest covers the generator stamp (README, "Exchange format v1"), so it changes with the version.
+    fix: the test now compares integrity.contentDigest, asserts generator.version equal to VERSION (1.1.0), and asserts that the digest differs from the fixture.
+
+Scripts run for the documentation of this change: scripts/cli-example.sh (docs/cli-example-output.txt, version 1.1.0 defaults: height 20, tangent join).

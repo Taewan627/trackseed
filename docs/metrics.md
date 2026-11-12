@@ -34,7 +34,7 @@ product is positive. Coincident triples give 0. Unit: 1/unit (1/world unit).
 | `totalTurningDegrees` | sum over vertices of abs heading change in x/z | degrees |
 | `curvature` | signed kappa_i per sample (omitted from CLI output unless `--samples`) | 1/unit |
 
-Reviewer-visible limitation: every curvature field above, and its fixed bin edges and thresholds, is expressed in
+Limitation: every curvature field above, and its fixed bin edges and thresholds, is expressed in
 1/unit. Uniformly scaling a track by s divides every kappa by s, so the same shape lands in different bins
 and classes. Legacy fields are kept bit-identical (experiments E3/E4/E5 depend on them; guarded by a fixture
 test) and must not be compared across tracks of different size.

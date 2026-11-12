@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { VERSION } from '../../src/version.ts';
 
 async function ready(page) {
   await page.goto('/?test=1');
@@ -152,7 +153,10 @@ test('io: importing a v1.0.0 Auto document keeps the legacy join and re-exports 
   const exported = JSON.parse(file.text);
   expect('autoJoin' in exported.params).toBe(false);
   expect(exported.params).toEqual(original.params);
-  expect(exported.integrity.digest).toBe(original.integrity.digest);
+  // The digest covers the generator stamp, so it differs from the 1.0.0 fixture by design;
+  // contentDigest excludes the stamp and must match.
+  expect(exported.generator.version).toBe(VERSION);
+  expect(exported.integrity.digest).not.toBe(original.integrity.digest);
   expect(exported.integrity.contentDigest).toBe(original.integrity.contentDigest);
   expect(errors).toEqual([]);
 });
