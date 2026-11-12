@@ -8,6 +8,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '../..');
@@ -51,7 +52,7 @@ if (mode === 'collect') {
 
   const toInput = p => ({ points: p.centerline.map(q => ({ x: q[0], z: q[1], y: 0 })), closed: true });
   const check = (p, W, options) => {
-    const v = validateTrack(trackFromPolyline({ ...toInput(p), width: W }), options);
+    const v = validateTrack(trackFromPolyline({ ...toInput(p), width: W }), { ...V12_VALIDATOR_PIN, ...options }); // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here): experiments/_v12-validator.mjs
     const sev = new Map();
     for (const x of v.violations) sev.set(x.code, x.severity); // violations are capped per code; every failing code appears at least once
     return { ok: v.ok, codes: [...sev.keys()].sort(), errorCodes: [...sev].filter(([, s]) => s === 'error').map(([c]) => c).sort(),

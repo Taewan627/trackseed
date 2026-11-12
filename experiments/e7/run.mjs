@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { V100_PIN } from '../_v100-params.mjs';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
 
 const DIST = new URL('../../cli-dist/', import.meta.url);
 if (!existsSync(new URL('validate.js', DIST))) throw new Error('cli-dist/ missing: run `npm run build:cli` first');
@@ -55,7 +56,7 @@ function geometry(t) {
 function evaluate(params) {
   let t;
   try { t = core.generateTrack(params); } catch (e) { return { generated: 0 }; }
-  const r = val.validateTrack(t), g = geometry(t);
+  const r = val.validateTrack(t, V12_VALIDATOR_PIN), g = geometry(t); // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED): experiments/_v12-validator.mjs
   return { generated: 1, ok: r.ok, codes: [...new Set(r.violations.map(v => v.code))].sort(),
     errCodes: [...new Set(r.violations.filter(v => v.severity === 'error').map(v => v.code))].sort(),
     length: t.length, ...g, pointsSha: sha(JSON.stringify(t.points)) };

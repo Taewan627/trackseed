@@ -7,6 +7,7 @@ import { gzipSync, gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { val, E2_SEEDS, MODES, gen, wilson, r6 } from './lib.mjs';
 
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
 const outDir = process.argv[2] ?? new URL('./results/e2-recheck', import.meta.url).pathname;
 const old = gunzipSync(readFileSync(new URL('../e2/results/amendment-01/validity.csv.gz', import.meta.url))).toString().trim().split('\n');
 const hdr = old[0].split(','), iOk = hdr.indexOf('ok'), iGen = hdr.indexOf('generated'), iCodes = hdr.indexOf('codes');
@@ -26,7 +27,7 @@ for (const [mode, over] of MODES) {
       }
       if (line[iGen] !== '1') mismatch++;
       s.generated++;
-      const a = val.validateTrack(t, { closureTangentMode: 'ratio' }), b = val.validateTrack(t);
+      const a = val.validateTrack(t, { closureTangentMode: 'ratio' }), b = val.validateTrack(t, V12_VALIDATOR_PIN); // pin the validator rule of the v1.1 comparison (no SHARP_VERTEX or UNDERSAMPLED, which v1.3 added): experiments/_v12-validator.mjs
       if ((a.ok ? '1' : '0') !== line[iOk]) mismatch++;
       if (a.ok) s.okRatio++; if (b.ok) s.okV11++;
       if (a.ok && !b.ok) s.okToNot++; if (!a.ok && b.ok) s.notToOk++;

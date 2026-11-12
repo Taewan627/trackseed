@@ -1,6 +1,7 @@
 // AMENDMENT-01 copy of e1b/entry.mjs (validator v0.5.1 default mode). E1b bundle entry: legacy v0.4 generateTrack + v0.5 validateTrack on the 1000 E1 cases.
 import { generateTrack } from '@legacy/core.ts';
 import { validateTrack } from '../../../src/validate.ts';
+import { V12_VALIDATOR_PIN } from '../../_v12-validator.mjs';
 import { CASES } from '../../e1/cases.mjs';
 
 const KIND = { tree: 'T', bench: 'B', lamp: 'L', building: 'U' };
@@ -8,7 +9,7 @@ const KIND = { tree: 'T', bench: 'B', lamp: 'L', building: 'U' };
 export function record(params) {
   let track;
   try { track = generateTrack(params); } catch (e) { return { throw: (e && e.name) || 'Error' }; }
-  const v = validateTrack(track);
+  const v = validateTrack(track, V12_VALIDATOR_PIN); // pin: validator v1.3 checks off (experiments/_v12-validator.mjs); the rule is the current default 'kink', not the v0.5.1 default of the committed run
   const pr = track.patternReport;
   return {
     throw: null,

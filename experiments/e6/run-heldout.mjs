@@ -16,7 +16,9 @@ const SEEDS = process.env.E6_SMOKE ? DEV_SEEDS.slice(0, 2) : HELD_SEEDS;
 const frozen = JSON.parse(readFileSync(`${root}dev/FROZEN.json`, 'utf8'));
 if (!frozen.criterionMet) throw new Error('DEV criterion not met; no HELD-OUT evaluation of a frozen rule: ' + frozen.reason);
 
-const BIG = { maxViolationsPerCheck: 1e9 };
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
+// pin the validator rule in force when these results were produced: validator v1.3 added SHARP_VERTEX and UNDERSAMPLED, switched off here (experiments/_v12-validator.mjs)
+const BIG = { maxViolationsPerCheck: 1e9, ...V12_VALIDATOR_PIN };
 const RULES = {
   frozen: { ...BIG, ...frozen.options },
   ratio: { ...BIG, closureTangentMode: 'ratio' },

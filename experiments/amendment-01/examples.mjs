@@ -4,13 +4,14 @@
 import { writeFileSync } from 'node:fs';
 import { generateTrack } from '../../src/core.ts';
 import { validateTrack } from '../../src/validate.ts';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
 import { CASES } from '../e2/grid.mjs';
 const A = [], B = [];
 let autoN = 0, autoFail = 0;
 for (const c of CASES) {
   if (A.length >= 3 && B.length >= 3) break;
   let t; try { t = generateTrack(c.params); } catch { continue; }
-  const r = validateTrack(t), a = validateTrack(t, { closureTangentMode: 'absolute' });
+  const r = validateTrack(t, V12_VALIDATOR_PIN), a = validateTrack(t, { closureTangentMode: 'absolute' }); // pin: validator v1.3 checks off, experiments/_v12-validator.mjs
   const cl = r.checks.find(x => x.id === 'closure'), has = x => x.violations.some(v => v.code === 'CLOSURE_TANGENT');
   const row = { index: c.index, mode: c.mode, curves: c.curves, straight: c.straight, width: c.width, size: c.size, height: c.height, seed: c.seed,
     theta0: +cl.stats.tangentDegrees.toFixed(3), neighbourhoodMax: +cl.stats.neighbourhoodMaxDegrees.toFixed(3),

@@ -1,4 +1,4 @@
-# Validator rules (`validateTrack`), including the local-kink rule added after an internal review ("v1.1")
+# Validator rules (`validateTrack`), including the local-kink rule added after an internal review ("v1.1") and the absolute per-vertex rule and sampling diagnostic of v1.3
 
 Scope: this file documents the rules, defaults, rationale and evidence of the geometry validator in `src/validate.ts`. The version number is not changed by the commit that adds it (versioning is handled separately). The README and the CLI describe this rule (see "Known follow-ups" for the remaining gaps).
 
@@ -10,10 +10,12 @@ Scope: this file documents the rules, defaults, rationale and evidence of the ge
 | `finite` | `NON_FINITE` | error | every coordinate and `params.width` finite and positive |
 | `closure` | `CLOSURE_POSITION`, `CLOSURE_EDGE`, `CLOSURE_HEIGHT`, `CLOSURE_TANGENT` | error | last point equals first within `closureTolerance` (1e-6 x f; edges too), height gap <= `heightTolerance` (1e-6 x f), f = 1 for every track of TrackSeed's size (see "Scale-relative tolerances"); `CLOSURE_TANGENT` = the seam vertex is flagged by the local-kink rule (mode `kink`) |
 | `local-kink` | `LOCAL_KINK` | error | NEW in mode `kink`: the same rule at every other vertex of the closed loop. Not run in the legacy modes (they return the 7 checks of v1.0.0) |
+| `sharp-vertex` | `SHARP_VERTEX` | error | NEW in v1.3, mode `kink` only: heading change at any vertex (seam included) > `sharpVertexDegrees` = 30, independent of the neighbours. See "Absolute per-vertex rule and sampling diagnostic" |
 | `self-intersection` | `SELF_INTERSECTION_*`, `EDGE_EDGE_INTERSECTION` | error | planar (x/z) segment intersections of centreline, each edge, edge vs edge |
 | `edge-fold` | `EDGE_FOLD` | error | flipped or degenerate ribbon triangles (x/z cross product <= `foldEpsilon` = 1e-5 x f^2) |
 | `min-turn-radius` | `MIN_TURN_RADIUS` | warning | local radius < `minRadiusToHalfWidth` x width/2 |
 | `max-slope` | `MAX_SLOPE` | warning | rise over run > `maxSlope` |
+| `undersampled` | `UNDERSAMPLED` | warning | NEW in v1.3, mode `kink` only: more than `undersampledShare` = 10 % of the vertices turn by more than `undersampledTurnDegrees` = 12 degrees (the polyline is coarser than the sampling requirement below) |
 
 ## The local-kink rule
 
@@ -29,9 +31,53 @@ Other rules are selectable with `kinkRule` for reproducing E6 (`turn`, `curvatur
 
 Legacy modes (`closureTangentMode: 'ratio' | 'absolute'`) reproduce v0.5.1 / v0.5.0 exactly (`tangentToleranceDegrees` = 5, `seamRatio` = 2) and run no `LOCAL_KINK` check. The E2 recheck below shows that 'ratio' reproduces the committed amendment-01 `ok` column bit for bit.
 
+## Absolute per-vertex rule and sampling diagnostic (validator v1.3)
+
+Why. The third red team (R2-1, R2-2) showed that the relative local-kink rule above detects locally anomalous turns, not sharp turns: when every vertex of a neighbourhood is equally sharp the reference is as large as the vertex and the ratio test never fires. A 4-vertex square and regular 5-, 6- and 8-gons (R = 500, width 12) were `ok` with no warning; so was a 2000-vertex circle with alternating +-5 radial offsets (about 145 degrees at every vertex); two 88-degree spikes two or four vertices apart masked each other, and a 20-vertex zigzag patch passed. The tool also had everything it needs to say that such input is sampled too coarsely and said nothing (metrics of the square: `turnCount` 1 and `straightLengthFraction` 0 without a warning).
+
+`SHARP_VERTEX` (error). In mode `kink` (the default), vertex i of the closed loop, the seam (index 0) included, fails iff theta_i > `sharpVertexDegrees`, where theta_i is the unsigned x/z heading change of the local-kink rule. Default 30 degrees. The test uses no neighbour, so polygons, uniform sawtooth and paired or periodic defects cannot mask one another. The comparison is strict and exact in double precision, so a polyline whose turn is 30 degrees by construction (a regular 12-gon) is decided by rounding at the 1e-14 level, vertex by vertex; regular polygons of 13 or more vertices pass and of 11 or fewer fail by margin. A spike also bends the vertices next to it, so a single spike usually gives three `SHARP_VERTEX` entries (i - 1, i, i + 1); the seam is reported twice when it is flagged, as `SHARP_VERTEX` at index 0 and as `CLOSURE_TANGENT`. `value` is the turn, `limit` is `sharpVertexDegrees`. `checks[].stats`: `maxTurnDegrees`, `limit`.
+
+`UNDERSAMPLED` (warning). Let over = the number of the n vertices with theta_i > `undersampledTurnDegrees` (default 12). The check warns iff over / n > `undersampledShare` (default 0.1). The 12 degrees are the turn of a vertex on an arc sampled at s = 0.2 R (requirement (1) of "Sampling requirement" below), so a polyline that meets the requirement has no such vertex on its arcs; the check is that requirement in observable form (the turn of an arc vertex, 2 asin(s / 2R), is s / R). The violation is one entry with `value` = the share, `limit` = `undersampledShare`, `index` = the vertex of the largest turn and a message with the count, the largest turn, the median spacing and the width. `checks[].stats`: `share`, `verticesOverTurn`, `turnDegrees`, `maxTurnDegrees`, `medianSpacing`, `maxSpacing`, `width`; `failures` is `verticesOverTurn` when the warning is raised and 0 otherwise. A warning does not change `ok`; `--strict` turns it into exit code 1. `metrics-polyline` runs no validator: it writes the same warning to stderr and leaves its JSON unchanged.
+
+Defaults and derivation. T_abs = 30 degrees and the 10 % share were chosen by exploration on clean generated TrackSeed tracks that were not created for this evaluation ([validator-v1.3-exploration.md](validator-v1.3-exploration.md), labelled exploratory): the largest turn of any of 60,290 clean tracks is 17.43 degrees (13.85 on pattern modes and Auto with straight 0), the largest share of vertices above 12 degrees is 4.44 % (2.69 % on pattern modes). Margins: 30 / 17.43 = 1.72 for the turn, 10 / 4.44 = 2.25 for the share; on the other side the weakest RT3 probe (alternating +-0.5) turns 35.5 degrees, the octagon 45. These are design choices informed by TrackSeed's own tracks (R2-5): nothing about third-party tracks was used.
+
+Selecting. Both checks are on by default in mode `kink`, in the library and the CLI, and not run in the legacy modes (`ratio`, `absolute`; those return the 7 checks of v1.0.0 as before). A disabled check is not listed in `checks`, so with both off the report is the v1.2.0 report.
+
+| Option | Library | CLI |
+|---|---|---|
+| `SHARP_VERTEX` limit (default 30) | `sharpVertexDegrees` (number) | `--limit sharpVertexDegrees=N` (finite numbers only; 180, the largest possible turn, disables it) |
+| switch `SHARP_VERTEX` off | `sharpVertexDegrees: Infinity` | `--no-sharp-vertex` (not together with `--limit sharpVertexDegrees=`) |
+| `UNDERSAMPLED` turn (default 12) and share (default 0.1) | `undersampledTurnDegrees`, `undersampledShare` | `--limit undersampledTurnDegrees=N`, `--limit undersampledShare=N` (1 or more disables it) |
+| switch `UNDERSAMPLED` off | `undersampledCheck: false` | `--no-undersampled-check` (also silences the `metrics-polyline` warning) |
+
+The flags are accepted by `validate`, `validate-polyline`, `batch` and (`--no-undersampled-check`) `metrics-polyline`. Experiment runners whose committed results predate v1.3 pass `{ sharpVertexDegrees: Infinity, undersampledCheck: false }` (`experiments/_v12-validator.mjs`, `V12_VALIDATOR_PIN`), so that those results reproduce (`docs/test-run-wp13.txt`).
+
+RT3 probe outcomes, before (v1.2, both checks off) and after (v1.3 defaults), from `scripts/validator-v1.3-exploration.mjs`. Polygons: R = 500, width 12; the others: a 2000-vertex circle, R = 1000, width 10 ("sawtooth" = the RT3 zigzag circles; "zigzag patch" = RT3's 20-vertex patch; paired spikes sit at vertices 500 and 500 + gap). Every probe class tested in `tests/sharp-vertex.test.ts`.
+
+| probe | max turn (deg) | v1.2 (new checks off) | v1.3 defaults |
+|---|---|---|---|
+| regular 4-gon, R=500, width 12 | 90.0 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| regular 5-gon, R=500, width 12 | 72.0 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| regular 6-gon, R=500, width 12 | 60.0 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| regular 8-gon, R=500, width 12 | 45.0 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| sawtooth: 2000-gon R=1000, alternating +-0.5, width 10 | 35.5 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| sawtooth: 2000-gon R=1000, alternating +-2, width 10 | 103.9 | ok warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX] warn [MIN_TURN_RADIUS,UNDERSAMPLED] |
+| sawtooth: 2000-gon R=1000, alternating +-5, width 10 | 145.3 | ok | INVALID [SHARP_VERTEX] warn [UNDERSAMPLED] |
+| paired spikes gap 2, h=3, 2000-gon R=1000, width 10 | 87.5 | ok warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX] warn [MIN_TURN_RADIUS] |
+| paired spikes gap 2, h=10, 2000-gon R=1000, width 10 | 145.1 | INVALID [EDGE_FOLD] | INVALID [SHARP_VERTEX,EDGE_FOLD] |
+| paired spikes gap 3, h=3, 2000-gon R=1000, width 10 | 87.5 | INVALID [SELF_INTERSECTION_EDGE,EDGE_FOLD] warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX,SELF_INTERSECTION_EDGE,EDGE_FOLD] warn [MIN_TURN_RADIUS] |
+| paired spikes gap 3, h=10, 2000-gon R=1000, width 10 | 145.1 | INVALID [SELF_INTERSECTION_EDGE,EDGE_FOLD] | INVALID [SHARP_VERTEX,SELF_INTERSECTION_EDGE,EDGE_FOLD] |
+| paired spikes gap 4, h=3, 2000-gon R=1000, width 10 | 87.5 | ok warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX] warn [MIN_TURN_RADIUS] |
+| paired spikes gap 4, h=10, 2000-gon R=1000, width 10 | 145.1 | INVALID [SELF_INTERSECTION_EDGE,EDGE_FOLD] | INVALID [SHARP_VERTEX,SELF_INTERSECTION_EDGE,EDGE_FOLD] |
+| zigzag patch of 20 vertices, amp 1, 2000-gon R=1000, width 10 | 65.1 | ok warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX] warn [MIN_TURN_RADIUS] |
+| zigzag patch of 20 vertices, amp 3, 2000-gon R=1000, width 10 | 124.9 | ok warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX] warn [MIN_TURN_RADIUS] |
+| zigzag patch of 20 vertices, amp 6, 2000-gon R=1000, width 10 | 150.8 | INVALID [SELF_INTERSECTION_EDGE,EDGE_FOLD] warn [MIN_TURN_RADIUS] | INVALID [SHARP_VERTEX,SELF_INTERSECTION_EDGE,EDGE_FOLD] warn [MIN_TURN_RADIUS] |
+
+Not solved by this change, and what it does not claim. (1) `--resample-smooth` still rounds a coarse polygon: after smoothing at S = 3 the 4-, 5- and 8-gons pass (largest turn 1.4, 0.9, 0.5 degrees). The checks judge the polyline that is validated; report the raw arm too (R2-3 is a separate issue). (2) A polyline that is smooth in the sense of the thresholds can still be wrong: the limits say nothing about drivability. (3) 30 degrees and 10 % are tool conventions chosen on TrackSeed's tracks; real circuits sampled coarsely will raise `UNDERSAMPLED`, and that is intended. (4) E9, E5 and the other committed experiments were not re-run with the new checks on; their committed results stand for the v1.2.0 rule set.
+
 ## Rationale and evidence
 
-All numbers: `experiments/e6/` (pre-registered in `PROTOCOL.md`, committed alone before any evaluation).
+All numbers: `experiments/e6/` (protocol in `PROTOCOL.md`, committed alone before any evaluation in the local git history).
 
 - Defect (found in an internal review before v1.1): the 'ratio' rule misses seam kinks; there was no interior kink check.
 - DEV (20 seeds, `results/dev/`): 711 configurations of four detector families (bare turn, curvature x half width, outlier, geometric spike, and combinations) were scored on clean generated tracks (pattern modes N1, Auto straight 0 N2), a synthetic stress set (N3: circles of 12..384 points, ellipses, stadiums) and five defect operators. The selection criterion fixed in the protocol (admissible = FPR <= 1% and no flag on N3; then maximum macro recall; then ties by fewest false positives, family simplicity, plateau centre) chose `outlier`, window 3, maximum, ratio 3, floor 12: DEV false positives 0/9718 (N1), 0/1080 (N2), 0/60 (N3); recall on must-detect instances 100% for all four planar operators. Bare-turn thresholds <= 30 degrees flag the coarse circles of N3; curvature-times-half-width cannot separate narrow-road Auto curves from kinks.

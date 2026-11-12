@@ -50,7 +50,7 @@ test('cli: generate -> validate -> metrics round trip, exit codes, stdout vs --o
     const v = run(['validate', file, '--verify', 'regenerate']);
     assert.ok(v.code === 0 || v.code === 1, `validate exit ${v.code}: ${v.err}`);
     const report = JSON.parse(v.out) as { ok: boolean; digest: string; violations: { severity: string }[]; checks: unknown[] };
-    assert.equal(report.digest, doc.integrity.digest); assert.equal(report.checks.length, 8); // seven v1.0.0 checks plus local-kink (default closureTangentMode 'kink')
+    assert.equal(report.digest, doc.integrity.digest); assert.equal(report.checks.length, 10); // seven v1.0.0 checks plus local-kink, sharp-vertex and undersampled (default closureTangentMode 'kink')
     assert.equal(v.code === 0, report.ok);
     assert.equal(report.ok, !report.violations.some(x => x.severity === 'error'));
 

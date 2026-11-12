@@ -4,6 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { validateTrack } from '../../src/validate.ts';
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
 import { computeMetrics } from '../../src/metrics.ts';
 import { dcos, dsin } from '../../src/detmath.ts';
 import { SEEDS, LEVELS } from '../e2/grid.mjs';
@@ -12,7 +13,8 @@ import { generateB2 } from '../e4/baselines/b2.ts';
 import { finishTrack, resample } from '../e4/baselines/common.ts';
 const MODE = process.env.CLOSURE_TANGENT_MODE || 'ratio';
 if (!['ratio', 'absolute'].includes(MODE)) throw new Error('CLOSURE_TANGENT_MODE');
-const VOPTS = { closureTangentMode: MODE };
+// pin the validator rule in force when these results were produced (legacy modes run neither SHARP_VERTEX nor UNDERSAMPLED; stated explicitly): experiments/_v12-validator.mjs
+const VOPTS = { closureTangentMode: MODE, ...V12_VALIDATOR_PIN };
 
 const METRICS = ['sampleCount', 'length', 'boundingBoxArea', 'straightLengthFraction', 'meanAbsCurvature', 'maxAbsCurvature', 'p95AbsCurvature',
   'curvatureEntropyBits', 'turnCount', 'elevationRange', 'maxAbsSlope', 'meanAbsSlope', 'totalTurningDegrees'];

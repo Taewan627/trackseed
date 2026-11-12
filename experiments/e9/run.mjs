@@ -7,6 +7,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import os from 'node:os';
 const here = dirname(fileURLToPath(import.meta.url)), root = join(here, '..', '..');
+import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs'; // pin the validator rule of the committed results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here)
 const lib = f => import(pathToFileURL(join(root, 'cli-dist', f)).href);
 const { trackFromPolyline, parsePolylineJson } = await lib('polyline.js');
 const { validateTrack } = await lib('validate.js');
@@ -27,7 +28,7 @@ const perimeter = pts => { // closed perimeter of the raw list (closing edge onl
 };
 function evaluate(raw, width, options) {
   const track = trackFromPolyline({ points: raw, width, closed: true }, options);
-  const v = validateTrack(track);
+  const v = validateTrack(track, V12_VALIDATOR_PIN);
   const m = computeMetrics(track);
   return { track, v, m };
 }

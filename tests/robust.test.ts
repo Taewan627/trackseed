@@ -139,7 +139,7 @@ test('duplicates: consecutive duplicate vertices are removed and counted; the ve
   assert.equal(validateTrack(tr).ok, true);
   // a spike whose vertex is duplicated is a LOCAL_KINK, not a self-intersection
   const sp = withSpike(clean, 100, 20), spd = [...sp.slice(0, 101), { ...sp[100] }, ...sp.slice(101)];
-  assert.deepEqual(codes(verdict(spd, 10)), codes(verdict(sp, 10))); assert.deepEqual(codes(verdict(sp, 10)), ['LOCAL_KINK']);
+  assert.deepEqual(codes(verdict(spd, 10)), codes(verdict(sp, 10))); assert.deepEqual(codes(verdict(sp, 10)), ['LOCAL_KINK', 'SHARP_VERTEX']); // v1.3: the 20-unit spike also exceeds the absolute 30 degree limit
   // runs, near duplicates (within 1e-9 of the diagonal), the closing copy given twice, last vs first
   const runs = [clean[0], { ...clean[0] }, { ...clean[0] }, ...clean.slice(1, 10), { x: clean[9].x + 1e-8, z: clean[9].z }, ...clean.slice(10), { x: clean[0].x + 1e-8, z: clean[0].z }, { ...clean[0] }];
   const rr = trackFromPolyline({ points: runs, width: 10, closed: true });
@@ -188,8 +188,9 @@ test('sampling requirement (2): spacing <= min(9 h, 0.07 R) flags a lateral defe
     const s = 2 * Math.PI * R / N; assert.ok(s <= 0.07 * R && s <= 9 * h, `N=${N} s=${s} h=${h}`);
     assert.equal(verdict(withSpike(circle(N, R), 5, h), 10).ok, false, `N=${N}, spike ${h}`);
   }
-  // outside the requirement the defect can be missed (the second red team's observation): N=24, a spike of 3.8 road widths
-  assert.equal(verdict(withSpike(circle(24, R), 5, 30), 10).ok, true);
+  // outside the requirement the RELATIVE rule can miss the defect (the second red team's observation): N=24, a spike of 3.8 road widths; the absolute rule of v1.3 (SHARP_VERTEX) does not
+  assert.equal(verdict(withSpike(circle(24, R), 5, 30), 10, {}, { sharpVertexDegrees: Infinity, undersampledCheck: false }).ok, true);
+  assert.equal(verdict(withSpike(circle(24, R), 5, 30), 10).ok, false);
 });
 
 test('smooth resampling: the rounded rectangle of the second red team becomes ok at spacing 20 and 47 once resampled at <= 5', () => {

@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { DEFAULTS, LIMITS, ParameterError, generateTrack, strictParams, type Params } from './core.js';
 import { TrackDocumentError, canonicalStringify, exportTrack, importTrack } from './schema.js';
-import { DEFAULT_VALIDATE_OPTIONS, validateTrack, type ValidateOptions } from './validate.js';
+import { DEFAULT_VALIDATE_OPTIONS, kinkProfile, samplingDiagnostic, validateTrack, type ValidateOptions } from './validate.js';
 import { computeMetrics, type TrackMetrics } from './metrics.js';
 import { VERSION } from './version.js';
 import { PolylineParseError, parsePolylineCsv, parsePolylineJson, trackFromPolyline } from './polyline.js';
@@ -48,7 +48,7 @@ Unknown keys and out-of-range values are errors (exit 2); nothing is clamped sil
 Exit 1 if the generator rejects the parameters (e.g. a corner pattern that cannot be fitted).
 `,
   batch: `Usage: trackseed batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing]
-                       [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
+                       [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N] [--no-sharp-vertex] [--no-undersampled-check]
 
 grid.json:
   { "seeds":  { "from": 1, "to": 6 }            // inclusive range, or an array of seeds
@@ -68,10 +68,11 @@ the batch. A one-line summary is printed to stderr. Exit 2 for an invalid grid.
 --seam-ratio N                              seam-continuity outlier factor, mode ratio only (default ${DEFAULT_VALIDATE_OPTIONS.seamRatio});
                                             an error without --closure-tangent-mode ratio
 --absolute-tolerances                       use the default closure/height/fold tolerances in absolute units at every scale (see "validate")
+--no-sharp-vertex, --no-undersampled-check  switch off the validator v1.3 checks SHARP_VERTEX and UNDERSAMPLED (see "validate")
 The validator options affect only "ok", "violationCodes" and "checkFailures"; documents, digests and metrics do not change.
 `,
   validate: `Usage: trackseed validate file.json [--verify digest|regenerate] [--limit key=value ...] [--strict]
-                         [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
+                         [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N] [--no-sharp-vertex] [--no-undersampled-check]
 
 Parses the document (schema, finite numbers, SHA-256 digest; --verify regenerate also regenerates
 the track from its params and compares digests), then runs the geometry validator and prints
@@ -93,6 +94,12 @@ ${Object.entries(DEFAULT_VALIDATE_OPTIONS).map(([k, v]) => `    ${k}=${v}`).join
                     Without it they are multiplied by f (f^2 for foldEpsilon), f = 1 for a track whose bounding-box diagonal D is
                     between 10 and 100000 units (all TrackSeed tracks), f = D/10 below and D/100000 above (docs/validator.md,
                     "Scale-relative tolerances"). A value given with --limit is always used literally.
+--no-sharp-vertex   switch off SHARP_VERTEX (validator v1.3, error, mode kink only): any vertex whose heading change exceeds
+                    sharpVertexDegrees (default 30) regardless of its neighbours. --limit sharpVertexDegrees=180 also disables it.
+--no-undersampled-check  switch off UNDERSAMPLED (validator v1.3, warning, mode kink only): more than undersampledShare of the vertices
+                    (default 10 %) turn by more than undersampledTurnDegrees (default 12), i.e. the polyline violates the sampling
+                    requirement s <= 0.2 R_min. Disabled checks are not listed in "checks"; with both off the report is the v1.2 report.
+                    docs/validator.md, "Absolute per-vertex rule and sampling diagnostic".
 `,
   metrics: `Usage: trackseed metrics file.json [--samples]
 
@@ -102,6 +109,7 @@ Exit 2 for an unreadable or invalid document.
 `,
   'validate-polyline': `Usage: trackseed validate-polyline file.json|file.csv --width W [--resample-spacing S | --resample-smooth S] [--strict]
                                   [--limit key=value ...] [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N] [--absolute-tolerances]
+                                  [--no-sharp-vertex] [--no-undersampled-check]
 
 Builds a TrackSeed track from a closed polyline (x/z ground plane, y height; src/polyline.ts documents the
 conventions: normals, float32 road edges at the given full width, no straight labelling) and runs the validator.
@@ -114,7 +122,7 @@ non-finite points are reported, fewer than 3 distinct points are rejected.
 --resample-smooth S   OFF by default; lay a closed centripetal Catmull-Rom spline through the given points, then resample it by arc
                       length at S. Rounds the corners of a coarsely sampled curve but passes through every input point (a vertex that
                       sticks out stays a sharp feature). Exclusive with --resample-spacing. Both change the validated geometry.
---closure-tangent-mode, --seam-ratio and --absolute-tolerances: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
+--closure-tangent-mode, --seam-ratio, --absolute-tolerances, --no-sharp-vertex and --no-undersampled-check: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
 Output and exit codes as for "validate" ({ file, width, input, ok, violations, checks }); exit 2 for unreadable input.
 
 Sampling requirement. The validator judges the polyline as given; a vertex that turns sharply is a kink, whatever curve the
@@ -129,10 +137,12 @@ Sample at s <= min(0.2 R_min, 9 h_min), or min(0.07 R_min, 9 h_min) if defects m
 pass a coarser polyline through --resample-smooth S with S below that bound. The requirement is sufficient, not necessary
 (the 3 x rule often accepts coarser samples). Derivation and measured examples: docs/validator.md, "Sampling requirement".
 `,
-  'metrics-polyline': `Usage: trackseed metrics-polyline file.json|file.csv --width W [--resample-spacing S | --resample-smooth S] [--samples]
+  'metrics-polyline': `Usage: trackseed metrics-polyline file.json|file.csv --width W [--resample-spacing S | --resample-smooth S] [--samples] [--no-undersampled-check]
 
 Prints the geometric metrics (same definitions as "metrics") of a closed polyline; see validate-polyline for the input format.
 --width is accepted for symmetry (metrics use the centerline only) and is required so both commands take the same arguments.
+If the polyline is undersampled (validator UNDERSAMPLED rule: more than 10 % of the vertices turn by more than 12 degrees) a warning is
+written to stderr and the metrics on stdout are unchanged and unreliable; --no-undersampled-check silences it.
 `,
 };
 
@@ -267,10 +277,14 @@ function metricsSummary(m: TrackMetrics): Omit<TrackMetrics, 'curvature'> {
 function validatorOptions(p: Parsed): ValidateOptions {
   const options: Record<string, number | string | boolean> = {};
   if (p.flags.has('absolute-tolerances')) options.absoluteTolerances = true;
+  if (p.flags.has('no-sharp-vertex')) options.sharpVertexDegrees = Infinity;
+  if (p.flags.has('no-undersampled-check')) options.undersampledCheck = false;
   for (const item of p.flags.get('limit') ?? []) {
     const [k, v] = parseAssignment(item, '--limit');
     if (k === 'closureTangentMode') throw new UsageError('closureTangentMode is not numeric; use --closure-tangent-mode kink|ratio|absolute');
     if (k === 'absoluteTolerances') throw new UsageError('absoluteTolerances is not numeric; use the flag --absolute-tolerances');
+    if (k === 'undersampledCheck') throw new UsageError('undersampledCheck is not numeric; use the flag --no-undersampled-check');
+    if (k === 'sharpVertexDegrees' && p.flags.has('no-sharp-vertex')) throw new UsageError('give either --no-sharp-vertex or --limit sharpVertexDegrees=, not both');
     if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
     options[k] = parseNumber(v, `--limit ${k}`);
   }
@@ -291,7 +305,7 @@ function validatorOptions(p: Parsed): ValidateOptions {
 }
 
 function batchCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['grid', 'out', 'jsonl', 'closure-tangent-mode', 'seam-ratio'], [], ['no-timing', 'absolute-tolerances']);
+  const p = parseArgs(argv, ['grid', 'out', 'jsonl', 'closure-tangent-mode', 'seam-ratio'], [], ['no-timing', 'absolute-tolerances', 'no-sharp-vertex', 'no-undersampled-check']);
   if (p.positional.length) throw new UsageError(`unexpected argument "${p.positional[0]}"`);
   if (!p.flags.has('grid')) throw new UsageError('--grid is required');
   if (!p.flags.has('out')) throw new UsageError('--out is required');
@@ -340,7 +354,7 @@ function loadDocument(path: string, verify: 'digest' | 'regenerate') {
 }
 
 function validateCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['verify', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances']);
+  const p = parseArgs(argv, ['verify', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances', 'no-sharp-vertex', 'no-undersampled-check']);
   if (p.positional.length !== 1) throw new UsageError('validate expects exactly one file');
   const verify = one(p, 'verify') ?? 'digest';
   if (verify !== 'digest' && verify !== 'regenerate') throw new UsageError(`--verify must be "digest" or "regenerate", got "${verify}"`);
@@ -380,7 +394,7 @@ function loadPolyline(p: Parsed) {
   catch (e) { if (e instanceof RangeError) throw new UsageError(`${file}: ${e.message}`); throw e; }
 }
 function validatePolylineCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances']);
+  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances', 'no-sharp-vertex', 'no-undersampled-check']);
   const options = validatorOptions(p);
   const { file, width, spacing, smooth, track } = loadPolyline(p);
   const result = validateTrack(track, options);
@@ -391,8 +405,14 @@ function validatePolylineCommand(argv: string[]): number {
   return !result.ok || (p.flags.has('strict') && warned) ? 1 : 0;
 }
 function metricsPolylineCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth'], [], ['samples']);
-  const m = computeMetrics(loadPolyline(p).track);
+  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth'], [], ['samples', 'no-undersampled-check']);
+  const { track } = loadPolyline(p);
+  const m = computeMetrics(track);
+  // the metrics themselves are unchanged; an undersampled polyline gets the validator's UNDERSAMPLED warning on stderr (stdout stays the metrics JSON)
+  if (!p.flags.has('no-undersampled-check')) {
+    const d = samplingDiagnostic(kinkProfile(track.points, track.params.width), DEFAULT_VALIDATE_OPTIONS.undersampledTurnDegrees, DEFAULT_VALIDATE_OPTIONS.undersampledShare);
+    if (d.flagged) process.stderr.write(`trackseed: warning UNDERSAMPLED: ${d.message}\n`);
+  }
   process.stdout.write(JSON.stringify(p.flags.has('samples') ? m : metricsSummary(m), null, 2) + '\n');
   return 0;
 }

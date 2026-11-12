@@ -17,6 +17,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const e9 = resolve(here, '..');
 const root = resolve(e9, '..', '..');
+import { V12_VALIDATOR_PIN } from '../../_v12-validator.mjs'; // pin the validator rule of the committed E9 results (v1.3 adds SHARP_VERTEX, UNDERSAMPLED switched off here)
 const lib = f => import(pathToFileURL(join(root, 'cli-dist', f)).href);
 const { trackFromPolyline, parsePolylineJson } = await lib('polyline.js');
 const { validateTrack, DEFAULT_VALIDATE_OPTIONS, kinkProfile, kinkFlags } = await lib('validate.js');
@@ -60,7 +61,7 @@ function evaluate(source, id, doc, raw, arm) {
   const W = doc.width, s = SMOOTH_FACTOR * W;
   const options = arm === 'raw' ? {} : { resampleSmooth: { spacing: s } };
   const track = trackFromPolyline({ points: raw, width: W, closed: true }, options);
-  const v = validateTrack(track);
+  const v = validateTrack(track, V12_VALIDATOR_PIN);
   const errors = [...new Set(v.violations.filter(x => x.severity === 'error').map(x => x.code))].sort().join(';');
   const outcome = v.ok ? 'ok' : 'fail';
   const c = committed.get(`${source}|${id}|${arm}`);
