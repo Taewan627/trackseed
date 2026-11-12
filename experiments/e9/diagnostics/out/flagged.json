@@ -1,0 +1,1387 @@
+{
+ "note": "EXPLORATORY post-hoc diagnostic of E9 (not a pre-registered prediction; changes no E9 result). Validator rerun as run.mjs; see README.md.",
+ "rule": {
+  "kinkRule": "outlier",
+  "window": 3,
+  "quantile": 1,
+  "ratio": 3,
+  "floorDegrees": 12
+ },
+ "selection": [
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Budapest",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Melbourne",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MexicoCity",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MoscowRaceway",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sakhir",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sepang",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Shanghai",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sochi",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Spa",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Suzuka",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "YasMarina",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "sg-2008",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": 7
+  },
+  {
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "az-2016",
+   "arms": [
+    "raw",
+    "smooth"
+   ],
+   "rawLocalKinkCount": 4
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s1",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s2",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s7",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s12345",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s99999",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s16777216",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1211967129",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1436848794",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s464855833",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1835407073",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s466535511",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  },
+  {
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1994105342",
+   "arms": [
+    "smooth"
+   ],
+   "rawLocalKinkCount": null
+  }
+ ],
+ "bacingerRankingRawLocalKink": "sg-2008:7 az-2016:4 mc-1929:4 au-1953:3 es-2026:2 us-2023:2 at-1969:1 bh-2002:1 br-1940:1 cn-2004:1 de-1932:1 fr-1960:1 fr-1969:1 it-1922:1 my-1999:1 nl-1948:1 ru-2014:1 tr-2005:1 us-2022:1 ae-2009:0 ar-1952:0 be-1925:0 br-1977:0 ca-1978:0 de-1927:0 es-1991:0 gb-1948:0 hu-1986:0 it-1914:0 it-1953:0 jp-1962:0 mx-1962:0 pt-1972:0 pt-2008:0 qa-2004:0 sa-2021:0 us-1909:0 us-1956:0 us-2012:0 za-1961:0",
+ "crossCheckedTrackArms": 178,
+ "crossCheckMismatchesAgainstResults": 0,
+ "mismatches": [],
+ "tracks": [
+  {
+   "key": "real-tumftm__Budapest__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Budapest",
+   "arm": "raw",
+   "width": 9.959,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 876,
+   "trackLength": 4376.861944093865,
+   "medianSpacing": 4.999759938475616,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    486
+   ]
+  },
+  {
+   "key": "real-tumftm__Budapest__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Budapest",
+   "arm": "smooth",
+   "width": 9.959,
+   "spacing": 2.48975,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1758,
+   "trackLength": 4377.302914487507,
+   "medianSpacing": 2.4900306873943236,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__Melbourne__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Melbourne",
+   "arm": "raw",
+   "width": 12.24,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1060,
+   "trackLength": 5298.735025732666,
+   "medianSpacing": 5.001637880718906,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 2
+   },
+   "panelIndices": [
+    835,
+    379
+   ]
+  },
+  {
+   "key": "real-tumftm__Melbourne__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Melbourne",
+   "arm": "smooth",
+   "width": 12.24,
+   "spacing": 3.06,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1732,
+   "trackLength": 5299.11210301205,
+   "medianSpacing": 3.059728579854913,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__MexicoCity__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MexicoCity",
+   "arm": "raw",
+   "width": 11.646,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 860,
+   "trackLength": 4297.202395734223,
+   "medianSpacing": 5.0027333781762495,
+   "LOCAL_KINK": 3,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 2,
+    "concentrated turn (peak above run mean) [uncertain: concentration 1.3-1.4]": 1
+   },
+   "panelIndices": [
+    197,
+    225,
+    216
+   ]
+  },
+  {
+   "key": "real-tumftm__MexicoCity__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MexicoCity",
+   "arm": "smooth",
+   "width": 11.646,
+   "spacing": 2.9115,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1476,
+   "trackLength": 4297.774479866704,
+   "medianSpacing": 2.9120730566510806,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__MoscowRaceway__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MoscowRaceway",
+   "arm": "raw",
+   "width": 10.702,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 813,
+   "trackLength": 4063.280564877502,
+   "medianSpacing": 5.00412350320862,
+   "LOCAL_KINK": 4,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 3,
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: concentration 1.2-1.3]": 1
+   },
+   "panelIndices": [
+    112,
+    575,
+    366,
+    247
+   ]
+  },
+  {
+   "key": "real-tumftm__MoscowRaceway__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "MoscowRaceway",
+   "arm": "smooth",
+   "width": 10.702,
+   "spacing": 2.6755,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1519,
+   "trackLength": 4063.898915715635,
+   "medianSpacing": 2.6756006454298826,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__Sakhir__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sakhir",
+   "arm": "raw",
+   "width": 12.903,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1082,
+   "trackLength": 5405.749125640374,
+   "medianSpacing": 5.000483342531579,
+   "LOCAL_KINK": 3,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 3
+   },
+   "panelIndices": [
+    451,
+    450,
+    317
+   ]
+  },
+  {
+   "key": "real-tumftm__Sakhir__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sakhir",
+   "arm": "smooth",
+   "width": 12.903,
+   "spacing": 3.22575,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1676,
+   "trackLength": 5406.1396314504145,
+   "medianSpacing": 3.2258659047935447,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: concentration 1.2-1.3]": 1
+   },
+   "panelIndices": [
+    698
+   ]
+  },
+  {
+   "key": "real-tumftm__Sepang__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sepang",
+   "arm": "raw",
+   "width": 14.495,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1108,
+   "trackLength": 5537.353359845019,
+   "medianSpacing": 5.001494273159071,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 2
+   },
+   "panelIndices": [
+    321,
+    535
+   ]
+  },
+  {
+   "key": "real-tumftm__Sepang__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sepang",
+   "arm": "smooth",
+   "width": 14.495,
+   "spacing": 3.62375,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1528,
+   "trackLength": 5537.636001466387,
+   "medianSpacing": 3.6244272792445447,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__Shanghai__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Shanghai",
+   "arm": "raw",
+   "width": 12.735,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1090,
+   "trackLength": 5445.2489721562015,
+   "medianSpacing": 4.999438747742955,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 2
+   },
+   "panelIndices": [
+    1037,
+    316
+   ]
+  },
+  {
+   "key": "real-tumftm__Shanghai__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Shanghai",
+   "arm": "smooth",
+   "width": 12.735,
+   "spacing": 3.18375,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1711,
+   "trackLength": 5445.748801336223,
+   "medianSpacing": 3.1831006908471413,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R > 0.2 (guideline not met for the run radius)": 1
+   },
+   "panelIndices": [
+    1627
+   ]
+  },
+  {
+   "key": "real-tumftm__Sochi__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sochi",
+   "arm": "raw",
+   "width": 12.011,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1169,
+   "trackLength": 5841.094831644401,
+   "medianSpacing": 5.001152657473507,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: s/R near 0.2, concentration 1.2-1.3]": 1,
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    946,
+    647
+   ]
+  },
+  {
+   "key": "real-tumftm__Sochi__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Sochi",
+   "arm": "smooth",
+   "width": 12.011,
+   "spacing": 3.00275,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1946,
+   "trackLength": 5841.526107080569,
+   "medianSpacing": 3.002000083818441,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean) [uncertain: concentration 1.3-1.4]": 1
+   },
+   "panelIndices": [
+    1078
+   ]
+  },
+  {
+   "key": "real-tumftm__Spa__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Spa",
+   "arm": "raw",
+   "width": 9.206,
+   "spacing": null,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1401,
+   "trackLength": 7000.0501643226435,
+   "medianSpacing": 4.998523017787221,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__Spa__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Spa",
+   "arm": "smooth",
+   "width": 9.206,
+   "spacing": 2.3015,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 3042,
+   "trackLength": 7000.547266924868,
+   "medianSpacing": 2.3013551942816814,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    176
+   ]
+  },
+  {
+   "key": "real-tumftm__Suzuka__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Suzuka",
+   "arm": "raw",
+   "width": 9.171,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "EDGE_EDGE_INTERSECTION;SELF_INTERSECTION_CENTERLINE;SELF_INTERSECTION_EDGE",
+   "vertices": 1161,
+   "trackLength": 5802.8838173544955,
+   "medianSpacing": 5.000849266781167,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__Suzuka__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "Suzuka",
+   "arm": "smooth",
+   "width": 9.171,
+   "spacing": 2.29275,
+   "outcome": "fail",
+   "errors": "EDGE_EDGE_INTERSECTION;SELF_INTERSECTION_CENTERLINE;SELF_INTERSECTION_EDGE",
+   "vertices": 2531,
+   "trackLength": 5803.294126522405,
+   "medianSpacing": 2.292933291339332,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-tumftm__YasMarina__raw",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "YasMarina",
+   "arm": "raw",
+   "width": 12.762,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 1110,
+   "trackLength": 5546.569516506401,
+   "medianSpacing": 5.001872187010266,
+   "LOCAL_KINK": 3,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 3
+   },
+   "panelIndices": [
+    567,
+    267,
+    926
+   ]
+  },
+  {
+   "key": "real-tumftm__YasMarina__smooth",
+   "group": "a",
+   "source": "real-tumftm",
+   "id": "YasMarina",
+   "arm": "smooth",
+   "width": 12.762,
+   "spacing": 3.1905,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1739,
+   "trackLength": 5547.206681691933,
+   "medianSpacing": 3.1903284153481244,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-bacinger-f1__sg-2008__raw",
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "sg-2008",
+   "arm": "raw",
+   "width": 12,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "EDGE_FOLD;LOCAL_KINK",
+   "vertices": 115,
+   "trackLength": 4942.6312647262685,
+   "medianSpacing": 19.27810175410404,
+   "LOCAL_KINK": 7,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R > 0.2 (guideline not met for the run radius)": 4,
+    "even run, s/R <= 0.2 (guideline met for the run radius)": 2,
+    "even run, s/R > 0.2 (guideline not met for the run radius) [uncertain: concentration 1.2-1.3]": 1
+   },
+   "panelIndices": [
+    18,
+    55,
+    80,
+    74
+   ]
+  },
+  {
+   "key": "real-bacinger-f1__sg-2008__smooth",
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "sg-2008",
+   "arm": "smooth",
+   "width": 12,
+   "spacing": 3,
+   "outcome": "ok",
+   "errors": "",
+   "vertices": 1650,
+   "trackLength": 4948.818391378007,
+   "medianSpacing": 2.999636501350761,
+   "LOCAL_KINK": 0,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {},
+   "panelIndices": []
+  },
+  {
+   "key": "real-bacinger-f1__az-2016__raw",
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "az-2016",
+   "arm": "raw",
+   "width": 12,
+   "spacing": null,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK;SELF_INTERSECTION_EDGE",
+   "vertices": 85,
+   "trackLength": 5986.076632453285,
+   "medianSpacing": 30.95667827102574,
+   "LOCAL_KINK": 4,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R <= 0.2 (guideline met for the run radius)": 1,
+    "even run, s/R > 0.2 (guideline not met for the run radius)": 3
+   },
+   "panelIndices": [
+    63,
+    58,
+    62,
+    9
+   ]
+  },
+  {
+   "key": "real-bacinger-f1__az-2016__smooth",
+   "group": "b",
+   "source": "real-bacinger-f1",
+   "id": "az-2016",
+   "arm": "smooth",
+   "width": 12,
+   "spacing": 3,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK;SELF_INTERSECTION_EDGE",
+   "vertices": 1998,
+   "trackLength": 5994.7304096705,
+   "medianSpacing": 3.0006010571615818,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    875
+   ]
+  },
+  {
+   "key": "gen-carracing__s1__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s1",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 290,
+   "trackLength": 965.9629239075194,
+   "medianSpacing": 3.3322017571374305,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    59
+   ]
+  },
+  {
+   "key": "gen-carracing__s2__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s2",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 353,
+   "trackLength": 1175.9391037798962,
+   "medianSpacing": 3.333377089579804,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    291
+   ]
+  },
+  {
+   "key": "gen-carracing__s7__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s7",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 336,
+   "trackLength": 1119.950815499998,
+   "medianSpacing": 3.3347271578167788,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    183
+   ]
+  },
+  {
+   "key": "gen-carracing__s12345__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s12345",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 336,
+   "trackLength": 1119.956243193996,
+   "medianSpacing": 3.3345485733483464,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1,
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: s/R near 0.2, concentration 1.2-1.3]": 1
+   },
+   "panelIndices": [
+    150,
+    104
+   ]
+  },
+  {
+   "key": "gen-carracing__s99999__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s99999",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 247,
+   "trackLength": 822.4682220970183,
+   "medianSpacing": 3.3307781212131538,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean) [uncertain: concentration 1.3-1.4]": 1
+   },
+   "panelIndices": [
+    236
+   ]
+  },
+  {
+   "key": "gen-carracing__s16777216__smooth",
+   "group": "c",
+   "source": "gen-carracing",
+   "id": "s16777216",
+   "arm": "smooth",
+   "width": 13.333333333333334,
+   "spacing": 3.3333333333333335,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 306,
+   "trackLength": 1018.4234308470288,
+   "medianSpacing": 3.3300501412621553,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: s/R near 0.2, concentration 1.2-1.3]": 1,
+    "concentrated turn (peak above run mean) [uncertain: concentration 1.3-1.4]": 1
+   },
+   "panelIndices": [
+    248,
+    61
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s1211967129__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1211967129",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 288,
+   "trackLength": 720.6103866189638,
+   "medianSpacing": 2.5028991509119853,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    284
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s1436848794__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1436848794",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 274,
+   "trackLength": 685.5073562882053,
+   "medianSpacing": 2.5028456032434767,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 2
+   },
+   "panelIndices": [
+    266,
+    62
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s464855833__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s464855833",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "EDGE_FOLD;LOCAL_KINK;SELF_INTERSECTION_EDGE",
+   "vertices": 311,
+   "trackLength": 776.3102739955503,
+   "medianSpacing": 2.4974333101293404,
+   "LOCAL_KINK": 2,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R > 0.2 (guideline not met for the run radius)": 2
+   },
+   "panelIndices": [
+    305,
+    304
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s1835407073__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1835407073",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 287,
+   "trackLength": 717.3226787210393,
+   "medianSpacing": 2.50030892869935,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "even run, s/R <= 0.2 (guideline met for the run radius) [uncertain: concentration 1.2-1.3]": 1
+   },
+   "panelIndices": [
+    282
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s466535511__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s466535511",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 306,
+   "trackLength": 765.2211450879847,
+   "medianSpacing": 2.502121208525381,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    84
+   ]
+  },
+  {
+   "key": "gen-zzangupenn__s1994105342__smooth",
+   "group": "c",
+   "source": "gen-zzangupenn",
+   "id": "s1994105342",
+   "arm": "smooth",
+   "width": 10,
+   "spacing": 2.5,
+   "outcome": "fail",
+   "errors": "LOCAL_KINK",
+   "vertices": 326,
+   "trackLength": 815.7754871945394,
+   "medianSpacing": 2.503222883910591,
+   "LOCAL_KINK": 1,
+   "CLOSURE_TANGENT": 0,
+   "consistency": {
+    "thetaMatchesSignedTurn": true,
+    "ruleRecomputedMatches": true,
+    "localKinkCountMatchesValidatorCheck": true,
+    "closureFlagMatchesValidator": true,
+    "edgeOffsetsEqualHalfWidth": true,
+    "flagsIndependentOfWidth": true
+   },
+   "categories": {
+    "concentrated turn (peak above run mean)": 1
+   },
+   "panelIndices": [
+    8
+   ]
+  }
+ ]
+}
