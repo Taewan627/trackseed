@@ -1,0 +1,78 @@
+{
+ "gen-amz-voronoi": {
+  "unit": "m",
+  "produced": 921,
+  "generationFailures": 79,
+  "failureReasons": {
+   "Exception: Unable to find suitable starting position. Try to decrease the length of the sta": 79
+  }
+ },
+ "gen-carracing": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-driftschool-s0": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-driftschool-s1": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-driftschool-s2": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-driftschool-s3": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-driftschool-s4": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-e5-thorimbert": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "gen-juangallostra": {
+  "unit": "px",
+  "produced": 998,
+  "generationFailures": 2,
+  "failureReasons": {
+   "ValueError: Error on input data": 2
+  }
+ },
+ "gen-zzangupenn": {
+  "unit": "u",
+  "produced": 1000,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "real-bacinger-f1": {
+  "unit": "m",
+  "produced": 40,
+  "generationFailures": 0,
+  "failureReasons": {}
+ },
+ "real-tumftm": {
+  "unit": "m",
+  "produced": 25,
+  "generationFailures": 0,
+  "failureReasons": {}
+ }
+}

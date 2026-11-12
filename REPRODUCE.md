@@ -13,7 +13,7 @@ In the table, "no" means either that the re-run differs from the committed file 
 - Node.js 22 (the version used for all checks: v22.23.4, V8 12.4.254.21-node.57). `package.json` requires `>=20.19.0`.
 - npm, with dependencies installed by `npm ci`.
 - esbuild 0.25 through `npx -y esbuild@0.25` (needs network on first use).
-- The E5 group needs network to clone the pinned third-party generator.
+- The E5 group needs network to clone the pinned third-party generator. The E9 group needs network to fetch seven pinned third-party repositories (git over HTTPS), the E5 bundle (esbuild through npx) and Python 3 with the packages of `experiments/e9/requirements.txt`.
 - Deno, Bun and browsers are needed only for the cross-engine runs listed in each experiment's `run-all.sh`. They were **not** re-run in the checks in this file.
 
 ## Build
@@ -28,7 +28,7 @@ Each experiment bundles its own code with its `build.sh` into a gitignored `buil
 ## Quick check
 
 ```
-scripts/reproduce-check.sh /tmp/repro e1 e2 amend e6 e7 e5   # all groups; about 25 minutes on the verification machine (measured at ce51cbe)
+scripts/reproduce-check.sh /tmp/repro e1 e2 amend e6 e7 e5 e9   # all groups; about 25 minutes on the verification machine (measured at ce51cbe)
 scripts/reproduce-check.sh /tmp/repro e1                     # about 2 minutes
 ```
 
@@ -55,6 +55,7 @@ The helper writes only to the scratch directory and to gitignored build folders.
 | E6 HELD-OUT (`experiments/e6`) | `e6/PROTOCOL.md` | `node experiments/e6/run-heldout.mjs <dir>` (reads the committed DEV inputs) | `results/heldout/heldout.json`, `instances.csv.gz`, `auto-straight.json`, `SUMMARY.md` (from `summarize.mjs`), figures | 3d5022d | full run for the three data files; `summarize.mjs` not re-run | **yes** for the three data files |
 | E6 E2 recheck (`experiments/e6`) | `e6/PROTOCOL.md` | `node experiments/e6/e2-recheck.mjs <dir>` | `results/e2-recheck/validity-v1.1.csv.gz`, `SUMMARY.*` | 8fedd7a | full run | **yes** for all three files |
 | E7 (`experiments/e7`) | `e7/PROTOCOL.md`, `e7/FREEZE.md` | `npm run build:cli && node experiments/e7/run.mjs dev\|heldout\|repro <dir>` | `results/{dev,heldout,repro}/cases.csv.gz`, `SUMMARY.json`, `SUMMARY.md`, `DETERMINISM.txt` | 3f867fc (dev, repro); 669a027 (heldout) | full run, one run per set; `exploratory.txt` also checked (helper, since ce51cbe); `DETERMINISM.txt` (two runs) not regenerated | **yes** for all three sets and `exploratory.txt` |
+| E9 (`experiments/e9`) | `e9/PROTOCOL.md` (pre-registration, commit e992b87) | `cd experiments/e9 && ./run-all.sh` (extract, two harness runs, analysis, determinism check, figure); parts: `./extract.sh`, `node run.mjs <dir>`, `node analyze.mjs <dir>`, `python3 -I make-figure.py results results/figure-e9` | `results/SUMMARY.{md,json}`, `tracks.csv.gz`, `TIMING.md`, `timing.json`, `DETERMINISM.txt`, `figure-e9.{png,svg}`, `NOTES.md` | see git log of `experiments/e9/results` | **yes**: `scripts/reproduce-check.sh /tmp/repro9 e9` (re-extraction from the pinned sources plus harness) reproduced `tracks.csv.gz`, `SUMMARY.json`, `SUMMARY.md`, `sources.json`, `env.json` byte for byte (same machine, 4 min 41 s); `DETERMINISM.txt` = two runs | `TIMING.md`/`timing.json` are machine dependent and are not compared |
 
 ## Notes on the table
 

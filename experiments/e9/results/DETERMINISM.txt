@@ -1,0 +1,9 @@
+E9 determinism check (2026-11-12T17:31:10Z), node v22.23.4
+polylines SHA256SUMS sha256: 44a1b4353f8176d71f0a97c33a8d1c525e067c63372a9fbae890d0e83fe0d1d1
+identical  45cc19851a7c413cea700dc0ca5cc5f146f0984e24c448c77efe6d302d278ef1  tracks.csv
+identical  ec6ecbe3b39cb3cb4668b459d1cea449ee9962a05cceb4d85780df5a862e123f  sources.json
+identical  447036bd622dacdcbf3c9aef38f7157b70195cb1e15add11f1e05f8ba35f7c3b  env.json
+identical  a908739c7184bf60a3d193fb1dd437a3e306ba07413fb3a94baf27d3eb2b35cf  SUMMARY.json
+identical  de9db706e35dd708331cddf4b26b67a3f65cc7d29e1a105a2210675d6ba288ae  SUMMARY.md
+excluded from the hash: timing.json, TIMING.md (wall-clock times)
+P4.1: held (all non-timing outputs identical)
