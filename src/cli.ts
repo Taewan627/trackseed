@@ -64,6 +64,7 @@ the batch. A one-line summary is printed to stderr. Exit 2 for an invalid grid.
 --closure-tangent-mode kink|ratio|absolute  validator rule (default kink, validator v1.1; see docs/validator.md)
 --seam-ratio N                              seam-continuity outlier factor, mode ratio only (default ${DEFAULT_VALIDATE_OPTIONS.seamRatio});
                                             an error without --closure-tangent-mode ratio
+--absolute-tolerances                       use the default closure/height/fold tolerances in absolute units at every scale (see "validate")
 The validator options affect only "ok", "violationCodes" and "checkFailures"; documents, digests and metrics do not change.
 `,
   validate: `Usage: tracklab validate file.json [--verify digest|regenerate] [--limit key=value ...] [--strict]
@@ -85,6 +86,10 @@ ${Object.entries(DEFAULT_VALIDATE_OPTIONS).map(([k, v]) => `    ${k}=${v}`).join
                     rule). 'ratio' and 'absolute' run no LOCAL_KINK check.
 --seam-ratio N      seam-continuity outlier factor, mode ratio only (same as --limit seamRatio=N);
                     an error without --closure-tangent-mode ratio
+--absolute-tolerances  closureTolerance, heightTolerance and foldEpsilon are used as the absolute defaults above at every scale.
+                    Without it they are multiplied by f (f^2 for foldEpsilon), f = 1 for a track whose bounding-box diagonal D is
+                    between 10 and 100000 units (all TrackLab tracks), f = D/10 below and D/100000 above (docs/validator.md,
+                    "Scale-relative tolerances"). A value given with --limit is always used literally.
 `,
   metrics: `Usage: tracklab metrics file.json [--samples]
 
@@ -92,19 +97,36 @@ Prints the geometric metrics of a track document as JSON (definitions: README, "
 --samples additionally includes the per-sample signed curvature array.
 Exit 2 for an unreadable or invalid document.
 `,
-  'validate-polyline': `Usage: tracklab validate-polyline file.json|file.csv --width W [--resample-spacing S] [--strict]
-                                  [--limit key=value ...] [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
+  'validate-polyline': `Usage: tracklab validate-polyline file.json|file.csv --width W [--resample-spacing S | --resample-smooth S] [--strict]
+                                  [--limit key=value ...] [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N] [--absolute-tolerances]
 
 Builds a TrackLab track from a closed polyline (x/z ground plane, y height; src/polyline.ts documents the
 conventions: normals, float32 road edges at the given full width, no straight labelling) and runs the validator.
 Input: .csv = one point per line "x,z" or "x,z[,y]" (optional header line); otherwise JSON {"points": [...]} or a bare
 array, each point [x, z] or {"x":..,"y":..,"z":..}. If the last point already equals the first it is not duplicated,
-otherwise the closing point is appended. Non-finite or too few points are reported / rejected, nothing is repaired.
---resample-spacing S  OFF by default; resample uniformly by arc length (about S units apart) before validating
---closure-tangent-mode and --seam-ratio: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
+otherwise the closing point is appended. Consecutive duplicate points (distance <= 1e-9 x bounding-box diagonal, also last
+against first) are removed before the edges are built and counted in input.duplicatePointsRemoved. Otherwise nothing is repaired;
+non-finite points are reported, fewer than 3 distinct points are rejected.
+--resample-spacing S  OFF by default; resample linearly by arc length (about S units apart) before validating
+--resample-smooth S   OFF by default; lay a closed centripetal Catmull-Rom spline through the given points, then resample it by arc
+                      length at S. Rounds the corners of a coarsely sampled curve but passes through every input point (a vertex that
+                      sticks out stays a sharp feature). Exclusive with --resample-spacing. Both change the validated geometry.
+--closure-tangent-mode, --seam-ratio and --absolute-tolerances: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
 Output and exit codes as for "validate" ({ file, width, input, ok, violations, checks }); exit 2 for unreadable input.
+
+Sampling requirement. The validator judges the polyline as given; a vertex that turns sharply is a kink, whatever curve the
+author meant. Let s be the spacing between consecutive vertices and R_min the smallest turn radius of the intended track.
+LOCAL_KINK needs a vertex turn above 12 degrees, and an arc of radius R sampled at spacing s turns 2 asin(s / 2R) per vertex, so
+  (1) no false LOCAL_KINK on any circular arc if  s <= 0.2 x R_min   (12 degrees = 0.209 rad).
+A vertex that sticks out by h from the line through its two neighbours turns by about 2 atan(h / s) in addition to the curve's own
+turn (about s / R_min radians), and is flagged only if the total exceeds max(12 degrees, 3 x the turns 2 and 3 vertices away), so
+  (2) a defect of size h_min is flagged everywhere on the track if  s <= 9 x h_min  and  s <= 0.07 x R_min
+      (h_min = half the road width is a natural choice).
+Sample at s <= min(0.2 R_min, 9 h_min), or min(0.07 R_min, 9 h_min) if defects must also be found inside the tightest curve, or
+pass a coarser polyline through --resample-smooth S with S below that bound. The requirement is sufficient, not necessary
+(the 3 x rule often accepts coarser samples). Derivation and measured examples: docs/validator.md, "Sampling requirement".
 `,
-  'metrics-polyline': `Usage: tracklab metrics-polyline file.json|file.csv --width W [--resample-spacing S] [--samples]
+  'metrics-polyline': `Usage: tracklab metrics-polyline file.json|file.csv --width W [--resample-spacing S | --resample-smooth S] [--samples]
 
 Prints the geometric metrics (same definitions as "metrics") of a closed polyline; see validate-polyline for the input format.
 --width is accepted for symmetry (metrics use the centerline only) and is required so both commands take the same arguments.
@@ -240,10 +262,12 @@ function metricsSummary(m: TrackMetrics): Omit<TrackMetrics, 'curvature'> {
 
 /** Validator options from --closure-tangent-mode / --seam-ratio (and numeric --limit entries). */
 function validatorOptions(p: Parsed): ValidateOptions {
-  const options: Record<string, number | string> = {};
+  const options: Record<string, number | string | boolean> = {};
+  if (p.flags.has('absolute-tolerances')) options.absoluteTolerances = true;
   for (const item of p.flags.get('limit') ?? []) {
     const [k, v] = parseAssignment(item, '--limit');
     if (k === 'closureTangentMode') throw new UsageError('closureTangentMode is not numeric; use --closure-tangent-mode kink|ratio|absolute');
+    if (k === 'absoluteTolerances') throw new UsageError('absoluteTolerances is not numeric; use the flag --absolute-tolerances');
     if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
     options[k] = parseNumber(v, `--limit ${k}`);
   }
@@ -264,7 +288,7 @@ function validatorOptions(p: Parsed): ValidateOptions {
 }
 
 function batchCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['grid', 'out', 'jsonl', 'closure-tangent-mode', 'seam-ratio'], [], ['no-timing']);
+  const p = parseArgs(argv, ['grid', 'out', 'jsonl', 'closure-tangent-mode', 'seam-ratio'], [], ['no-timing', 'absolute-tolerances']);
   if (p.positional.length) throw new UsageError(`unexpected argument "${p.positional[0]}"`);
   if (!p.flags.has('grid')) throw new UsageError('--grid is required');
   if (!p.flags.has('out')) throw new UsageError('--out is required');
@@ -313,7 +337,7 @@ function loadDocument(path: string, verify: 'digest' | 'regenerate') {
 }
 
 function validateCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['verify', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict']);
+  const p = parseArgs(argv, ['verify', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances']);
   if (p.positional.length !== 1) throw new UsageError('validate expects exactly one file');
   const verify = one(p, 'verify') ?? 'digest';
   if (verify !== 'digest' && verify !== 'regenerate') throw new UsageError(`--verify must be "digest" or "regenerate", got "${verify}"`);
@@ -346,21 +370,25 @@ function loadPolyline(p: Parsed) {
   try { raw = file.toLowerCase().endsWith('.csv') ? parsePolylineCsv(text) : parsePolylineJson(text); }
   catch (e) { if (e instanceof PolylineParseError) throw new UsageError(`${file}: ${e.message}`); throw e; }
   const spacing = p.flags.has('resample-spacing') ? parseNumber(one(p, 'resample-spacing')!, '--resample-spacing') : undefined;
-  try { return { file, width, spacing, track: trackFromPolyline({ points: raw, width, closed: true }, spacing === undefined ? {} : { resample: { spacing } }) }; }
+  const smooth = p.flags.has('resample-smooth') ? parseNumber(one(p, 'resample-smooth')!, '--resample-smooth') : undefined;
+  if (spacing !== undefined && smooth !== undefined) throw new UsageError('--resample-spacing and --resample-smooth are mutually exclusive');
+  const options = spacing !== undefined ? { resample: { spacing } } : smooth !== undefined ? { resampleSmooth: { spacing: smooth } } : {};
+  try { return { file, width, spacing, smooth, track: trackFromPolyline({ points: raw, width, closed: true }, options) }; }
   catch (e) { if (e instanceof RangeError) throw new UsageError(`${file}: ${e.message}`); throw e; }
 }
 function validatePolylineCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['width', 'resample-spacing', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict']);
+  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth', 'closure-tangent-mode', 'seam-ratio'], ['limit'], ['strict', 'absolute-tolerances']);
   const options = validatorOptions(p);
-  const { file, width, spacing, track } = loadPolyline(p);
+  const { file, width, spacing, smooth, track } = loadPolyline(p);
   const result = validateTrack(track, options);
   process.stdout.write(JSON.stringify({ file, width, input: { pointCount: track.inputPointCount, inputWasClosed: track.inputWasClosed,
-    resampleSpacing: spacing ?? null, sampleCount: track.points.length - 1 }, ...result }, null, 2) + '\n');
+    duplicatePointsRemoved: track.duplicatePointsRemoved, resampleSpacing: spacing ?? null, resampleSmoothSpacing: smooth ?? null,
+    sampleCount: track.points.length - 1 }, ...result }, null, 2) + '\n');
   const warned = result.checks.some(c => c.severity === 'warning' && !c.passed);
   return !result.ok || (p.flags.has('strict') && warned) ? 1 : 0;
 }
 function metricsPolylineCommand(argv: string[]): number {
-  const p = parseArgs(argv, ['width', 'resample-spacing'], [], ['samples']);
+  const p = parseArgs(argv, ['width', 'resample-spacing', 'resample-smooth'], [], ['samples']);
   const m = computeMetrics(loadPolyline(p).track);
   process.stdout.write(JSON.stringify(p.flags.has('samples') ? m : metricsSummary(m), null, 2) + '\n');
   return 0;
