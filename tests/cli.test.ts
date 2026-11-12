@@ -142,18 +142,27 @@ test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () =>
     assert.equal(run(['generate', '--seed', '36', '--set', 'cornerPattern=hairpin', 'curves=10', 'cornerCount=2', '--out', file]).code, 0);
     const codes = (r: { out: string }) => (JSON.parse(r.out) as { violations: { code: string }[] }).violations.map(v => v.code);
     const def = run(['validate', file]), ratio = run(['validate', file, '--closure-tangent-mode', 'ratio']);
-    assert.equal(ratio.code, 0); assert.equal(def.code, 0); // the default is now 'kink' (not selectable by the CLI yet); both accept this track
+    assert.equal(ratio.code, 0); assert.equal(def.code, 0); // the default is 'kink' (validator v1.1); both accept this track
     assert.ok(!codes(def).includes('CLOSURE_TANGENT'));
+    assert.equal(run(['validate', file, '--closure-tangent-mode', 'kink']).out, def.out, 'kink is the default');
     const abs = run(['validate', file, '--closure-tangent-mode=absolute']);
     assert.equal(abs.code, 1); assert.ok(codes(abs).includes('CLOSURE_TANGENT'));
     // seam-ratio 0 makes the ratio rule equal to the absolute limit; a large ratio never fires; same as --limit seamRatio=
     const R = ['--closure-tangent-mode', 'ratio'];
     assert.equal(run(['validate', file, ...R, '--seam-ratio', '0']).code, 1);
     assert.equal(run(['validate', file, ...R, '--seam-ratio', '2']).out, ratio.out);
-    assert.equal(run(['validate', file, '--seam-ratio', '5']).out, run(['validate', file, '--limit', 'seamRatio=5']).out);
+    assert.equal(run(['validate', file, ...R, '--seam-ratio', '5']).out, run(['validate', file, ...R, '--limit', 'seamRatio=5']).out);
+    // --seam-ratio applies only to mode ratio: without it (default kink) or with another mode it is a usage error (exit 2)
+    const seamErr = run(['validate', file, '--seam-ratio', '2']);
+    assert.equal(seamErr.code, 2); assert.match(seamErr.err, /--seam-ratio applies only to --closure-tangent-mode ratio/);
+    assert.equal(run(['validate', file, '--closure-tangent-mode', 'absolute', '--seam-ratio', '2']).code, 2);
+    const csv = join(dir, 'circle.csv');
+    writeFileSync(csv, 'x,z\n' + Array.from({ length: 60 }, (_, i) => `${50 * Math.cos(2 * Math.PI * i / 60)},${50 * Math.sin(2 * Math.PI * i / 60)}`).join('\n') + '\n');
+    assert.equal(run(['validate-polyline', csv, '--width', '12', '--seam-ratio', '2']).code, 2);
+    assert.equal(run(['validate-polyline', csv, '--width', '12', '--closure-tangent-mode', 'kink']).code, 0);
     // Errors: bad mode, bad ratio, conflicting spec, non-numeric limit
-    for (const bad of [['--closure-tangent-mode', 'sloppy'], ['--seam-ratio', 'x'], ['--seam-ratio', '-1'],
-      ['--seam-ratio', '3', '--limit', 'seamRatio=3'], ['--limit', 'closureTangentMode=absolute']]) {
+    for (const bad of [['--closure-tangent-mode', 'sloppy'], [...R, '--seam-ratio', 'x'], [...R, '--seam-ratio', '-1'],
+      [...R, '--seam-ratio', '3', '--limit', 'seamRatio=3'], ['--limit', 'closureTangentMode=absolute']]) {
       const r = run(['validate', file, ...bad]); assert.equal(r.code, 2, bad.join(' ')); assert.match(r.err, /tracklab:/);
     }
     // batch: same options, summary reflects the mode; documents and digests are unaffected.

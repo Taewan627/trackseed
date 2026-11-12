@@ -45,7 +45,7 @@ Unknown keys and out-of-range values are errors (exit 2); nothing is clamped sil
 Exit 1 if the generator rejects the parameters (e.g. a corner pattern that cannot be fitted).
 `,
   batch: `Usage: tracklab batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing]
-                       [--closure-tangent-mode ratio|absolute] [--seam-ratio N]
+                       [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
 
 grid.json:
   { "seeds":  { "from": 1, "to": 6 }            // inclusive range, or an array of seeds
@@ -61,12 +61,13 @@ them so two runs produce byte-identical JSONL.
 A case whose generation throws is recorded with generated=false and an error; it does not stop
 the batch. A one-line summary is printed to stderr. Exit 2 for an invalid grid.
 
---closure-tangent-mode ratio|absolute  CLOSURE_TANGENT rule of the validator (default ratio)
---seam-ratio N                         seam-continuity outlier factor of the ratio rule (default ${DEFAULT_VALIDATE_OPTIONS.seamRatio})
+--closure-tangent-mode kink|ratio|absolute  validator rule (default kink, validator v1.1; see docs/validator.md)
+--seam-ratio N                              seam-continuity outlier factor, mode ratio only (default ${DEFAULT_VALIDATE_OPTIONS.seamRatio});
+                                            an error without --closure-tangent-mode ratio
 The validator options affect only "ok", "violationCodes" and "checkFailures"; documents, digests and metrics do not change.
 `,
   validate: `Usage: tracklab validate file.json [--verify digest|regenerate] [--limit key=value ...] [--strict]
-                         [--closure-tangent-mode ratio|absolute] [--seam-ratio N]
+                         [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
 
 Parses the document (schema, finite numbers, SHA-256 digest; --verify regenerate also regenerates
 the track from its params and compares digests), then runs the geometry validator and prints
@@ -76,10 +77,14 @@ Exit 0: ok (no error-severity violation). Exit 1: at least one error-severity vi
 
 --limit key=value   Override a numeric validator limit, repeatable. Defaults:
 ${Object.entries(DEFAULT_VALIDATE_OPTIONS).map(([k, v]) => `    ${k}=${v}`).join('\n')}
---closure-tangent-mode ratio|absolute  CLOSURE_TANGENT rule: 'ratio' (default) fails a seam only if its heading change
-                    exceeds both tangentToleranceDegrees and seamRatio x the largest neighbouring turn; 'absolute'
-                    uses tangentToleranceDegrees alone (the pre-0.5.1 rule)
---seam-ratio N      seam-continuity outlier factor of the ratio rule (same as --limit seamRatio=N)
+--closure-tangent-mode kink|ratio|absolute  validator rule (default kink, validator v1.1; see docs/validator.md):
+                    'kink' (default) applies the local-kink outlier rule at every vertex, the seam included
+                    (CLOSURE_TANGENT at the seam, LOCAL_KINK elsewhere); 'ratio' is the legacy seam rule, which
+                    fails a seam only if its heading change exceeds both tangentToleranceDegrees and seamRatio x
+                    the largest neighbouring turn; 'absolute' uses tangentToleranceDegrees alone (the pre-0.5.1
+                    rule). 'ratio' and 'absolute' run no LOCAL_KINK check.
+--seam-ratio N      seam-continuity outlier factor, mode ratio only (same as --limit seamRatio=N);
+                    an error without --closure-tangent-mode ratio
 `,
   metrics: `Usage: tracklab metrics file.json [--samples]
 
@@ -88,7 +93,7 @@ Prints the geometric metrics of a track document as JSON (definitions: README, "
 Exit 2 for an unreadable or invalid document.
 `,
   'validate-polyline': `Usage: tracklab validate-polyline file.json|file.csv --width W [--resample-spacing S] [--strict]
-                                  [--limit key=value ...] [--closure-tangent-mode ratio|absolute] [--seam-ratio N]
+                                  [--limit key=value ...] [--closure-tangent-mode kink|ratio|absolute] [--seam-ratio N]
 
 Builds a TrackLab track from a closed polyline (x/z ground plane, y height; src/polyline.ts documents the
 conventions: normals, float32 road edges at the given full width, no straight labelling) and runs the validator.
@@ -96,6 +101,8 @@ Input: .csv = one point per line "x,z" or "x,z[,y]" (optional header line); othe
 array, each point [x, z] or {"x":..,"y":..,"z":..}. If the last point already equals the first it is not duplicated,
 otherwise the closing point is appended. Non-finite or too few points are reported / rejected, nothing is repaired.
 --resample-spacing S  OFF by default; resample uniformly by arc length (about S units apart) before validating
+--closure-tangent-mode and --seam-ratio: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
+--closure-tangent-mode and --seam-ratio: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
 Output and exit codes as for "validate" ({ file, width, input, ok, violations, checks }); exit 2 for unreadable input.
 `,
   'metrics-polyline': `Usage: tracklab metrics-polyline file.json|file.csv --width W [--resample-spacing S] [--samples]
@@ -247,20 +254,20 @@ function validatorOptions(p: Parsed): ValidateOptions {
   const options: Record<string, number | string> = {};
   for (const item of p.flags.get('limit') ?? []) {
     const [k, v] = parseAssignment(item, '--limit');
-    if (k === 'closureTangentMode') throw new UsageError('closureTangentMode is not numeric; use --closure-tangent-mode ratio|absolute');
+    if (k === 'closureTangentMode') throw new UsageError('closureTangentMode is not numeric; use --closure-tangent-mode kink|ratio|absolute');
     if (!(k in DEFAULT_VALIDATE_OPTIONS)) throw new UsageError(`unknown limit "${k}" (known: ${Object.keys(DEFAULT_VALIDATE_OPTIONS).join(', ')})`);
     options[k] = parseNumber(v, `--limit ${k}`);
   }
+  const mode = one(p, 'closure-tangent-mode');
+  if (mode !== undefined && mode !== 'kink' && mode !== 'ratio' && mode !== 'absolute')
+    throw new UsageError(`--closure-tangent-mode must be "kink", "ratio" or "absolute", got "${mode}"`);
+  if (mode !== undefined) options.closureTangentMode = mode;
   if (p.flags.has('seam-ratio')) {
+    if (mode !== 'ratio') throw new UsageError('--seam-ratio applies only to --closure-tangent-mode ratio (the default mode is kink)');
     if ('seamRatio' in options) throw new UsageError('give the seam ratio either as --seam-ratio or as --limit seamRatio=, not both');
     const r = parseNumber(one(p, 'seam-ratio')!, '--seam-ratio');
     if (r < 0) throw new UsageError(`--seam-ratio must be >= 0, got ${r}`);
     options.seamRatio = r;
-  }
-  if (p.flags.has('closure-tangent-mode')) {
-    const m = one(p, 'closure-tangent-mode')!;
-    if (m !== 'ratio' && m !== 'absolute') throw new UsageError(`--closure-tangent-mode must be "ratio" or "absolute", got "${m}"`);
-    options.closureTangentMode = m;
   }
   return options as ValidateOptions;
 }
