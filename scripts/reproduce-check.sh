@@ -57,6 +57,14 @@ for g in "${groups[@]}"; do
     # v100: the document digest changed by design at generator 1.1.0 (the stamp is part of the serialized document), so compare contentDigest per case
     CMP_FIELD=cases CMP_CASE_KEY=contentDigest compare "E1 v1.0.0 node22 v100 (contentDigest per case; digest differs by design since generator 1.1.0)" "experiments/e1/results/v1.0.0/node22.v100.json" "$scratch/e1-node22.v100.json"
     CMP_FIELD=cases compare "E1 v1.0.0 node22 v050" "experiments/e1/results/v1.0.0/node22.v050.json" "$scratch/e1-node22.v050.json"
+    # v1.2.0 subjects (S1 default join, S2 legacy join): contentDigest per case is version-independent; digest also matches while src/version.ts is 1.2.0
+    cd "$repo/experiments/e1/v1.2.0" && mkdir -p build && $E entry-s1.mjs --outfile=build/s1.mjs && $E entry-s2.mjs --outfile=build/s2.mjs \
+      && node run.mjs s1 > "$scratch/e1-v120-node22.s1.json" 2>> "$scratch/logs/e1.log" && node run.mjs s2 > "$scratch/e1-v120-node22.s2.json" 2>> "$scratch/logs/e1.log"
+    cd "$repo"
+    for sub in s1 s2; do
+      CMP_FIELD=cases CMP_CASE_KEY=contentDigest compare "E1 v1.2.0 node22 $sub (contentDigest per case)" "experiments/e1/results/v1.2.0/node22.$sub.json" "$scratch/e1-v120-node22.$sub.json"
+      CMP_FIELD=cases CMP_CASE_KEY=digest compare "E1 v1.2.0 node22 $sub (digest per case; valid while src/version.ts is 1.2.0)" "experiments/e1/results/v1.2.0/node22.$sub.json" "$scratch/e1-v120-node22.$sub.json"
+    done
     ;;
   e2)
     note "e2: full validity run (48,600 cases)"
