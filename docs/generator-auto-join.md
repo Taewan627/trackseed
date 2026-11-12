@@ -52,7 +52,7 @@ Pre-registered (protocol committed alone), DEV then freeze then one HELD-OUT run
 | ok, straight > 0 | 0.00% (0/4860) | 80.06% [78.91, 81.16] |
 | default parameters | not run | 30/30 |
 
-All ten predictions held on DEV and HELD-OUT (see SUMMARY.md for each number). On the auditor's measurement (default parameters, seeds 0..199, exploratory) the tangent join gives 200/200 ok against 0/200.
+All ten predictions held on DEV and HELD-OUT (see SUMMARY.md for each number). On an exploratory measurement (default parameters, seeds 0..199, not a pre-registered prediction) the tangent join gives 200/200 ok against 0/200.
 
 ## Limitations
 
