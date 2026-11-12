@@ -4,6 +4,8 @@ This file says how to regenerate the committed experiment outputs under `experim
 
 Since v1.1, `generateTrack` defaults to the tangent join (`autoJoin: 'tangent'`). The runners that produce v1.0.0-era results pass `autoJoin: 'legacy'` explicitly (see [docs/generator-auto-join.md](docs/generator-auto-join.md)). The validator's default rule also changed in v1.1, so the E2 runner pins the rule that was in force when E2 ran (see the notes below).
 
+`DEFAULTS.height` changed from 80 to 20 in commit 073fba5 (for E8). Runners whose committed results predate that change pin `height: 80`, the v1.0.0 default, through the shared helper `V100_PIN` in [experiments/_v100-params.mjs](experiments/_v100-params.mjs) (`{ autoJoin: 'legacy', height: 80 }`). Explicit values always win; the list of affected runners is in the notes below.
+
 In the table, "no" means either that the re-run differs from the committed file or that it was not re-run; the reason is given in each row.
 
 ## Environment
@@ -26,7 +28,7 @@ Each experiment bundles its own code with its `build.sh` into a gitignored `buil
 ## Quick check
 
 ```
-scripts/reproduce-check.sh /tmp/repro e1 e2 amend e6 e7 e5   # all groups; about 35 minutes on the verification machine
+scripts/reproduce-check.sh /tmp/repro e1 e2 amend e6 e7 e5   # all groups; about 25 minutes on the verification machine (measured at ce51cbe)
 scripts/reproduce-check.sh /tmp/repro e1                     # about 2 minutes
 ```
 
@@ -34,7 +36,7 @@ The helper writes only to the scratch directory and to gitignored build folders.
 
 ## Experiments
 
-"Original commit" is the last commit that changed the committed output file. "Verified at HEAD": **yes** (byte-identical, or identical content as stated), **subset** (only the named engine or part was re-run), **no** (re-run differs, or not re-run), with the reason in the last column. Checks were made at commit `dede2b9` plus the validator pin commit that follows it.
+"Original commit" is the last commit that changed the committed output file. "Verified at HEAD": **yes** (byte-identical, or identical content as stated), **subset** (only the named engine or part was re-run), **no** (re-run differs, or not re-run), with the reason in the last column. The latest checks were made at commit `ce51cbe` (the height pin on top of 073fba5). The previous checks were at `dede2b9` plus the validator pin commit. Results of both are in [experiments/REPRODUCE_CHECK.md](experiments/REPRODUCE_CHECK.md).
 
 | Experiment | Protocol / notes | Runner command | Committed outputs | Original commit | Verified at HEAD | sha256 match |
 |---|---|---|---|---|---|---|
@@ -52,14 +54,20 @@ The helper writes only to the scratch directory and to gitignored build folders.
 | E6 DEV (`experiments/e6`) | `e6/PROTOCOL.md` | `npm run build:cli && node experiments/e6/run-dev.mjs <dir>/candidates.json && node experiments/e6/select.mjs <dir>` | `results/dev/*` | bf1ab67 | full run | **yes** for `candidates.csv`, `FROZEN.json`, `DEV_SUMMARY.md` (byte-identical). `candidates.json` differs only in recorded metadata (see note below) |
 | E6 HELD-OUT (`experiments/e6`) | `e6/PROTOCOL.md` | `node experiments/e6/run-heldout.mjs <dir>` (reads the committed DEV inputs) | `results/heldout/heldout.json`, `instances.csv.gz`, `auto-straight.json`, `SUMMARY.md` (from `summarize.mjs`), figures | 3d5022d | full run for the three data files; `summarize.mjs` not re-run | **yes** for the three data files |
 | E6 E2 recheck (`experiments/e6`) | `e6/PROTOCOL.md` | `node experiments/e6/e2-recheck.mjs <dir>` | `results/e2-recheck/validity-v1.1.csv.gz`, `SUMMARY.*` | 8fedd7a | full run | **yes** for all three files |
-| E7 (`experiments/e7`) | `e7/PROTOCOL.md`, `e7/FREEZE.md` | `npm run build:cli && node experiments/e7/run.mjs dev\|heldout\|repro <dir>` | `results/{dev,heldout,repro}/cases.csv.gz`, `SUMMARY.json`, `SUMMARY.md`, `DETERMINISM.txt` | 3f867fc (dev, repro); 669a027 (heldout) | full run, one run per set; `DETERMINISM.txt` (two runs) not regenerated | **yes** for all three sets |
+| E7 (`experiments/e7`) | `e7/PROTOCOL.md`, `e7/FREEZE.md` | `npm run build:cli && node experiments/e7/run.mjs dev\|heldout\|repro <dir>` | `results/{dev,heldout,repro}/cases.csv.gz`, `SUMMARY.json`, `SUMMARY.md`, `DETERMINISM.txt` | 3f867fc (dev, repro); 669a027 (heldout) | full run, one run per set; `exploratory.txt` also checked (helper, since ce51cbe); `DETERMINISM.txt` (two runs) not regenerated | **yes** for all three sets and `exploratory.txt` |
 
 ## Notes on the table
 
 - **E6 DEV `candidates.json`.** The committed file records the validator defaults that were in force when the DEV run was made (commit bf1ab67). The frozen rule became the validator default later (commit 8fedd7a), so the file's metadata now differs from a run at HEAD. The difference is confined to `candidates[*].opts` for 39 candidates (A1 13, A2 10, C 16): the keys `kinkWindow` (committed 5, HEAD 3), `kinkQuantile` (committed 0.5, HEAD 1) and `kinkFloorDegrees` (committed 20, HEAD 12). All other fields of the file are identical, including candidate ids and labels. The code was not changed for this.
 - **E1 v0.5 subject.** `experiments/e1/entry-v05.mjs` is historical and is not expected to reproduce at HEAD. The v0.5.0 numbers are reproduced through the `@v050` alias bound to 145277e (`experiments/e1/v1.0.0`).
 - **Experiments bound to old commits.** E1 `legacy` (6fea4d6), E1 `v050` (145277e) and E1b (6fea4d6, `@legacy` alias) are reproduced from those commits by their documented build scripts.
-- **autoJoin pins** (`autoJoin: 'legacy'`) are applied in `experiments/e1/v1.0.0/entry-v100.mjs`, `experiments/e2/grid.mjs` (which feeds `e2/run.mjs`, `amendment-01/run-e2.mjs` and `amendment-01/examples.mjs`), `experiments/amendment-01/e1-digest-effect.mjs`, `experiments/e6/lib.mjs` and `experiments/e5/analyze.mjs`. E7 already passes `autoJoin` explicitly; its default-parameter run intentionally uses the tangent default.
+- **autoJoin pins** (`autoJoin: 'legacy'`) are applied in `experiments/e1/v1.0.0/entry-v100.mjs`, `experiments/e2/grid.mjs` (which feeds `e2/run.mjs`, `amendment-01/run-e2.mjs` and `amendment-01/examples.mjs`), `experiments/amendment-01/e1-digest-effect.mjs` and `experiments/e6/lib.mjs`. `experiments/e5/analyze.mjs` takes `autoJoin` from `V100_PIN`. E7 already passes `autoJoin` explicitly; its default-parameter run intentionally uses the tangent default. The inline pins were left as they were, because they already set the height where it matters.
+- **Height pins** (`V100_PIN.height`, 80) are applied where the height is unset and the committed result predates 073fba5:
+  - `experiments/e1/cases.mjs` (the E1 case set, 1000 cases): the four configurations without an explicit height. The `extreme` configuration keeps its height of 200. The helper's `autoJoin` is not used here, so the entries keep their own join setting. This affects `experiments/e1/v1.0.0/entry-v100.mjs` (reproduces again, 1000/1000) and `experiments/e1/entry-v05.mjs` (historical, still not reproducible by design). The `@legacy` and `@v050` subjects set height 80 explicitly, which is the same value their own DEFAULTS had, so their output is unchanged.
+  - `experiments/e5/analyze.mjs`: the TrackLab configurations of the analysis.
+  - `experiments/e7/run.mjs`: the default-parameter runs only (`evaluate({ height, seed })`). The default join stays tangent, as the protocol defines.
+  - `experiments/e7/exploratory.mjs`: all calls, where the height was unset.
+- **Not affected, no change:** `experiments/e2/grid.mjs` (every case sets `height`, so the E2 grid and the AMENDMENT-01 E2 and examples runners are unchanged), `experiments/e6` (every generated parameter set sets `height`), `experiments/e8` (uses `DEFAULTS` on purpose, height 20, and its exploratory calls set `height` explicitly), `experiments/e4` and `experiments/e5/adapter.mjs` (no `generateTrack` calls with defaults).
 - **Validator pin.** `experiments/e2/run.mjs` passes `{ closureTangentMode: 'absolute' }`, the rule in force when the committed E2 base file was produced (before AMENDMENT-01; see [experiments/AMENDMENT-01.md](experiments/AMENDMENT-01.md)). `experiments/amendment-01/run-e2.mjs` pins `'ratio'` by default; `CLOSURE_TANGENT_MODE` can override it. The E5 analysis uses the validator default; its `validity.jsonl` is identical, so no pin was added there.
 - **E6 HELD-OUT** reads the committed DEV files (`candidates.json`, `FROZEN.json`) as inputs, so it is checked against those files, not against a DEV run at HEAD.
-- **Not re-run in this check:** the browser runs (Chrome, Firefox) and the Deno and Bun runs of every experiment. `experiments/e1/page.html` (tracked) was not rebuilt; it embeds the bundle built before the autoJoin pin. E1 will be re-run in full, across all engines, at release v1.1.0.
+- **Not re-run in this check:** E1b and AMENDMENT-01 E1b (they use the E1 case set, which now carries height 80; that equals the 6fea4d6 default, so the output should not change). The browser runs (Chrome, Firefox) and the Deno and Bun runs of every experiment. `experiments/e1/page.html` (tracked) was not rebuilt; it embeds the bundle built before the autoJoin pin. E1 will be re-run in full, across all engines, at release v1.1.0.
