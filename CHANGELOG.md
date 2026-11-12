@@ -13,6 +13,11 @@ This entry combines two changes made after the 1.1.0 tree was frozen: the rename
 
 Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackSeed's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
 
+### Repository and documentation
+
+- `docs/history/` (the v0.4 Korean README and the historical development and deployment reports) is removed from the tree; the files remain in the git history. Links to them were fixed.
+- README: new "Provenance" section and new "Development process and AI use" section (maintainer responsibility, the models named in the commit trailers, commit counts, the tooling identity used up to 2026-11-12 UTC).
+
 ### Changed (behaviour only outside TrackSeed's scale, or for inputs that crashed or were misreported)
 
 - **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackSeed's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.

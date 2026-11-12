@@ -297,6 +297,23 @@ Every number in this README comes from a committed file, a source constant or a 
 | E8 held-out (100 seeds): `MAX_SLOPE` 0 of 100 at height 20 and 100 of 100 at 80; at 20 max slope median 0.207, 95th percentile 0.252, maximum 0.289; elevation range median 48.58 | `experiments/e8/results/heldout/SUMMARY.md` |
 | E3 valid-only re-run | `experiments/e3/results/amendment-01/SUMMARY.md`, `tables.md`; prediction file `experiments/amendment-01/ADDENDUM-E3.md` |
 
+## Development process and AI use
+
+- **Responsibility.** The maintainer, Taewan Kim (a human), is responsible for all decisions and for the releases.
+- **Who wrote the code.** Most of the code, tests, experiment harnesses and documentation since v0.4 were written by Anthropic Claude models (Opus, Sonnet and Haiku) under the maintainer's direction, with an AI review (audit) step. This README, the experiment protocols and the committed result files were produced the same way.
+- **What the git history records.** The history begins with a baseline import of v0.4 (commit `6fea4d6`, 2026-11-11); the earlier development of v0.1 to v0.4 is not in this repository. Commits up to 2026-11-12 (UTC) were made under a tooling identity, `tlsx-audit <audit@local>`; later commits are under the maintainer's identity. The committer identity does not tell human and AI authorship apart. The `Co-Authored-By` trailer of a commit records the model that wrote it.
+- **Counts** (history up to commit `a9f6a41`, 109 commits; reproduce with `git log --format=%B | grep -o 'Co-Authored-By: Claude [A-Za-z]* [0-9.]*' | sort | uniq -c`):
+
+  | Model named in the trailer | Commits |
+  | --- | --- |
+  | Claude Opus 5.5 | 24 |
+  | Claude Sonnet 5.5 | 49 |
+  | Claude Haiku 5.5 | 17 |
+  | no trailer | 19 |
+
+  The 19 commits without a trailer are the v0.4 baseline import, merge commits and early experiment commits; the history does not say who wrote them. Of the 109 commits, 102 are under the tooling identity and 7 under the maintainer's.
+- **Earlier versions.** Tools used for v0.1 to v0.4: [PI: AI-DISCLOSURE]
+
 ## Provenance
 
 TrackSeed began as a web port (v0.4) of a Processing course project by the first author, Taewan Kim, made in his graduate studies; the port was then developed into the research tool described here. Course name and year: [PI: PROVENANCE]
