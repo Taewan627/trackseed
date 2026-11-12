@@ -1,6 +1,6 @@
 # Validator rules (`validateTrack`), including the post-RT1 local-kink rule ("v1.1")
 
-Scope: this file documents the rules, defaults, rationale and evidence of the geometry validator in `src/validate.ts`. The version number is not changed by the commit that adds it (versioning is handled separately). README and CLI text have not been updated yet: see "Known follow-ups".
+Scope: this file documents the rules, defaults, rationale and evidence of the geometry validator in `src/validate.ts`. The version number is not changed by the commit that adds it (versioning is handled separately). The README and the CLI describe this rule (see "Known follow-ups" for the remaining gaps).
 
 ## Checks
 
@@ -57,5 +57,5 @@ The pattern modes are unchanged (no false positive of the new rule on 36,444 cle
 
 ## Known follow-ups (outside this change)
 
-- `src/cli.ts` accepts only `--closure-tangent-mode ratio|absolute` and its help text still says the default is `ratio`; the CLI therefore cannot select the new mode, and `README.md` still documents seven checks and the two legacy modes. `tests/cli.test.ts` was edited minimally (8 checks; seam-ratio cases now select mode `ratio` explicitly).
+- The CLI selects the rule with `--closure-tangent-mode kink|ratio|absolute` (default `kink`). `--seam-ratio N` and `--limit seamRatio=N` apply only to `ratio` and are rejected with exit 2 in the other modes. `README.md` documents the eight checks of the default mode and the two legacy modes. `tests/cli.test.ts` covers the mode selection and the rejections; its seam-ratio cases select mode `ratio` explicitly.
 - Stored `ok` flags and `violationCodes` of earlier result files (E2, E4, E1b) were computed with the legacy rules and are not overwritten.

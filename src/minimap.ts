@@ -1,4 +1,5 @@
 import { CURB, SIDEWALK, mapTransform, type Track } from './core.js';
+import { t } from './i18n.js';
 
 export class Minimap {
   private base = document.createElement('canvas');
@@ -13,7 +14,7 @@ export class Minimap {
     canvas.width = this.base.width = this.width * dpr;
     canvas.height = this.base.height = this.height * dpr;
     const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('2D 미니맵을 초기화할 수 없습니다.');
+    if (!ctx) throw new Error(t('minimap.noContext'));
     this.ctx = ctx;
     this.ctx.scale(dpr, dpr);
   }
