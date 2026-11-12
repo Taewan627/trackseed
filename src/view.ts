@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CURB, CURB_HEIGHT, SIDEWALK, STEPS, project, type Track, type Point } from './core.js';
 import { COIN_RADIUS, generateCoins, type Coin } from './coins.js';
+import { t } from './i18n.js';
 
 type Pose = Point & { heading: number; pitch: number };
 export type CameraMode = 'overview' | 'chase';
@@ -97,7 +98,7 @@ export class TrackView {
     this.renderer.setClearColor(0x182329);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.domElement.tabIndex = 0;
-    this.renderer.domElement.setAttribute('aria-label', '3D 트랙 주행 화면. 방향키로 운전, C로 카메라 전환');
+    this.renderer.domElement.setAttribute('aria-label', t('canvas.aria'));
     host.append(this.renderer.domElement);
     this.scene.add(new THREE.HemisphereLight(0xd6ecf4, 0x4e5c42, 2.5));
     const sun = new THREE.DirectionalLight(0xffedd4, 2.5);

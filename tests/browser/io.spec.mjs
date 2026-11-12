@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 async function ready(page) {
   await page.goto('/?test=1');
@@ -99,24 +100,61 @@ test('io: a tampered file shows the error and keeps the previous track', async (
   expect(await page.evaluate(() => window.__tracklab.generation)).toBe(before.generation);
 });
 
-test('io: validation panel is INVALID for default seed-42 Auto and OK for a pattern track', async ({ page }) => {
+test('io: validation panel is OK for default seed-42 Auto, INVALID with the Legacy join, OK for a pattern track', async ({ page }) => {
   await ready(page);
+  await expect(page.locator('#autoJoin')).toHaveValue('tangent');
+  await expect(page.locator('#validation-badge')).toHaveText('OK');
+  expect((await page.evaluate(() => window.__tracklab.validation)).ok).toBe(true);
+  await expect(page.locator('#validation-violations .violation-error')).toHaveCount(0);
+  // Legacy (v1.0.0) straight join at the default straight ratio 0.25: the known defect
+  await page.locator('#autoJoin').selectOption('legacy');
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.autoJoin)).toBe('legacy');
   await expect(page.locator('#validation-badge')).toHaveText('INVALID');
   await expect(page.locator('#validation-checks [data-check="self-intersection"]')).toHaveClass(/check-error/);
   await expect(page.locator('#validation-checks [data-check="edge-fold"]')).toHaveClass(/check-error/);
-  await expect(page.locator('#validation-violations .violation-error').first()).toBeVisible();
+  await expect(page.locator('#validation-violations .violation-error code').filter({ hasText: /^LOCAL_KINK$/ }).first()).toBeVisible();
   const summary = await page.evaluate(() => window.__tracklab.validation);
   expect(summary.ok).toBe(false);
   expect(summary.errors).toBeGreaterThan(0);
   expect(summary.failedChecks).toEqual(expect.arrayContaining(['self-intersection', 'edge-fold']));
+  await page.locator('#autoJoin').selectOption('tangent');
+  await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.autoJoin)).toBe('tangent');
+  await expect(page.locator('#validation-badge')).toHaveText('OK');
+  // a spliced pattern makes the join inert: the control is disabled and shows the canonical legacy value
   await page.locator('#cornerPattern').selectOption('right-angle');
   await page.locator('#cornerCount-value').fill('3');
   await page.locator('#cornerStrength-value').fill('60');
   await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.cornerPattern)).toBe('right-angle');
   await expect(page.locator('#pattern-status')).toContainText('3 / 3 applied');
+  await expect(page.locator('#autoJoin')).toBeDisabled();
+  await expect(page.locator('#autoJoin')).toHaveValue('legacy');
+  await expect(page.locator('#autojoin-hint')).toBeVisible();
   await expect(page.locator('#validation-badge')).toHaveText('OK');
   expect((await page.evaluate(() => window.__tracklab.validation)).ok).toBe(true);
   await expect(page.locator('#validation-violations .violation-error')).toHaveCount(0);
+});
+
+test('io: importing a v1.0.0 Auto document keeps the legacy join and re-exports the same digest', async ({ page }) => {
+  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  const fixture = fileURLToPath(new URL('../fixtures/v1.0.0-auto-seed42.json', import.meta.url));
+  const original = JSON.parse(readFileSync(fixture, 'utf8'));
+  expect('autoJoin' in original.params).toBe(false);
+  await ready(page);
+  await expect(page.locator('#autoJoin')).toHaveValue('tangent');
+  await page.locator('#import-file').setInputFiles(fixture);
+  await expect(page.locator('#status')).toContainText('Imported');
+  await expect(page.locator('#status')).not.toContainText('Import failed');
+  await expect(page.locator('#io-message')).not.toHaveClass(/error/);
+  await expect(page.locator('#io-message')).toContainText(original.integrity.digest.slice(0, 8));
+  await expect(page.locator('#autoJoin')).toHaveValue('legacy');
+  expect(await page.evaluate(() => window.__tracklab.track.params.autoJoin)).toBe('legacy');
+  const file = await exportFile(page);
+  const exported = JSON.parse(file.text);
+  expect('autoJoin' in exported.params).toBe(false);
+  expect(exported.params).toEqual(original.params);
+  expect(exported.integrity.digest).toBe(original.integrity.digest);
+  expect(exported.integrity.contentDigest).toBe(original.integrity.contentDigest);
+  expect(errors).toEqual([]);
 });
 
 test('io: keyboard driving still works after import', async ({ page }) => {

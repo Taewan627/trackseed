@@ -164,6 +164,13 @@ test('cli: --closure-tangent-mode and --seam-ratio on validate and batch', () =>
     writeFileSync(csv, 'x,z\n' + Array.from({ length: 60 }, (_, i) => `${50 * Math.cos(2 * Math.PI * i / 60)},${50 * Math.sin(2 * Math.PI * i / 60)}`).join('\n') + '\n');
     assert.equal(run(['validate-polyline', csv, '--width', '12', '--seam-ratio', '2']).code, 2);
     assert.equal(run(['validate-polyline', csv, '--width', '12', '--closure-tangent-mode', 'kink']).code, 0);
+    // --limit seamRatio=N is the same option: outside mode ratio it would be silently ignored, so it is a usage error too
+    for (const args of [['--limit', 'seamRatio=3'], ['--closure-tangent-mode', 'absolute', '--limit', 'seamRatio=3']]) {
+      const r = run(['validate', file, ...args]); assert.equal(r.code, 2, args.join(' '));
+      assert.match(r.err, /--limit seamRatio applies only to --closure-tangent-mode ratio/);
+    }
+    assert.equal(run(['validate-polyline', csv, '--width', '12', '--limit', 'seamRatio=2']).code, 2);
+    assert.equal(run(['validate', file, ...R, '--limit', 'seamRatio=5']).code, 0);
     // Errors: bad mode, bad ratio, conflicting spec, non-numeric limit
     for (const bad of [['--closure-tangent-mode', 'sloppy'], [...R, '--seam-ratio', 'x'], [...R, '--seam-ratio', '-1'],
       [...R, '--seam-ratio', '3', '--limit', 'seamRatio=3'], ['--limit', 'closureTangentMode=absolute']]) {

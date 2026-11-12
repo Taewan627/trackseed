@@ -1,5 +1,5 @@
 import './style.css';
-import { DEFAULTS, LIMITS, generateTrack, sanitize, type Params } from './core.js';
+import { DEFAULTS, LIMITS, generateTrack, sanitize, type AutoJoin, type Params } from './core.js';
 import { Minimap } from './minimap.js';
 import { TrackView } from './view.js';
 import { NO_INPUT, spawnVehicle, updateVehicle, type Controls } from './vehicle.js';
@@ -25,6 +25,8 @@ app.innerHTML = `
       <section class="parameter-section"><h2 ${T('sec.shape')}><span>01</span> ${t('sec.shape')}</h2><div id="geometry-fields"></div></section>
       <section class="parameter-section"><h2 ${T('sec.cornerPattern')}><span>02</span> ${t('sec.cornerPattern')}</h2>
         <label class="select-field" for="cornerPattern" ${T('cornerPattern.label')}>${t('cornerPattern.label')}<select id="cornerPattern" name="cornerPattern"><option value="auto" ${T('cornerPattern.auto')}>${t('cornerPattern.auto')}</option><option value="right-angle" ${T('cornerPattern.rightAngle')}>${t('cornerPattern.rightAngle')}</option><option value="hairpin" ${T('cornerPattern.hairpin')}>${t('cornerPattern.hairpin')}</option><option value="s-curve" ${T('cornerPattern.sCurve')}>${t('cornerPattern.sCurve')}</option></select></label>
+        <label class="select-field" for="autoJoin" ${T('autoJoin.label')}>${t('autoJoin.label')}<select id="autoJoin" name="autoJoin"><option value="tangent" ${T('autoJoin.tangent')}>${t('autoJoin.tangent')}</option><option value="legacy" ${T('autoJoin.legacy')}>${t('autoJoin.legacy')}</option></select></label>
+        <p id="autojoin-hint" class="pattern-status" ${T('autoJoin.inert')} hidden>${t('autoJoin.inert')}</p>
         <div id="corner-fields"></div><p id="pattern-status" class="pattern-status" role="status">${t('pattern.autoIdle')}</p>
         <p id="pattern-warning" class="pattern-warning" role="alert" hidden></p>
       </section>
@@ -139,7 +141,13 @@ function readParams(): Params {
   const raw = Object.fromEntries(Object.keys(LIMITS).map(key => [key,
     Number($<HTMLInputElement>(key === 'seed' ? key : `${key}-value`).value)]));
   return sanitize({ ...raw, scene: $<HTMLSelectElement>('scene').value as Params['scene'],
-    cornerPattern: $<HTMLSelectElement>('cornerPattern').value as Params['cornerPattern'] });
+    cornerPattern: $<HTMLSelectElement>('cornerPattern').value as Params['cornerPattern'],
+    autoJoin: $<HTMLSelectElement>('autoJoin').value as AutoJoin });
+}
+/** The straight join is inert with a spliced corner pattern (sanitize() canonicalises it to 'legacy' there). */
+function syncJoinControl() {
+  const current = readParams(), inert = current.cornerPattern !== 'auto' && current.cornerCount > 0;
+  $<HTMLSelectElement>('autoJoin').disabled = inert; $('autojoin-hint').hidden = !inert;
 }
 function writeParams(p: Params) {
   for (const key of Object.keys(LIMITS) as (keyof typeof LIMITS)[]) {
@@ -148,9 +156,12 @@ function writeParams(p: Params) {
   }
   $<HTMLSelectElement>('scene').value = p.scene;
   $<HTMLSelectElement>('cornerPattern').value = p.cornerPattern;
+  // an absent autoJoin is the legacy (v1.0.0) join; the control shows the canonical value the track was built with
+  $<HTMLSelectElement>('autoJoin').value = p.autoJoin ?? 'legacy';
+  syncJoinControl();
 }
 function pending() {
-  clearTimeout(regenerationTimer);
+  clearTimeout(regenerationTimer); syncJoinControl();
   const inputs = $('parameters').querySelectorAll<HTMLInputElement>('input[type=number]');
   if ([...inputs].some(input => input.value === '' || !Number.isFinite(input.valueAsNumber))) {
     setStatus(() => t('status.waitingInput')); return;
@@ -256,8 +267,7 @@ async function importJson(file: File) {
   let doc, params;
   try {
     doc = parseTrackDocument(await file.text());
-    importTrack(doc, { verify: 'regenerate' });
-    params = doc.params;
+    params = importTrack(doc, { verify: 'regenerate' }).params;
   } catch (error) {
     const reason = error instanceof TrackDocumentError ? error.message : error instanceof Error ? error.message : String(error);
     importFailure(() => reason); return;

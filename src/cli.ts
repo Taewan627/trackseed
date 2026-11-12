@@ -102,7 +102,6 @@ array, each point [x, z] or {"x":..,"y":..,"z":..}. If the last point already eq
 otherwise the closing point is appended. Non-finite or too few points are reported / rejected, nothing is repaired.
 --resample-spacing S  OFF by default; resample uniformly by arc length (about S units apart) before validating
 --closure-tangent-mode and --seam-ratio: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
---closure-tangent-mode and --seam-ratio: same meaning as for "validate" (default kink; --seam-ratio only with ratio).
 Output and exit codes as for "validate" ({ file, width, input, ok, violations, checks }); exit 2 for unreadable input.
 `,
   'metrics-polyline': `Usage: tracklab metrics-polyline file.json|file.csv --width W [--resample-spacing S] [--samples]
@@ -262,6 +261,8 @@ function validatorOptions(p: Parsed): ValidateOptions {
   if (mode !== undefined && mode !== 'kink' && mode !== 'ratio' && mode !== 'absolute')
     throw new UsageError(`--closure-tangent-mode must be "kink", "ratio" or "absolute", got "${mode}"`);
   if (mode !== undefined) options.closureTangentMode = mode;
+  // seamRatio is read only by the ratio rule: in kink (the default) or absolute mode it would be silently ignored
+  if ('seamRatio' in options && mode !== 'ratio') throw new UsageError('--limit seamRatio applies only to --closure-tangent-mode ratio (the default mode is kink)');
   if (p.flags.has('seam-ratio')) {
     if (mode !== 'ratio') throw new UsageError('--seam-ratio applies only to --closure-tangent-mode ratio (the default mode is kink)');
     if ('seamRatio' in options) throw new UsageError('give the seam ratio either as --seam-ratio or as --limit seamRatio=, not both');
