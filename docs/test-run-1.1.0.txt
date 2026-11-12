@@ -1,0 +1,15 @@
+TrackLab 1.1.0 test counts, run on the tree of commit 7b3fac8 (version 1.1.0, before the documentation commits of this change; no file under src/, tests/ or experiments/ differs from it).
+Machine: Linux 6.18.44-fc-v378 x86_64, node v22.23.4 (uname and node -v of the run; no committed environment file describes this machine).
+
+npm test                                  : tests 113, pass 113, fail 0, cancelled 0, skipped 0   (duration 145.7 s)
+npm run build                             : exit 0 (tsc --noEmit and vite build)
+npm run build:cli                         : exit 0
+npx playwright test --list                : Total: 46 tests in 7 files
+PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright test (after npm run build) :
+    45 passed (7.3 min), 1 failed
+    failed: tests/browser/io.spec.mjs:137 "io: importing a v1.0.0 Auto document keeps the legacy join and re-exports the same digest"
+    cause: line 155 expects the re-exported whole-document digest to equal the digest stored in tests/fixtures/v1.0.0-auto-seed42.json.
+           That fixture has generator.version 1.0.0; the digest covers the generator stamp (README, "Exchange format v1"),
+           so the 1.1.0 export has a different digest (received b6f0800f..., expected 28c55e16...). The contentDigest check on the next line was not reached.
+
+Scripts rerun for this change: scripts/cli-example.sh rewrote docs/cli-example-output.txt (version 1.1.0 defaults: height 20, tangent join).

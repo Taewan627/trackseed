@@ -54,30 +54,30 @@ $ tracklab validate track.json --verify regenerate
 {
   "file": "track.json",
   "verify": "regenerate",
-  "digest": "05a1389a3ad57baa5dac5dc9c552ae171e0b38cc3825f0dcf2b460710b2a6e91",
+  "digest": "2062329927bd5b0a2c35c4dfbb8bab3774ae518237b689130382e7bc4c4a98f3",
   "ok": true,
-  "violations": [
+  "violations": [],
+  "checks": [
     {
-      "code": "MAX_SLOPE",
-      "severity": "warning",
-      "index": 0,
-      "value": 0.6901827792120803,
-      "limit": 0.3,
-      "message": "slope 0.6901827792120803 of segment 0 exceeds 0.3"
-    },
+      "id": "structure",
+      "severity": "error",
+      "checked": 1,
+      "failures": 0,
+      "stats": {},
+      "skipped": false,
   ... (violations list trimmed)
-checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: false, 154
+checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: true, 0
 
 $ tracklab metrics track.json
 {
   "sampleCount": 325,
-  "length": 2747.0916760838677,
+  "length": 2606.746448590328,
   "boundingBoxArea": 613608.2703178154,
-  "straightLengthFraction": 0.051442653460416966,
+  "straightLengthFraction": 0.05224851801553694,
   ...
 
 $ tracklab batch --grid examples/grid-small.json --out out/ --jsonl out/summary.jsonl --no-timing
-tracklab batch: 48 cases, 48 generated, 0 generation failures, 42 ok
+tracklab batch: 48 cases, 48 generated, 0 generation failures, 48 ok
 ```
 
 CLI reference:
@@ -231,7 +231,7 @@ Results used by this README (see "Evidence"): in the E2 grid (4 modes x 12,150 t
 
 ## Testing
 
-`npm test` builds the CLI, compiles the tests and runs 113 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and modified-document cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 46 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs its `test` job on Ubuntu, Windows and macOS with Node 20, 22 and 24 (nine combinations, `fail-fast` off): `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`, in bash on every OS). A separate `determinism` job runs on the same three operating systems: `node cli-dist/cli.js generate` for seeds 0, 1, 42 and 7 with cornerPattern `auto` and `hairpin`, whose `integrity.contentDigest` values must equal those committed in [tests/fixtures/ci-golden-digests.json](tests/fixtures/ci-golden-digests.json); and [scripts/ci-digests.mjs](scripts/ci-digests.mjs) run under Node 22, Deno 2.9.6 and Bun 1.4.4, checked against the same file. The browser suite is not part of CI. Counts and logs of the release run: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt).
+`npm test` builds the CLI, compiles the tests and runs 113 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and modified-document cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 46 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). At version 1.1.0, 45 pass and one fails: the test that imports a v1.0.0 Auto document compares the whole-document `digest` with the stored v1.0.0 value, and that digest covers the generator stamp, so it changes with the version ([docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt)). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs its `test` job on Ubuntu, Windows and macOS with Node 20, 22 and 24 (nine combinations, `fail-fast` off): `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`, in bash on every OS). A separate `determinism` job runs on the same three operating systems: `node cli-dist/cli.js generate` for seeds 0, 1, 42 and 7 with cornerPattern `auto` and `hairpin`, whose `integrity.contentDigest` values must equal those committed in [tests/fixtures/ci-golden-digests.json](tests/fixtures/ci-golden-digests.json) (legacy join, `--set autoJoin=legacy --set height=80`) and in [tests/fixtures/ci-golden-digests-v1.1.json](tests/fixtures/ci-golden-digests-v1.1.json) (default tangent join, `--set height=80`); and [scripts/ci-digests.mjs](scripts/ci-digests.mjs) run under Node 22, Deno 2.9.6 and Bun 1.4.4, checked against both files. The browser suite is not part of CI. Counts and logs: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) (release 1.0.0) and [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt) (version 1.1.0).
 
 ## Limitations
 
@@ -249,13 +249,14 @@ Every number in this README comes from a committed file, a source constant or a 
 
 | Number(s) | Source |
 | --- | --- |
-| 76 Node tests, 40 browser tests | [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt); test files in `tests/` |
-| CI matrix: Node 20, 22, 24 on Ubuntu, Windows, macOS; determinism digests | `.github/workflows/ci.yml`, `tests/fixtures/ci-golden-digests.json` |
+| 113 Node tests; 46 browser tests, 45 passing at 1.1.0 | [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt); test files in `tests/` |
+| 76 Node tests, 40 browser tests at 1.0.0 | [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) |
+| CI matrix: Node 20, 22, 24 on Ubuntu, Windows, macOS; determinism digests | `.github/workflows/ci.yml`, `tests/fixtures/ci-golden-digests.json`, `tests/fixtures/ci-golden-digests-v1.1.json` |
 | Node >= 20.19 | `package.json` (`engines`) |
 | Parameter ranges and defaults, 150 ms debounce text | `src/core.ts` (`DEFAULTS`, `LIMITS`); `docs/history/README_v0.4_ko.md` |
 | Validator defaults (1e-6, 1e-6, 5, 2, 3 vertices, 1e-5, 1, 0.3, 20), `closureTangentMode` `kink` with the local-kink values (window 3, maximum, ratio 3, floor 12 degrees) and 16.7 degrees | `src/validate.ts` (`DEFAULT_VALIDATE_OPTIONS`, `SEAM_WINDOW`) |
 | Metric thresholds 5e-4, 4e-3, 8 bins and edges | `src/metrics.ts` |
-| 48 cases of `grid-small.json`; CLI outputs (digest, 154 slope failures, 325 samples, length 2747.09, 42 of 48 ok) | `examples/grid-small.json`; `docs/cli-example-output.txt` (made by `scripts/cli-example.sh`) |
+| 48 cases of `grid-small.json`; CLI outputs at version 1.1.0 (digest, 0 MAX_SLOPE failures at the default height 20, 325 samples, length 2606.75, 48 of 48 ok) | `examples/grid-small.json`; `docs/cli-example-output.txt` (made by `scripts/cli-example.sh`) |
 | E1 at 1.0.0: 8 runs, 1000 cases, 0 mismatches for `digest` and `contentDigest`; 1000 of 1000 `contentDigest` equal to 0.5.0, 0 of 1000 `digest` equal; engine versions; 6 min 34 s | `experiments/e1/results/v1.0.0/SUMMARY.md`, `SUMMARY.json`, `NOTES.md` |
 | Legacy control: 513 mismatches on Node 24, 1000 on Deno, Bun, Chrome, Firefox, 0 on Node 20 | `experiments/e1/results/E1_SUMMARY.md` |
 | 0 of 1000 discrete disagreements of legacy outcomes; largest relative length difference 2.34e-15 | `experiments/e1b/results/SUMMARY.md` |
