@@ -163,8 +163,41 @@ export interface Track {
   patternReport: PatternReport;
 }
 
-export function generateTrack(input: Partial<Params> = {}): Track {
-  const p = sanitize(input);
+/** Thrown by strict parameter checking (generateTrack with { strict: true }; the CLI reports it as a usage error). */
+export class ParameterError extends Error {
+  constructor(message: string) { super(message); this.name = 'ParameterError'; }
+}
+const PARAM_KEYS = Object.keys(DEFAULTS) as (keyof Params)[];
+const isNumericParam = (k: string) => typeof DEFAULTS[k as keyof Params] === 'number';
+/**
+ * Strict parameter check, shared by the CLI and generateTrack(params, { strict: true }) so that both reject exactly the same input:
+ * unknown keys, values of the wrong type (a finite number for numeric parameters, a string for the others), and any value that
+ * sanitize() would change (out of range, not an integer where sanitize() rounds, an unknown scene/cornerPattern/autoJoin, or an
+ * autoJoin that is inert for the requested corner pattern). Nothing is clamped or rounded. Returns the sanitized parameters.
+ * `where` prefixes the message; `hint` is appended inside the parentheses of the out-of-range message.
+ */
+export function strictParams(raw: unknown, where: string, hint = '; valid ranges are given by LIMITS in src/core.ts'): Params {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw new ParameterError(`${where}: parameters must be an object`);
+  const input = raw as Record<string, unknown>;
+  for (const [k, v] of Object.entries(input)) {
+    if (!PARAM_KEYS.includes(k as keyof Params)) throw new ParameterError(`${where}: unknown parameter "${k}" (known: ${PARAM_KEYS.join(', ')})`);
+    if (isNumericParam(k) ? typeof v !== 'number' || !Number.isFinite(v) : typeof v !== 'string')
+      throw new ParameterError(`${where}: parameter "${k}" must be ${isNumericParam(k) ? 'a finite number' : 'a string'}, got ${JSON.stringify(v)}`);
+  }
+  const clean = sanitize(input as Partial<Params>);
+  for (const [k, v] of Object.entries(input)) {
+    if (clean[k as keyof Params] !== v) throw new ParameterError(
+      `${where}: parameter "${k}" = ${JSON.stringify(v)} is not valid (sanitized to ${JSON.stringify(clean[k as keyof Params])}${hint})`);
+  }
+  return clean;
+}
+export interface GenerateOptions {
+  /** Reject (throw ParameterError) instead of clamping/rounding silently; see strictParams(). Default false. */
+  strict?: boolean;
+}
+
+export function generateTrack(input: Partial<Params> = {}, options: GenerateOptions = {}): Track {
+  const p = options.strict ? strictParams(input, 'generateTrack (strict)') : sanitize(input);
   const rng = random(p.seed);
   const radius = 300 + p.size * 60;
   const waypoints = Array.from({ length: p.curves }, (_, i) => {

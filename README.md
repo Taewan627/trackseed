@@ -113,7 +113,7 @@ const back = importTrack(doc, { verify: 'regenerate' });                        
 
 | Function | Purpose |
 | --- | --- |
-| `generateTrack(params?)` | Sanitises the (partial) parameters and returns a `Track`: `params`, `points`, `normals`, `roadEdges` (two polylines), `straightSegments`, `length`, `bounds`, `props`, `obstacles`, `patternReport`. |
+| `generateTrack(params?, { strict? })` | Sanitises the (partial) parameters and returns a `Track`: `params`, `points`, `normals`, `roadEdges` (two polylines), `straightSegments`, `length`, `bounds`, `props`, `obstacles`, `patternReport`. By default out-of-range values are clamped, fractions rounded and unknown keys ignored, silently. With `{ strict: true }` it throws `ParameterError` instead for an unknown key, a value of the wrong type, or any value that `sanitize()` would change; this is the same check (`strictParams` in `src/core.ts`) that the CLI applies. |
 | `validateTrack(track, options?)` | Pure validator, works on a `Track` or an imported document. Options and defaults: `DEFAULT_VALIDATE_OPTIONS`. |
 | `computeMetrics(track, options?)` | Geometric metrics of the centerline. |
 | `exportTrack(track)` / `serializeTrack(track)` | `TrackDocumentV1` object / its canonical JSON string. |
@@ -199,7 +199,7 @@ Parameters and ranges of `generateTrack`:
 | `cornerCount` | 0 to 3 | 1 |
 | `cornerStrength` | 20 to 100 | 60 |
 
-Ranges come from `LIMITS` in `src/core.ts`. Every numeric parameter except `straight` is rounded to the nearest integer by `sanitize()`, so `height` takes whole values only. `straight` is not rounded and takes any value from 0 to 0.6. The third element of each `LIMITS` entry is the increment of the browser UI sliders (0.05 for `straight`, 5 for `height`, 1 for the other sliders; `seed` has no slider). Only the browser's slider controls read it; `generateTrack()`, the CLI and the validator never snap a value to it. `generateTrack()` and the browser UI pass values through `sanitize()`, which clamps them to the range and rounds them silently. The CLI does not: it rejects a value that `sanitize()` would change (see the `generate` row in the CLI table).
+Ranges come from `LIMITS` in `src/core.ts`. Every numeric parameter except `straight` is rounded to the nearest integer by `sanitize()`, so `height` takes whole values only. `straight` is not rounded and takes any value from 0 to 0.6. The third element of each `LIMITS` entry is the increment of the browser UI sliders (0.05 for `straight`, 5 for `height`, 1 for the other sliders; `seed` has no slider). Only the browser's slider controls read it; `generateTrack()`, the CLI and the validator never snap a value to it. `generateTrack()` and the browser UI pass values through `sanitize()`, which clamps them to the range and rounds them silently. The CLI does not: it rejects a value that `sanitize()` would change (see the `generate` row in the CLI table), and so does `generateTrack(params, { strict: true })`, which uses the same function. Note that the "grid" the strict check enforces is the one `sanitize()` applies (whole numbers for every parameter except `straight`), not the slider increment in the third `LIMITS` element: `height` 82 is accepted, 20.5 is rejected.
 
 ## Determinism
 
