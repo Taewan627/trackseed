@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -19,6 +19,19 @@ test('cli: --help for the program and every command, exit 0 and a Usage line', (
   }
   assert.equal(run([]).code, 2);
   const bad = run(['frobnicate']); assert.equal(bad.code, 2); assert.match(bad.err, /unknown command/);
+});
+
+test('cli: a reader that closes stdout early (EPIPE) ends quietly with status 0 and no stack trace', async () => {
+  // generate prints about 108 KB, more than a pipe buffer, so the write reaches a pipe with no reader
+  const child = spawn(process.execPath, [CLI, 'generate', '--seed', '1'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  let err = '';
+  child.stderr.setEncoding('utf8').on('data', d => { err += d; });
+  child.stdout.destroy(); // no reader is left for the pipe (as in `generate | head -c 10` after the first bytes)
+  const code = await new Promise<number | null>((resolve, reject) => {
+    child.on('error', reject);
+    child.on('close', resolve);
+  });
+  assert.equal(code, 0); assert.equal(err, '');
 });
 
 test('cli: generate -> validate -> metrics round trip, exit codes, stdout vs --out', () => {

@@ -419,4 +419,11 @@ function main(argv: string[]): number {
   }
 }
 
+// A reader that closes stdout early (e.g. `trackseed generate | head -c 10`) is not an error: stop quietly. The status
+// is the one the command had reached (0 unless a check failed), so a failing validate is still reported as failing.
+process.stdout.on('error', (e: NodeJS.ErrnoException) => {
+  if (e.code !== 'EPIPE') throw e;
+  process.exit(typeof process.exitCode === 'number' ? process.exitCode : 0);
+});
+
 process.exitCode = main(process.argv.slice(2));
