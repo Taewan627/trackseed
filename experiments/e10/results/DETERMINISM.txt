@@ -1,0 +1,7 @@
+E10 determinism check (2026-11-12T21:20:12Z), node v22.23.4: two full runs (run.mjs + analyze.mjs), sha256 of every output
+identical  612de6a71f17736b9f531bd117b65c90018a685884ff0e1a439f07310fa2886f  instances.csv
+identical  1984496a0b9dee7f8a1bf97c93d7e2bce67e8e6857c702ce62761c82c51464e6  clean.json
+identical  3c7557f9460707bca7841d6311c8e34f56a399d3f530e6532ae651f3dd316878  env.json
+identical  9f7be9a7db2ea71de072e26e4538db6086fb0585564054d06386cd00ec83a4d0  SUMMARY.json
+identical  bf138774fc3ab2d35d0c93a4e7a0828ed5981cb949748f4d0d30ce34fda8c655  SUMMARY.md
+all outputs identical in the two runs
