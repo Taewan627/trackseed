@@ -95,7 +95,19 @@ CLI reference:
 
 ## Library API
 
-`npm run build:cli` compiles the modules reachable from the CLI to ES modules in `cli-dist/` (`core.js`, `validate.js`, `metrics.js`, `schema.js`, ...); TypeScript users can import `src/*.ts` directly. The package is not published to npm (`private: true`).
+The package `trackseed` is an ES module package with TypeScript declarations. `npm run build:cli` compiles the library and the CLI to ES modules and `.d.ts` files in `cli-dist/`; `npm pack` runs that build (`prepack`) and packs `cli-dist/`, `schema/`, README, licence files, CHANGELOG and THIRD_PARTY_NOTICES only. Entry points: `trackseed` (everything below), `trackseed/core`, `trackseed/validate`, `trackseed/metrics`, `trackseed/schema`, `trackseed/polyline`, `trackseed/detmath`, and `trackseed/schema.json` (the JSON Schema). The commands `trackseed` and, for one release, the deprecated alias `tracklab` are installed as `bin` entries.
+
+```bash
+npm pack                                   # writes trackseed-1.1.0.tgz
+npm install ./trackseed-1.1.0.tgz          # in another project; or `npm install trackseed` once the package is published
+npx trackseed generate --seed 1 --out track.json
+```
+
+```js
+import { generateTrack, validateTrack, computeMetrics, exportTrack } from 'trackseed';
+```
+
+Inside a clone, the same modules are imported from `cli-dist/`:
 
 ```js
 import { generateTrack } from './cli-dist/core.js';

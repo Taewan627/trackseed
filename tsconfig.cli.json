@@ -6,8 +6,9 @@
     "lib": ["ES2022"],
     "types": ["node"],
     "outDir": "cli-dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "declaration": true
   },
-  "include": ["src/cli.ts"],
+  "include": ["src/cli.ts", "src/index.ts"],
   "exclude": []
 }
