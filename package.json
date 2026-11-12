@@ -15,7 +15,7 @@
     "build": "tsc --noEmit && vite build",
     "build:cli": "tsc -p tsconfig.cli.json",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run build:cli && tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js .test-build/tests/validate.test.js .test-build/tests/metrics.test.js .test-build/tests/cli.test.js",
+    "test": "npm run build:cli && tsc -p tsconfig.test.json && node --test .test-build/tests/core.test.js .test-build/tests/patterns.test.js .test-build/tests/detmath.test.js .test-build/tests/schema.test.js .test-build/tests/validate.test.js .test-build/tests/metrics.test.js .test-build/tests/cli.test.js .test-build/tests/polyline.test.js",
     "test:browser": "npm run build && playwright test"
   },
   "dependencies": { "three": "0.187.0" },
