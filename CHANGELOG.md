@@ -53,7 +53,7 @@ Changes since the commit that set the version to 1.0.0 (`eb8598f`). Every item p
 ### Documentation and library text
 
 - Library error and audit-reason texts (coins, vehicle, patterns) are in English.
-- README rewritten for reviewers; the earlier Korean README and historical reports are in [docs/history/](docs/history/). The wording on digests states that they give integrity checking, not authentication or provenance.
+- README rewritten for reviewers; the earlier Korean README and historical reports were kept in `docs/history/` at that time (removed from the tree after 1.1.0; they remain in the git history). The wording on digests states that they give integrity checking, not authentication or provenance.
 
 ### Compatibility
 

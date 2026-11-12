@@ -2,7 +2,7 @@
 
 TrackSeed is a procedural racing-track generator written in TypeScript. From a small parameter set (number of Catmull-Rom spans, straight-span ratio, road width, scale, elevation amplitude, scenery, seed, and an optional corner pattern: 90-degree, hairpin or S-curve) it produces a closed, elevated track with road edges, scenery, obstacles and coins. The same parameters give the same document, which is serialised in a self-describing, integrity-checked JSON exchange format. The package contains a browser front end (Three.js, with a kinematic driving preview), a headless validator and metric library, and a command-line interface for batch generation. It is intended for experiments on procedural level generation that need reproducible tracks, automatic validity checks and interpretable geometric metrics.
 
-The web front end is in English by default, with a Korean toggle (or `?lang=ko` in the URL); the library, CLI and this document are English. The earlier Korean README (v0.4) is kept in [docs/history/README_v0.4_ko.md](docs/history/README_v0.4_ko.md), together with the historical development reports in [docs/history/](docs/history/).
+The web front end is in English by default, with a Korean toggle (or `?lang=ko` in the URL); the library, CLI and this document are English.
 
 ## Features
 
@@ -277,7 +277,7 @@ Every number in this README comes from a committed file, a source constant or a 
 | 76 Node tests, 40 browser tests at 1.0.0 | [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) |
 | CI matrix: Node 20, 22, 24 on Ubuntu, Windows, macOS; determinism digests | `.github/workflows/ci.yml`, `tests/fixtures/ci-golden-digests.json`, `tests/fixtures/ci-golden-digests-v1.1.json` |
 | Node >= 20.19 | `package.json` (`engines`) |
-| Parameter ranges and defaults, 150 ms debounce text | `src/core.ts` (`DEFAULTS`, `LIMITS`); `docs/history/README_v0.4_ko.md` |
+| Parameter ranges and defaults, 150 ms debounce | `src/core.ts` (`DEFAULTS`, `LIMITS`); `src/main.ts` (regeneration timer) |
 | Validator defaults (1e-6, 1e-6, 5, 2, 3 vertices, 1e-5, 1, 0.3, 20), `closureTangentMode` `kink` with the local-kink values (window 3, maximum, ratio 3, floor 12 degrees) and 16.7 degrees | `src/validate.ts` (`DEFAULT_VALIDATE_OPTIONS`, `SEAM_WINDOW`) |
 | Metric thresholds 5e-4, 4e-3, 8 bins and edges | `src/metrics.ts` |
 | 48 cases of `grid-small.json`; CLI outputs at version 1.1.0 (digest, 0 MAX_SLOPE failures at the default height 20, 325 samples, length 2606.75, 48 of 48 ok) | `examples/grid-small.json`; `docs/cli-example-output.txt` (made by `scripts/cli-example.sh`) |
@@ -296,6 +296,10 @@ Every number in this README comes from a committed file, a source constant or a 
 | E7 held-out (30 seeds): Auto ok 29.55% (legacy) and 82.92% (tangent); straight = 0 88.64%; straight > 0 0.00% and 80.06%; width 80 45.6%; realised straight fraction 0.452 and 0.302 (ratio 0.617); length +3.5%; 0 of 4860 legacy ok | `experiments/e7/SUMMARY.md`; `docs/generator-auto-join.md` |
 | E8 held-out (100 seeds): `MAX_SLOPE` 0 of 100 at height 20 and 100 of 100 at 80; at 20 max slope median 0.207, 95th percentile 0.252, maximum 0.289; elevation range median 48.58 | `experiments/e8/results/heldout/SUMMARY.md` |
 | E3 valid-only re-run | `experiments/e3/results/amendment-01/SUMMARY.md`, `tables.md`; prediction file `experiments/amendment-01/ADDENDUM-E3.md` |
+
+## Provenance
+
+TrackSeed began as a web port (v0.4) of a Processing course project by the first author, Taewan Kim, made in his graduate studies; the port was then developed into the research tool described here. Course name and year: [PI: PROVENANCE]
 
 ## Citation
 
