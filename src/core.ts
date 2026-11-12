@@ -18,7 +18,7 @@ export interface Params {
   autoJoin?: AutoJoin;
 }
 export const DEFAULTS: Params = {
-  curves: 6, straight: 0.25, width: 40, size: 2, height: 80,
+  curves: 6, straight: 0.25, width: 40, size: 2, height: 20,
   obstacles: 3, density: 10, scene: 'mixed', seed: 42,
   cornerPattern: 'auto', cornerCount: 1, cornerStrength: 60,
   autoJoin: 'tangent',

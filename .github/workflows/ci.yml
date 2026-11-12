@@ -55,17 +55,17 @@ jobs:
           mkdir -p "$RUNNER_TEMP/cli"
           for seed in 0 1 42 7; do
             for pattern in auto hairpin; do
-              node cli-dist/cli.js generate --seed "$seed" --set cornerPattern="$pattern" --set autoJoin=legacy --out "$RUNNER_TEMP/cli/seed$seed-$pattern.json"
+              node cli-dist/cli.js generate --seed "$seed" --set cornerPattern="$pattern" --set autoJoin=legacy --set height=80 --out "$RUNNER_TEMP/cli/seed$seed-$pattern.json"
             done
           done
           node scripts/ci-digests.mjs --from-dir "$RUNNER_TEMP/cli" --check tests/fixtures/ci-golden-digests.json
-      - name: Node CLI digests, default tangent join (node cli-dist/cli.js generate)
+      - name: Node CLI digests, default tangent join (node cli-dist/cli.js generate, height pinned to the value of the goldens)
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/cli-tangent"
           for seed in 0 1 42 7; do
             for pattern in auto hairpin; do
-              node cli-dist/cli.js generate --seed "$seed" --set cornerPattern="$pattern" --out "$RUNNER_TEMP/cli-tangent/seed$seed-$pattern.json"
+              node cli-dist/cli.js generate --seed "$seed" --set cornerPattern="$pattern" --set height=80 --out "$RUNNER_TEMP/cli-tangent/seed$seed-$pattern.json"
             done
           done
           node scripts/ci-digests.mjs --from-dir "$RUNNER_TEMP/cli-tangent" --check tests/fixtures/ci-golden-digests-v1.1.json

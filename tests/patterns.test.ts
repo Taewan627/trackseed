@@ -16,7 +16,7 @@ test('v0.5: Auto and count zero reproduce the golden v0.5 (deterministic-math) g
     fields: (keyof ReturnType<typeof generateTrack>)[]; cases: { params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   for (const entry of fixture.cases) for (const cornerPattern of ['auto', ...kinds] as const) {
     // the v0.5 golden is the legacy join (the default is now 'tangent')
-    const track = generateTrack({ ...entry.params, autoJoin: 'legacy', cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
+    const track = generateTrack({ height: 80, ...entry.params, autoJoin: 'legacy', cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.fields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256); assert.equal(track.patternReport.inserted, 0);
     assert.equal(track.patternReport.attempts, 0); assert.equal(track.patternReport.geometry, null);
@@ -30,7 +30,7 @@ test('v0.5: right-angle, hairpin and s-curve pattern layouts match the golden v0
     patternCases: { name: string; params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   assert.deepEqual(new Set(fixture.patternCases.map(c => c.params.cornerPattern)), new Set(kinds));
   for (const entry of fixture.patternCases) {
-    const track = generateTrack(entry.params);
+    const track = generateTrack({ height: 80, ...entry.params });
     assert.ok(track.patternReport.inserted > 0, entry.name);
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.patternFields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256, entry.name);

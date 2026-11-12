@@ -1,13 +1,14 @@
 // CI determinism check: contentDigest of fixed generation cases.
 //
-// Cases: seeds 0, 1, 42, 7 with cornerPattern auto and hairpin (the defaults for every other parameter).
+// Cases: seeds 0, 1, 42, 7 with cornerPattern auto and hairpin, height 80 (the DEFAULTS.height at the time the goldens were recorded;
+// the defaults for every other parameter).
 //
 // Default mode generates each case in-process from cli-dist/ (run `npm run build:cli` first) and
 // prints { "seed-<n>-<pattern>": "<contentDigest>" } as JSON on stdout. It has no Node-only
 // dependencies, so the same file runs unchanged under Node, Deno and Bun.
 //
 // --from-dir <dir>  Read <dir>/seed<n>-<pattern>.json instead of generating. Those files are the
-//                   output of `node cli-dist/cli.js generate --seed <n> --set cornerPattern=<pattern>`.
+//                   output of `node cli-dist/cli.js generate --seed <n> --set cornerPattern=<pattern> --set height=80`.
 // --auto-join <j>   Auto join of the generated cases: legacy (default; the v1.0.0 construction, the 8 digests of
 //                   tests/fixtures/ci-golden-digests.json) or tangent (the current DEFAULTS join; golden
 //                   tests/fixtures/ci-golden-digests-v1.1.json). Only affects module generation; with --from-dir the
@@ -30,6 +31,8 @@ import { exportTrack } from '../cli-dist/schema.js';
 
 const SEEDS = [0, 1, 42, 7];
 const PATTERNS = ['auto', 'hairpin'];
+// The goldens were recorded when DEFAULTS.height was 80; the height is pinned here so that changing a DEFAULT never silently changes what the goldens check.
+const GOLDEN_HEIGHT = 80;
 
 const args = typeof Deno !== 'undefined' ? Deno.args : process.argv.slice(2);
 const USAGE = 'usage: ci-digests.mjs [--auto-join legacy|tangent] [--from-dir DIR] [--check GOLDEN.json]';
@@ -61,7 +64,7 @@ function digestsFromModules() {
   const out = {};
   for (const seed of SEEDS) {
     for (const pattern of PATTERNS) {
-      out[caseKey(seed, pattern)] = exportTrack(generateTrack({ seed, cornerPattern: pattern, autoJoin })).integrity.contentDigest;
+      out[caseKey(seed, pattern)] = exportTrack(generateTrack({ seed, cornerPattern: pattern, height: GOLDEN_HEIGHT, autoJoin })).integrity.contentDigest;
     }
   }
   return out;
