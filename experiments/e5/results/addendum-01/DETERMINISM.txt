@@ -1,0 +1,6 @@
+analysis run twice (addendum-01.mjs analyze), outputs byte-identical: yes
+sha256 (second run, committed in results/addendum-01/):
+0d2701ba918ea2d2ab7d4128593782fc6b4db1b5d94cce49dc3742a4bbf7c2b0  SUMMARY.md
+3f2cb68b3b126db4017aa9bad9c07a28b341529983810bc0cbb42bd7eda250aa  SUMMARY.json
+bcb73ecbde2e217953c720b289badb0aa4f44ac442012aaf730fa65a596b2e34  validity.jsonl
+111115d5c5a2c9201cd4451ac91f8a867aa7a267bc23f02c0c82bb99ce6d2b0d  node22.json

@@ -17,7 +17,7 @@ $ tracklab validate track.json --verify regenerate
       "message": "slope 0.6901827792120803 of segment 0 exceeds 0.3"
     },
   ... (violations list trimmed)
-checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: false, 154
+checks (id: passed, failures): structure: true, 0 | finite: true, 0 | closure: true, 0 | local-kink: true, 0 | self-intersection: true, 0 | edge-fold: true, 0 | min-turn-radius: true, 0 | max-slope: false, 154
 exit 0
 
 $ tracklab metrics track.json
