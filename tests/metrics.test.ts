@@ -188,7 +188,8 @@ test('metrics: existing fields are bit-identical to the values recorded on maste
   assert.equal(names.length, 5);
   for (const name of names) {
     const { params, metrics: old } = fixture[name];
-    const now = computeMetrics(generateTrack(params)) as unknown as Record<string, unknown>;
+    // the fixture was recorded under v1.0 behaviour: the legacy join is requested explicitly
+    const now = computeMetrics(generateTrack({ ...params, autoJoin: 'legacy' })) as unknown as Record<string, unknown>;
     for (const key of Object.keys(old)) assert.deepEqual(now[key], old[key], `${name}.${key}`);
     assert.deepEqual(Object.keys(old).sort(), Object.keys(now).filter(k => !k.endsWith('Norm') && !k.endsWith('BitsNorm')).sort(), `${name}: only additive fields`);
   }
