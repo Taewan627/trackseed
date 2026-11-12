@@ -98,8 +98,8 @@ CLI reference:
 The package `trackseed` is an ES module package with TypeScript declarations. `npm run build:cli` compiles the library and the CLI to ES modules and `.d.ts` files in `cli-dist/`; `npm pack` runs that build (`prepack`) and packs `cli-dist/`, `schema/`, README, licence files, CHANGELOG and THIRD_PARTY_NOTICES only. Entry points: `trackseed` (everything below), `trackseed/core`, `trackseed/validate`, `trackseed/metrics`, `trackseed/schema`, `trackseed/polyline`, `trackseed/detmath`, and `trackseed/schema.json` (the JSON Schema). The commands `trackseed` and, for one release, the deprecated alias `tracklab` are installed as `bin` entries.
 
 ```bash
-npm pack                                   # writes trackseed-1.1.0.tgz
-npm install ./trackseed-1.1.0.tgz          # in another project; or `npm install trackseed` once the package is published
+npm pack                                   # writes trackseed-1.2.0.tgz
+npm install ./trackseed-1.2.0.tgz          # in another project; or `npm install trackseed` once the package is published
 npx trackseed generate --seed 1 --out track.json
 ```
 
@@ -255,7 +255,7 @@ Results used by this README (see "Evidence"), measured with the v1.0.0 generator
 
 ## Testing
 
-`npm test` builds the CLI, compiles the tests and runs 129 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and modified-document cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 46 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). At version 1.1.0 all 46 pass ([docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt)). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs its `test` job on Ubuntu, Windows and macOS with Node 20, 22 and 24 (nine combinations, `fail-fast` off): `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`, in bash on every OS). A separate `determinism` job runs on the same three operating systems: `node cli-dist/cli.js generate` for seeds 0, 1, 42 and 7 with cornerPattern `auto` and `hairpin`, whose `integrity.contentDigest` values must equal those committed in [tests/fixtures/ci-golden-digests.json](tests/fixtures/ci-golden-digests.json) (legacy join, `--set autoJoin=legacy --set height=80`) and in [tests/fixtures/ci-golden-digests-v1.1.json](tests/fixtures/ci-golden-digests-v1.1.json) (default tangent join, `--set height=80`); and [scripts/ci-digests.mjs](scripts/ci-digests.mjs) run under Node 22, Deno 2.9.6 and Bun 1.4.4, checked against both files. The browser suite is not part of CI. Counts and logs: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) (release 1.0.0) and [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt) (version 1.1.0).
+`npm test` builds the CLI, compiles the tests and runs 130 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and modified-document cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 46 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). At version 1.1.0 all 46 pass ([docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt)). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs its `test` job on Ubuntu, Windows and macOS with Node 20, 22 and 24 (nine combinations, `fail-fast` off): `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`, in bash on every OS). A separate `determinism` job runs on the same three operating systems: `node cli-dist/cli.js generate` for seeds 0, 1, 42 and 7 with cornerPattern `auto` and `hairpin`, whose `integrity.contentDigest` values must equal those committed in [tests/fixtures/ci-golden-digests.json](tests/fixtures/ci-golden-digests.json) (legacy join, `--set autoJoin=legacy --set height=80`) and in [tests/fixtures/ci-golden-digests-v1.1.json](tests/fixtures/ci-golden-digests-v1.1.json) (default tangent join, `--set height=80`); and [scripts/ci-digests.mjs](scripts/ci-digests.mjs) run under Node 22, Deno 2.9.6 and Bun 1.4.4, checked against both files. The browser suite is not part of CI. Counts and logs: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) (release 1.0.0) and [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt) (version 1.1.0).
 
 ## Limitations
 
@@ -273,7 +273,7 @@ Results used by this README (see "Evidence"), measured with the v1.0.0 generator
 
 ## Release and versioning
 
-- **Version.** The current version is 1.1.0 (`src/version.ts`, `package.json`, [CITATION.cff](CITATION.cff)). It is not released yet: [CHANGELOG.md](CHANGELOG.md) records it as "unreleased; no release date and no tag yet". The changelog lists every change since 1.0.0 with the document or experiment that describes and evidences it.
+- **Version.** The current version is 1.2.0 (`src/version.ts`, `package.json`, [CITATION.cff](CITATION.cff)). It is not released yet: [CHANGELOG.md](CHANGELOG.md) records it as "unreleased; no release date and no tag yet". The changelog lists every change since 1.0.0 with the document or experiment that describes and evidences it.
 - **Version in documents.** Each document carries a `generator` object (`name`, `version`), the same string as `src/version.ts`. `integrity.digest` covers that object, so the same content written by two versions has two different `digest` values. `integrity.contentDigest` leaves it out, so it does not change with the version for unchanged content.
 - **Digests across versions.** In the 1.1.0 cross-engine check the legacy-join setting reproduced the committed v1.0.0 documents: `contentDigest` equal in 1000 of 1000 cases and `digest` equal in 0 of 1000, on every engine ([experiments/e1/results/v1.1.0/SUMMARY.md](experiments/e1/results/v1.1.0/SUMMARY.md), prediction P2).
 - **Cross-engine check at 1.1.0.** Nine engine runs on one Linux x86_64 virtual machine: Node 22 (twice), Node 20, Node 24, Deno 2.9.6, Bun 1.4.4, headless Chrome 153, Firefox 157 and WebKit 27.2. Each run covered 1000 cases for each of the two join settings, and every run gave 0 mismatches for `digest` and `contentDigest`. The WebKit binary is the Playwright build for Linux, so it says nothing about Safari on macOS or iOS. The harness pins `height` to 80, so the default height is not part of this check. ([experiments/e1/results/v1.1.0/SUMMARY.md](experiments/e1/results/v1.1.0/SUMMARY.md); [NOTES.md](experiments/e1/results/v1.1.0/NOTES.md) for the WebKit binary, scope and deviations)
@@ -285,7 +285,7 @@ Every number in this README comes from a committed file, a source constant or a 
 
 | Number(s) | Source |
 | --- | --- |
-| 129 Node tests (113 at 1.1.0 plus 16 in `tests/robust.test.ts`); 46 browser tests, all passing at 1.1.0 | [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt), [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt); test files in `tests/` |
+| 130 Node tests (113 at 1.1.0, plus 16 in `tests/robust.test.ts` and 1 CLI EPIPE test; all 130 pass at 1.2.0); 46 browser tests, all passing at 1.1.0 | [docs/test-run-1.1.0.txt](docs/test-run-1.1.0.txt), [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt); test files in `tests/` |
 | 76 Node tests, 40 browser tests at 1.0.0 | [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt) |
 | CI matrix: Node 20, 22, 24 on Ubuntu, Windows, macOS; determinism digests | `.github/workflows/ci.yml`, `tests/fixtures/ci-golden-digests.json`, `tests/fixtures/ci-golden-digests-v1.1.json` |
 | Node >= 20.19 | `package.json` (`engines`) |
@@ -332,7 +332,7 @@ TrackSeed began as a web port (v0.4) of a Processing course project by the first
 
 ## Citation
 
-Cite the software with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" entry). The file carries title, authors, ORCID iDs, licence and version 1.1.0; `date-released` is added at release.
+Cite the software with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" entry). The file carries title, authors, ORCID iDs, licence and version 1.2.0; `date-released` is added at release.
 
 ## Licence
 

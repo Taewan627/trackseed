@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 (unreleased; no release date and no tag yet)
 
-This entry combines two changes made after the 1.1.0 tree was frozen: the rename to TrackSeed, and the validator and polyline-path robustness work (WP7a, described below).
+Changes since the commit that set the version to 1.1.0 (`0d106a8`). No source file of the generation path (`core`, `patterns`, `coins`, `sha256`) changed since 1.1.0; `detmath.ts` and `schema.ts` changed in comments only. The document `digest` covers the `generator` stamp and therefore differs from 1.1.0 for identical content; `contentDigest` excludes the stamp (see "Compatibility").
 
 ### Renamed
 
@@ -39,6 +39,23 @@ Validator and polyline-path robustness (WP7a), from the second red team's findin
 - **`--resample-smooth S`** (library `resampleSmooth: { spacing }`) for `validate-polyline` and `metrics-polyline`: centripetal Catmull-Rom spline through the input points, then arc-length resampling; off by default, exclusive with `--resample-spacing` (linear, unchanged).
 - **Sampling requirement** for imported polylines, with derivation, in [docs/validator.md](docs/validator.md), the README and `validate-polyline --help`.
 - `tests/robust.test.ts` (16 tests): scale invariance 1e-4 to 1e5, 200,000-vertex inputs through the library and the CLI, duplicates, sampling requirement, smooth resampling.
+
+### Evidence and tooling added since 1.1.0
+
+- **E9, external evaluation** of the polyline input path on tracks the authors did not create (real circuits from two public databases and procedural generators from five public repositories, fetched at pinned commits; no third-party code or data is committed). Protocol committed before any harness code or run: [experiments/e9/PROTOCOL.md](experiments/e9/PROTOCOL.md); results, notes and figure in `experiments/e9/results/` ([SUMMARY.md](experiments/e9/results/SUMMARY.md), [NOTES.md](experiments/e9/results/NOTES.md)); attribution in [experiments/e9/ATTRIBUTION.md](experiments/e9/ATTRIBUTION.md). Row in [REPRODUCE.md](REPRODUCE.md) and group `e9` in `scripts/reproduce-check.sh`.
+- **E9 post-hoc diagnostic (exploratory)** of the `LOCAL_KINK` flags on flagged real and generated tracks: [experiments/e9/diagnostics/README.md](experiments/e9/diagnostics/README.md). It is not a pre-registered E9 prediction and changes no E9 result.
+
+### Fixed in tooling
+
+- **`scripts/reproduce-check.sh`** compares the E1 v1.0.0 `contentDigest` per case (the `digest` differs by design since 1.1.0 because the generator stamp is part of the serialized document); REPRODUCE.md states this. The "TrackLab configurations" wording was changed to "TrackSeed (formerly TrackLab)".
+- **CLI:** `trackseed generate ... | head -c 10` no longer prints an unhandled `EPIPE` stack trace. A closed stdout ends the process with the status the command had reached (0 unless a check failed); other stdout errors are rethrown. Output bytes are unchanged; a Node test closes the reader before the document is written.
+- **`scripts/release-check.mjs`** also fails while the schema `$id`, the CITATION.cff `repository-code` or `package.json` `repository` / `homepage` (when present) contain a placeholder or the former repository name.
+
+### Compatibility
+
+- The `generator` stamp is now "1.2.0", so `integrity.digest` of every document differs from the one written by 1.1.0 for the same parameters; `integrity.contentDigest` is computed without `generator` and `integrity`. The CI goldens (`tests/fixtures/ci-golden-digests.json`, `ci-golden-digests-v1.1.json`) hash `contentDigest` and pass unchanged.
+- The exchange format `schemaVersion` is unchanged (1); the schema name `tracklab.track` and the generator name `tracklab` are kept (see "Renamed").
+- The `tracklab` command remains as a deprecated alias of `trackseed` for this release.
 
 ## v1.1.0 (unreleased; no release date and no tag yet)
 
