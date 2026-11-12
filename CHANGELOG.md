@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+Validator and polyline-path robustness (WP7a), from the second red team's findings on scale, large inputs, duplicate vertices and sampling ([docs/validator.md](docs/validator.md)). No change to the generator, the exchange format or any result inside TrackLab's own scale; the reproduce check of E2, AMENDMENT-01, E6, E7 and E5 is in [docs/test-run-wp7a.txt](docs/test-run-wp7a.txt).
+
+### Changed (behaviour only outside TrackLab's scale, or for inputs that crashed or were misreported)
+
+- **Scale-relative default tolerances.** `closureTolerance` and `heightTolerance` (1e-6) are multiplied by f and `foldEpsilon` (1e-5) by f^2, with f = D/10 for a bounding-box diagonal D < 10, D/100000 for D > 100000 and 1 in between. A valid track scaled with its width by 1e-4 no longer fails with `EDGE_FOLD`; tracks of TrackLab's size (D about 600 to 1600) are judged exactly as before. Values passed explicitly are literal; `absoluteTolerances: true` / `--absolute-tolerances` restores the absolute defaults. When f is not 1 the `closure` and `edge-fold` checks report `stats.toleranceScale`.
+- **Segment intersection test** uses the product of signs instead of the product of cross products (same result, no underflow at small scale). The spatial-hash cell floor scales with f, and above 50,000 vertices the cell is also capped at 4 mean segment lengths (200,000 vertices: about 1 s instead of 15 s; the set of reported pairs is the same).
+- **Polyline path removes consecutive duplicate vertices** (distance <= 1e-9 x bounding-box diagonal, last against first too) and reports `duplicatePointsRemoved` (CLI: `input.duplicatePointsRemoved`). A duplicated vertex used to give `SELF_INTERSECTION_CENTERLINE`, `SELF_INTERSECTION_EDGE` and `EDGE_FOLD` on a clean circle. Fewer than 3 distinct vertices is a `RangeError` (CLI exit 2). Generated tracks have no duplicates and do not use this path.
+
+### Fixed
+
+- `trackFromPolyline` threw `RangeError: Maximum call stack size exceeded` at 200,000 vertices or more (`Math.min(...array)` in the bounds). Resampling that would produce more than 5,000,000 points is now a `RangeError` (CLI exit 2) instead of an allocation failure.
+
+### Added
+
+- **`--resample-smooth S`** (library `resampleSmooth: { spacing }`) for `validate-polyline` and `metrics-polyline`: centripetal Catmull-Rom spline through the input points, then arc-length resampling; off by default, exclusive with `--resample-spacing` (linear, unchanged).
+- **Sampling requirement** for imported polylines, with derivation, in [docs/validator.md](docs/validator.md), the README and `validate-polyline --help`.
+- `tests/robust.test.ts` (16 tests): scale invariance 1e-4 to 1e5, 200,000-vertex inputs through the library and the CLI, duplicates, sampling requirement, smooth resampling.
+
 ## v1.1.0 (unreleased; no release date and no tag yet)
 
 Changes since the commit that set the version to 1.0.0 (`eb8598f`). Every item points to the document or experiment that describes and evidences it. The document `digest` covers the `generator` stamp, so documents written by 1.1.0 have a different `digest` than 1.0.0 documents with identical content; `contentDigest` excludes the generator and is unchanged for identical content (see "Compatibility").

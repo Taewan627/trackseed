@@ -91,8 +91,15 @@ export interface ValidateOptions {
   maxSlope?: number;
   /** At most this many violations are listed per check (counts in `checks` are complete). Default 20. */
   maxViolationsPerCheck?: number;
+  /**
+   * Scale-relative defaults of closureTolerance, heightTolerance and foldEpsilon (see toleranceScale()). Default false.
+   * true: use those three defaults literally (absolute units) at every scale, as validator v1.1.0 did.
+   * A value passed explicitly for one of the three is always used literally, whatever this flag says.
+   * Library and CLI-flag option (`--absolute-tolerances`); not a numeric `--limit` key.
+   */
+  absoluteTolerances?: boolean;
 }
-export const DEFAULT_VALIDATE_OPTIONS: Required<ValidateOptions> = {
+export const DEFAULT_VALIDATE_OPTIONS: Required<Omit<ValidateOptions, 'absoluteTolerances'>> = {
   closureTolerance: 1e-6, heightTolerance: 1e-6, tangentToleranceDegrees: 5, seamRatio: 2, closureTangentMode: 'kink', foldEpsilon: 1e-5,
   // kink* defaults = the rule frozen on DEV in experiments/e6 (results/dev/FROZEN.json): rule 'outlier', window 3, maximum, ratio 3, floor 12 degrees.
   // kinkTurnDegrees, kinkCurvature, kinkSpike* belong to the other candidate rules and are inert under the default kinkRule.
@@ -102,6 +109,32 @@ export const DEFAULT_VALIDATE_OPTIONS: Required<ValidateOptions> = {
 };
 
 const RAD_TO_DEG = 180 / Math.PI;
+/**
+ * Band of track sizes (diagonal of the 3D bounding box of the centreline, coordinate units) in which the default absolute
+ * tolerances closureTolerance (1e-6), heightTolerance (1e-6) and foldEpsilon (1e-5) are used exactly as written. TrackLab's
+ * own tracks (diagonal about 600 to 1600 over the parameter ranges sampled in docs/validator.md) are far inside the band.
+ */
+export const TOLERANCE_BAND_LO = 10, TOLERANCE_BAND_HI = 1e5;
+/**
+ * Scale factor f of the default tolerances for a track of bounding-box diagonal D:
+ *   f = D / TOLERANCE_BAND_LO   if D < TOLERANCE_BAND_LO,
+ *   f = D / TOLERANCE_BAND_HI   if D > TOLERANCE_BAND_HI,
+ *   f = 1                       otherwise (and when D is zero or not finite).
+ * Lengths (closureTolerance, heightTolerance, the spatial-hash cell floor) are multiplied by f, areas (foldEpsilon) by f^2.
+ * f is continuous in D, equals 1 on the whole band, so no result inside the band changes, and a uniform scaling of
+ * coordinates and width by a factor c gives f(cD) = c f(D) outside the band: lengths and areas scale as lengths and areas.
+ */
+export function toleranceScale(points: Point[]): number {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (const p of points) {
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+    if (p.z < minZ) minZ = p.z; if (p.z > maxZ) maxZ = p.z;
+  }
+  const d = dhypot(maxX - minX, maxY - minY, maxZ - minZ);
+  if (!(d > 0) || !Number.isFinite(d)) return 1;
+  return d < TOLERANCE_BAND_LO ? d / TOLERANCE_BAND_LO : d > TOLERANCE_BAND_HI ? d / TOLERANCE_BAND_HI : 1;
+}
 /** Vertices on each side of the seam whose turns form the neighbourhood of the 'ratio' seam test. */
 const SEAM_WINDOW = 3;
 
@@ -195,10 +228,14 @@ const cross = (a: Point, b: Point, c: Point) => (b.x - a.x) * (c.z - a.z) - (b.z
 interface Segment { a: Point; b: Point; ring: number; index: number; minX: number; maxX: number; minZ: number; maxZ: number }
 function intersects(s: Segment, t: Segment): boolean {
   if (s.maxX < t.minX || t.maxX < s.minX || s.maxZ < t.minZ || t.maxZ < s.minZ) return false;
-  return cross(s.a, s.b, t.a) * cross(s.a, s.b, t.b) <= 0 && cross(t.a, t.b, s.a) * cross(t.a, t.b, s.b) <= 0;
+  // sign products instead of products of cross products: the same result, but no underflow of tiny products at small scale
+  return Math.sign(cross(s.a, s.b, t.a)) * Math.sign(cross(s.a, s.b, t.b)) <= 0 && Math.sign(cross(t.a, t.b, s.a)) * Math.sign(cross(t.a, t.b, s.b)) <= 0;
 }
 
 const MAX_CELLS_PER_SEGMENT = 1024;
+/** Above this many vertices the spatial-hash cell is also capped at DENSE_CELL_SEGMENTS mean segment lengths (below it the cell is unchanged). */
+export const DENSE_VERTEX_COUNT = 50000;
+const DENSE_CELL_SEGMENTS = 4;
 /**
  * Every pair of the closed contours' segments that intersects, found with a
  * uniform spatial hash (segments spanning more than MAX_CELLS_PER_SEGMENT cells
@@ -286,6 +323,13 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   }
   record({ id: 'finite', severity: 'error', checked: checkedValues, failures: nonFinite, stats: {} });
   const finite = nonFinite === 0;
+  // Scale-relative defaults (see toleranceScale): factor 1 inside the band, hence bit-identical to the absolute defaults there.
+  // A tolerance passed explicitly in `options` is used literally.
+  const sf = finite && options.absoluteTolerances !== true ? toleranceScale(pts) : 1;
+  const closureTol = options.closureTolerance !== undefined ? o.closureTolerance : o.closureTolerance * sf;
+  const heightTol = options.heightTolerance !== undefined ? o.heightTolerance : o.heightTolerance * sf;
+  const foldEps = options.foldEpsilon !== undefined ? o.foldEpsilon : o.foldEpsilon * sf * sf;
+  const scaleStats: Record<string, number> = sf !== 1 ? { toleranceScale: sf } : {};
 
   // 1. closure ------------------------------------------------------------
   let kink: { profile: KinkProfile; flags: Uint8Array } | null = null;
@@ -311,18 +355,18 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
     if (kinkMode) { const profile = kinkProfile(pts, width); kink = { profile, flags: kinkFlags(profile, o) }; }
     const tangentLimit = kink ? kinkLimit(kink.profile, 0, o) : o.closureTangentMode === 'absolute' ? o.tangentToleranceDegrees
       : Math.max(o.tangentToleranceDegrees, o.seamRatio * neighbourhood);
-    if (gap > o.closureTolerance) { failures++; add({ code: 'CLOSURE_POSITION', severity: 'error', index: n, value: gap, limit: o.closureTolerance,
-      message: `last point is ${gap} units from the first point (limit ${o.closureTolerance})` }); }
-    if (edgeGap > o.closureTolerance) { failures++; add({ code: 'CLOSURE_EDGE', severity: 'error', index: n, value: edgeGap, limit: o.closureTolerance,
-      message: `a road edge's last point is ${edgeGap} units from its first point (limit ${o.closureTolerance})` }); }
-    if (heightGap > o.heightTolerance) { failures++; add({ code: 'CLOSURE_HEIGHT', severity: 'error', index: n, value: heightGap, limit: o.heightTolerance,
-      message: `height differs by ${heightGap} across the seam (limit ${o.heightTolerance})` }); }
+    if (gap > closureTol) { failures++; add({ code: 'CLOSURE_POSITION', severity: 'error', index: n, value: gap, limit: closureTol,
+      message: `last point is ${gap} units from the first point (limit ${closureTol})` }); }
+    if (edgeGap > closureTol) { failures++; add({ code: 'CLOSURE_EDGE', severity: 'error', index: n, value: edgeGap, limit: closureTol,
+      message: `a road edge's last point is ${edgeGap} units from its first point (limit ${closureTol})` }); }
+    if (heightGap > heightTol) { failures++; add({ code: 'CLOSURE_HEIGHT', severity: 'error', index: n, value: heightGap, limit: heightTol,
+      message: `height differs by ${heightGap} across the seam (limit ${heightTol})` }); }
     const tangentFails = kink ? kink.flags[0] === 1 : tangent > (tangentLimit as number);
     if (tangentFails) { failures++; add({ code: 'CLOSURE_TANGENT', severity: 'error', index: 0, value: tangent, ...(tangentLimit !== undefined ? { limit: tangentLimit } : {}),
       message: `heading changes by ${tangent} degrees across the seam (${kink ? `local-kink rule ${o.kinkRule}` : `limit ${tangentLimit}`}; neighbourhood maximum ${neighbourhood} degrees, mode ${o.closureTangentMode})` }); }
     record({ id: 'closure', severity: 'error', checked: 4, failures,
       stats: { positionGap: gap, edgeGap, heightGap, tangentDegrees: tangent, neighbourhoodMaxDegrees: neighbourhood,
-        ...(neighbourhood > 0 ? { tangentRatio: tangent / neighbourhood } : {}) } });
+        ...(neighbourhood > 0 ? { tangentRatio: tangent / neighbourhood } : {}), ...scaleStats } });
   }
 
   // 2b. local kink (mode 'kink' only): the same rule at every vertex of the closed loop; the seam vertex is reported as CLOSURE_TANGENT
@@ -347,7 +391,12 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
   if (!finite) record({ id: 'self-intersection', severity: 'error', skipped: true, checked: 0, failures: 0, stats: {} });
   else {
     const counts = { centerline: 0, leftEdge: 0, rightEdge: 0, edgeToEdge: 0 };
-    const cell = Math.max(64, width * 2);
+    let cell = Math.max(64 * sf, width * 2);
+    if (n > DENSE_VERTEX_COUNT) { // dense input: a cell of 64 units would hold thousands of segments (quadratic time); the set of reported pairs does not depend on the cell
+      let planar = 0;
+      for (let i = 0; i < n; i++) planar += dhypot(pts[i + 1].x - pts[i].x, pts[i + 1].z - pts[i].z);
+      if (planar > 0 && Number.isFinite(planar)) cell = Math.min(cell, DENSE_CELL_SEGMENTS * planar / n);
+    }
     scanIntersections([pts, edges[0], edges[1]], n, cell,
       (a, b) => a === b || (a !== 0 && b !== 0),
       (p, q) => {
@@ -372,14 +421,14 @@ export function validateTrack(track: ValidatableTrack, options: ValidateOptions 
     const [l, r] = edges;
     for (let i = 0; i < n; i++) {
       const c1 = cross(l[i], l[i + 1], r[i]), c2 = cross(r[i], l[i + 1], r[i + 1]);
-      const bad = (c1 <= o.foldEpsilon ? 1 : 0) + (c2 <= o.foldEpsilon ? 1 : 0);
+      const bad = (c1 <= foldEps ? 1 : 0) + (c2 <= foldEps ? 1 : 0);
       if (bad) {
         failures++; flipped += bad;
-        add({ code: 'EDGE_FOLD', severity: 'error', index: i, value: Math.min(c1, c2), limit: o.foldEpsilon,
+        add({ code: 'EDGE_FOLD', severity: 'error', index: i, value: Math.min(c1, c2), limit: foldEps,
           message: `road ribbon segment ${i} has ${bad} flipped or degenerate triangle(s) (min signed area x2 = ${Math.min(c1, c2)})` });
       }
     }
-    record({ id: 'edge-fold', severity: 'error', checked: n, failures, stats: { flippedTriangles: flipped } });
+    record({ id: 'edge-fold', severity: 'error', checked: n, failures, stats: { flippedTriangles: flipped, ...scaleStats } });
   }
 
   // 5. minimum turning radius vs half width (warning) ------------------------
