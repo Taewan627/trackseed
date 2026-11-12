@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Taewan627/tracklab/schema/trackdocument-v1.schema.json",
+  "title": "TrackLab TrackDocumentV1",
+  "description": "Structure of a TrackLab exchange document (src/schema.ts, schema 'tracklab.track', schemaVersion 1) as validated by importTrack(). Not expressible here and checked only by importTrack(): the integrity digests (SHA-256 over the canonical sorted-keys JSON), that params equal their sanitized canonical form beyond the ranges below, that geometry.normals and geometry.roadEdges have the same length as geometry.points, that geometry.straightSegments has params.curves entries, and (with verify 'regenerate') that generateTrack(params) reproduces the content. The integrity digest is unkeyed: it gives integrity, not authenticity of provenance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "generator", "params", "geometry", "props", "obstacles", "coins", "patternReport", "integrity"],
+  "properties": {
+    "schema": { "const": "tracklab.track" },
+    "schemaVersion": { "const": 1 },
+    "generator": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "params": { "$ref": "#/$defs/params" },
+    "geometry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["points", "normals", "roadEdges", "straightSegments", "length", "bounds"],
+      "properties": {
+        "points": { "type": "array", "minItems": 4, "items": { "$ref": "#/$defs/point" } },
+        "normals": { "type": "array", "items": { "$ref": "#/$defs/point2" } },
+        "roadEdges": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "items": { "type": "array", "items": { "$ref": "#/$defs/point" } }
+        },
+        "straightSegments": { "type": "array", "items": { "type": "boolean" } },
+        "length": { "type": "number" },
+        "bounds": {
+          "type": "object", "additionalProperties": false,
+          "required": ["minX", "maxX", "minZ", "maxZ", "minY", "maxY"],
+          "properties": {
+            "minX": { "type": "number" }, "maxX": { "type": "number" },
+            "minZ": { "type": "number" }, "maxZ": { "type": "number" },
+            "minY": { "type": "number" }, "maxY": { "type": "number" }
+          }
+        }
+      }
+    },
+    "props": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["x", "y", "z", "kind", "heading", "scale"],
+        "properties": {
+          "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" },
+          "kind": { "enum": ["tree", "bench", "lamp", "building"] },
+          "heading": { "type": "number" }, "scale": { "type": "number" }
+        }
+      }
+    },
+    "obstacles": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["x", "y", "z", "radius", "heading"],
+        "properties": {
+          "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" },
+          "radius": { "type": "number" }, "heading": { "type": "number" }
+        }
+      }
+    },
+    "coins": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "x", "y", "z"],
+        "properties": { "id": { "type": "integer" }, "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+      }
+    },
+    "patternReport": {
+      "type": "object", "additionalProperties": false,
+      "required": ["selected", "requested", "inserted", "attempts", "scale", "patterns", "geometry"],
+      "properties": {
+        "selected": { "enum": ["auto", "right-angle", "hairpin", "s-curve"] },
+        "requested": { "type": "number" }, "inserted": { "type": "number" },
+        "attempts": { "type": "number" }, "scale": { "type": "number" },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["kind", "startIndex", "endIndex", "turnDegrees", "positiveTurnDegrees", "negativeTurnDegrees", "curvatureChanges", "verified"],
+            "properties": {
+              "kind": { "enum": ["right-angle", "hairpin", "s-curve"] },
+              "startIndex": { "type": "number" }, "endIndex": { "type": "number" },
+              "turnDegrees": { "type": "number" }, "positiveTurnDegrees": { "type": "number" },
+              "negativeTurnDegrees": { "type": "number" }, "curvatureChanges": { "type": "number" },
+              "verified": { "type": "boolean" }, "parallelDot": { "type": "number" }
+            }
+          }
+        },
+        "geometry": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object", "additionalProperties": false,
+              "required": ["valid", "closed", "minRadius", "maxStepAngle", "selfIntersections", "boundaryIntersections", "foldedTriangles", "boundariesChecked", "reasons"],
+              "properties": {
+                "valid": { "type": "boolean" }, "closed": { "type": "boolean" },
+                "minRadius": { "type": "number" }, "maxStepAngle": { "type": "number" },
+                "selfIntersections": { "type": "number" }, "boundaryIntersections": { "type": "number" },
+                "foldedTriangles": { "type": "number" }, "boundariesChecked": { "type": "boolean" },
+                "reasons": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "integrity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "canonical", "digest", "contentDigest"],
+      "properties": {
+        "algorithm": { "const": "sha256" },
+        "canonical": { "const": "sorted-keys-json" },
+        "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "contentDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object", "additionalProperties": false, "required": ["x", "y", "z"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+    },
+    "point2": {
+      "type": "object", "additionalProperties": false, "required": ["x", "z"],
+      "properties": { "x": { "type": "number" }, "z": { "type": "number" } }
+    },
+    "params": {
+      "type": "object", "additionalProperties": false,
+      "required": ["curves", "straight", "width", "size", "height", "obstacles", "density", "scene", "seed", "cornerPattern", "cornerCount", "cornerStrength"],
+      "properties": {
+        "curves": { "type": "integer", "minimum": 3, "maximum": 10 },
+        "straight": { "type": "number", "minimum": 0, "maximum": 0.6 },
+        "width": { "type": "integer", "minimum": 20, "maximum": 80 },
+        "size": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "height": { "type": "integer", "minimum": 0, "maximum": 200 },
+        "obstacles": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "density": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "scene": { "enum": ["nature", "city", "mixed"] },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+        "cornerPattern": { "enum": ["auto", "right-angle", "hairpin", "s-curve"] },
+        "cornerCount": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "cornerStrength": { "type": "integer", "minimum": 20, "maximum": 100 },
+        "autoJoin": { "const": "tangent" }
+      },
+      "if": {
+        "properties": { "cornerPattern": { "not": { "const": "auto" } }, "cornerCount": { "minimum": 1 } },
+        "required": ["cornerPattern", "cornerCount"]
+      },
+      "then": { "not": { "required": ["autoJoin"] } }
+    }
+  }
+}
