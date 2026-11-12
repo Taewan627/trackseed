@@ -1,0 +1,1473 @@
+{
+  "cases": 1000,
+  "engines": [
+    {
+      "label": "node22",
+      "name": "Node 22 (reference)",
+      "ran": true,
+      "env": {
+        "engine": "node",
+        "version": "v22.23.4",
+        "v8": "12.4.254.21-node.57"
+      },
+      "n": 1000,
+      "mismatches": 0,
+      "agreementPercent": 100,
+      "firstMismatches": [],
+      "bitsDigestMismatches": 0,
+      "digest3dMismatches": 0,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      }
+    },
+    {
+      "label": "node22-repeat",
+      "name": "Node 22 (repeat run)",
+      "ran": true,
+      "env": {
+        "engine": "node",
+        "version": "v22.23.4",
+        "v8": "12.4.254.21-node.57"
+      },
+      "n": 1000,
+      "mismatches": 0,
+      "agreementPercent": 100,
+      "firstMismatches": [],
+      "bitsDigestMismatches": 0,
+      "digest3dMismatches": 0,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      }
+    },
+    {
+      "label": "node20",
+      "name": "Node 20",
+      "ran": true,
+      "env": {
+        "engine": "node",
+        "version": "v20.20.2",
+        "v8": "11.3.244.8-node.38"
+      },
+      "n": 1000,
+      "mismatches": 0,
+      "agreementPercent": 100,
+      "firstMismatches": [],
+      "bitsDigestMismatches": 0,
+      "digest3dMismatches": 0,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      }
+    },
+    {
+      "label": "node24",
+      "name": "Node 24",
+      "ran": true,
+      "env": {
+        "engine": "node",
+        "version": "v24.22.2",
+        "v8": "13.6.233.17-node.63"
+      },
+      "n": 1000,
+      "mismatches": 0,
+      "agreementPercent": 100,
+      "firstMismatches": [],
+      "bitsDigestMismatches": 0,
+      "digest3dMismatches": 0,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      }
+    },
+    {
+      "label": "deno",
+      "name": "Deno",
+      "ran": true,
+      "env": {
+        "engine": "deno",
+        "version": "2.9.6",
+        "v8": "15.0.245.2-rusty"
+      },
+      "n": 1000,
+      "mismatches": 995,
+      "agreementPercent": 0.5,
+      "firstMismatches": [
+        0,
+        1,
+        2,
+        3,
+        7,
+        42,
+        100,
+        1234,
+        12345,
+        65535
+      ],
+      "bitsDigestMismatches": 995,
+      "digest3dMismatches": 960,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      },
+      "secondary": {
+        "mismatchingCases": 995,
+        "sameOutcomeAndPointCount": 995,
+        "sameShare": 1,
+        "maxAbsDiffMedian": 1.7053025658242404e-12,
+        "maxAbsDiffMax": 1.4270540305005852e-10
+      }
+    },
+    {
+      "label": "bun",
+      "name": "Bun (JavaScriptCore)",
+      "ran": true,
+      "env": {
+        "engine": "bun",
+        "version": "1.4.4",
+        "revision": "38afee6c84fcf48c0edb2466aa4b27d287a59c30"
+      },
+      "n": 1000,
+      "mismatches": 1000,
+      "agreementPercent": 0,
+      "firstMismatches": [
+        0,
+        1,
+        2,
+        3,
+        7,
+        42,
+        100,
+        1234,
+        12345,
+        65535
+      ],
+      "bitsDigestMismatches": 1000,
+      "digest3dMismatches": 962,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      },
+      "secondary": {
+        "mismatchingCases": 1000,
+        "sameOutcomeAndPointCount": 1000,
+        "sameShare": 1,
+        "maxAbsDiffMedian": 1.7053025658242404e-12,
+        "maxAbsDiffMax": 1.7386980744049652e-10
+      }
+    },
+    {
+      "label": "chrome",
+      "name": "Chrome headless (V8)",
+      "ran": true,
+      "env": {
+        "engine": "browser",
+        "version": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "cliVersion": "chrome 153.0.8010.12 via playwright-core"
+      },
+      "n": 1000,
+      "mismatches": 995,
+      "agreementPercent": 0.5,
+      "firstMismatches": [
+        0,
+        1,
+        2,
+        3,
+        7,
+        42,
+        100,
+        1234,
+        12345,
+        65535
+      ],
+      "bitsDigestMismatches": 995,
+      "digest3dMismatches": 960,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      },
+      "secondary": {
+        "mismatchingCases": 995,
+        "sameOutcomeAndPointCount": 995,
+        "sameShare": 1,
+        "maxAbsDiffMedian": 1.7053025658242404e-12,
+        "maxAbsDiffMax": 1.4270540305005852e-10
+      }
+    },
+    {
+      "label": "firefox",
+      "name": "Firefox (SpiderMonkey)",
+      "ran": true,
+      "env": {
+        "engine": "browser",
+        "version": "Mozilla/5.0 (X11; Linux x86_64; rv:157.0) Gecko/20100101 Firefox/157.0",
+        "cliVersion": "firefox 157.0 via playwright-core"
+      },
+      "n": 1000,
+      "mismatches": 992,
+      "agreementPercent": 0.8,
+      "firstMismatches": [
+        0,
+        1,
+        2,
+        3,
+        7,
+        42,
+        100,
+        1234,
+        12345,
+        65535
+      ],
+      "bitsDigestMismatches": 992,
+      "digest3dMismatches": 832,
+      "selfTest": true,
+      "scriptSha256Equal": true,
+      "newGlobals": [],
+      "outcomes": {
+        "ok": 1000
+      },
+      "secondary": {
+        "mismatchingCases": 992,
+        "sameOutcomeAndPointCount": 992,
+        "sameShare": 1,
+        "maxAbsDiffMedian": 1.4495071809506044e-12,
+        "maxAbsDiffMax": 1.028723772833473e-10
+      }
+    }
+  ],
+  "pairwiseAgreementCounts": {
+    "labels": [
+      "node22",
+      "node22-repeat",
+      "node20",
+      "node24",
+      "deno",
+      "bun",
+      "chrome",
+      "firefox"
+    ],
+    "counts": [
+      [
+        1000,
+        1000,
+        1000,
+        1000,
+        5,
+        0,
+        5,
+        8
+      ],
+      [
+        1000,
+        1000,
+        1000,
+        1000,
+        5,
+        0,
+        5,
+        8
+      ],
+      [
+        1000,
+        1000,
+        1000,
+        1000,
+        5,
+        0,
+        5,
+        8
+      ],
+      [
+        1000,
+        1000,
+        1000,
+        1000,
+        5,
+        0,
+        5,
+        8
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        1000,
+        26,
+        1000,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        26,
+        1000,
+        26,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        1000,
+        26,
+        1000,
+        0
+      ],
+      [
+        8,
+        8,
+        8,
+        8,
+        0,
+        0,
+        0,
+        1000
+      ]
+    ]
+  },
+  "staticMath": {
+    "raw": {
+      "PI": 1,
+      "abs": 4,
+      "acos": 1,
+      "atan2": 1,
+      "cos": 4,
+      "floor": 9,
+      "hypot": 1,
+      "max": 12,
+      "min": 12,
+      "random": 1,
+      "round": 2,
+      "sin": 5,
+      "sqrt": 4
+    },
+    "codeOnly": {
+      "PI": 1,
+      "abs": 4,
+      "acos": 1,
+      "atan2": 1,
+      "cos": 4,
+      "floor": 7,
+      "hypot": 1,
+      "max": 12,
+      "min": 12,
+      "random": 1,
+      "round": 2,
+      "sin": 4,
+      "sqrt": 2
+    },
+    "powOperatorRaw": 2,
+    "powOperatorCodeOnly": 0,
+    "approximatedUsedInCode": [
+      "acos",
+      "atan2",
+      "cos",
+      "hypot",
+      "sin"
+    ],
+    "approximatedList": [
+      "sin",
+      "cos",
+      "tan",
+      "asin",
+      "acos",
+      "atan",
+      "atan2",
+      "sinh",
+      "cosh",
+      "tanh",
+      "asinh",
+      "acosh",
+      "atanh",
+      "exp",
+      "expm1",
+      "log",
+      "log2",
+      "log10",
+      "log1p",
+      "pow",
+      "cbrt",
+      "hypot"
+    ],
+    "mathRandomRaw": 1
+  },
+  "dynamicMathCalls": {
+    "abs": 7209207,
+    "acos": 7178307,
+    "atan2": 10940613,
+    "cos": 70601453,
+    "floor": 5903315,
+    "hypot": 345032330,
+    "max": 170460045,
+    "min": 174093732,
+    "sin": 70601453,
+    "sqrt": 30650595
+  },
+  "scriptSha256": "1faa92c230579806326a7d5118f05561b425de9f5812f1a0b5af6799e84a0815",
+  "Q2": {
+    "widths": {
+      "4": {
+        "pass": 987,
+        "passShareOfOk": 98.7,
+        "wilson95": [
+          97.79,
+          99.24
+        ],
+        "passShareOfAll": 98.7,
+        "errorCodeCases": {
+          "SELF_INTERSECTION_EDGE": 13,
+          "EDGE_EDGE_INTERSECTION": 3,
+          "SELF_INTERSECTION_CENTERLINE": 3
+        },
+        "warningCodeCases": {},
+        "failing": 13
+      },
+      "8": {
+        "pass": 964,
+        "passShareOfOk": 96.4,
+        "wilson95": [
+          95.06,
+          97.39
+        ],
+        "passShareOfAll": 96.4,
+        "errorCodeCases": {
+          "SELF_INTERSECTION_EDGE": 36,
+          "EDGE_EDGE_INTERSECTION": 3,
+          "SELF_INTERSECTION_CENTERLINE": 3
+        },
+        "warningCodeCases": {},
+        "failing": 36
+      },
+      "14": {
+        "pass": 915,
+        "passShareOfOk": 91.5,
+        "wilson95": [
+          89.61,
+          93.07
+        ],
+        "passShareOfAll": 91.5,
+        "errorCodeCases": {
+          "SELF_INTERSECTION_EDGE": 85,
+          "EDGE_EDGE_INTERSECTION": 3,
+          "SELF_INTERSECTION_CENTERLINE": 3
+        },
+        "warningCodeCases": {},
+        "failing": 85
+      }
+    },
+    "ownWidth": {
+      "min": 4,
+      "casesBelow4": 0
+    },
+    "okOutputs": 1000,
+    "totalCases": 1000,
+    "threeD": {
+      "width": 4,
+      "okCases": 987,
+      "maxSlopeWarningCases": 380
+    },
+    "bruteForceCenterlineCrossCheck": {
+      "bruteForceSeeds": [
+        1969636755,
+        521946500,
+        1274672711
+      ],
+      "validatorSeeds": [
+        1969636755,
+        521946500,
+        1274672711
+      ],
+      "identical": true
+    }
+  },
+  "Q3": {
+    "third-party (as is)": {
+      "sampleCount": {
+        "n": 1000,
+        "median": 601,
+        "p25": 500,
+        "p75": 687,
+        "min": 261,
+        "max": 1080
+      },
+      "length": {
+        "n": 1000,
+        "median": 1184.266870002982,
+        "p25": 989.1480659421024,
+        "p75": 1353.7408131853201,
+        "min": 509.86236223612445,
+        "max": 2135.4033187085574
+      },
+      "boundingBoxArea": {
+        "n": 1000,
+        "median": 114951.1464536727,
+        "p25": 85841.08171217081,
+        "p75": 148089.24433352458,
+        "min": 24760.461701557666,
+        "max": 336969.5403030807
+      },
+      "straightLengthFraction": {
+        "n": 1000,
+        "median": 0.5718804772043368,
+        "p25": 0.5219832565369833,
+        "p75": 0.6154462942541883,
+        "min": 0.3285906712463055,
+        "max": 0.772683866854573
+      },
+      "meanAbsCurvature": {
+        "n": 1000,
+        "median": 0.016142208363531047,
+        "p25": 0.013832057585223776,
+        "p75": 0.018512780088612305,
+        "min": 0.008000335160209399,
+        "max": 0.02963408286456161
+      },
+      "maxAbsCurvature": {
+        "n": 1000,
+        "median": 0.09071624520569212,
+        "p25": 0.0814912162102549,
+        "p75": 0.09658235934058183,
+        "min": 0.05256269595440933,
+        "max": 0.10000000000004387
+      },
+      "p95AbsCurvature": {
+        "n": 1000,
+        "median": 0.06801845359900464,
+        "p25": 0.061011133740928855,
+        "p75": 0.07509686575940316,
+        "min": 0.03588126501258039,
+        "max": 0.09800594794982898
+      },
+      "curvatureEntropyBits": {
+        "n": 1000,
+        "median": 1.5140556298012364,
+        "p25": 1.4007908660237094,
+        "p75": 1.629910644149829,
+        "min": 0.9189300800348115,
+        "max": 1.99382680942382
+      },
+      "turnCount": {
+        "n": 1000,
+        "median": 15,
+        "p25": 11,
+        "p75": 19,
+        "min": 7,
+        "max": 28
+      },
+      "elevationRange": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "maxAbsSlope": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "meanAbsSlope": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "totalTurningDegrees": {
+        "n": 1000,
+        "median": 1054.4104452807903,
+        "p25": 783.4149080832502,
+        "p75": 1342.398370770454,
+        "min": 387.3185582998284,
+        "max": 2153.5612319694437
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 1000,
+        "median": 18.839098140934965,
+        "p25": 13.937470053828216,
+        "p75": 23.918090930242425,
+        "min": 6.939209282441691,
+        "max": 38.186811269521904
+      },
+      "totalTurningOver360": {
+        "n": 1000,
+        "median": 2.928917903557751,
+        "p25": 2.176152522453473,
+        "p75": 3.728884363251261,
+        "min": 1.0758848841661899,
+        "max": 5.982114533248454
+      }
+    },
+    "third-party (scaled x2.8)": {
+      "sampleCount": {
+        "n": 1000,
+        "median": 601,
+        "p25": 500,
+        "p75": 687,
+        "min": 261,
+        "max": 1080
+      },
+      "length": {
+        "n": 1000,
+        "median": 3315.9472360083337,
+        "p25": 2769.614584637875,
+        "p75": 3790.474276918875,
+        "min": 1427.6146142611453,
+        "max": 5979.129292384029
+      },
+      "boundingBoxArea": {
+        "n": 1000,
+        "median": 901216.9881967937,
+        "p25": 672994.0806234191,
+        "p75": 1161019.6755748326,
+        "min": 194122.0197402121,
+        "max": 2641841.195976152
+      },
+      "straightLengthFraction": {
+        "n": 1000,
+        "median": 0.5718804772043372,
+        "p25": 0.5219832565369836,
+        "p75": 0.6154462942541913,
+        "min": 0.32859067124630753,
+        "max": 0.7726838668545771
+      },
+      "meanAbsCurvature": {
+        "n": 1000,
+        "median": 0.0057650744155471854,
+        "p25": 0.004940020566152273,
+        "p75": 0.006611707174504954,
+        "min": 0.002857262557218665,
+        "max": 0.010583601023058492
+      },
+      "maxAbsCurvature": {
+        "n": 1000,
+        "median": 0.03239865900203599,
+        "p25": 0.029104005789380143,
+        "p75": 0.03449369976449446,
+        "min": 0.018772391412289317,
+        "max": 0.03571428571430365
+      },
+      "p95AbsCurvature": {
+        "n": 1000,
+        "median": 0.02429230485678119,
+        "p25": 0.02178969062175933,
+        "p75": 0.026820309199789196,
+        "min": 0.012814737504494163,
+        "max": 0.03500212426779706
+      },
+      "curvatureEntropyBits": {
+        "n": 1000,
+        "median": 1.6642324299921634,
+        "p25": 1.555972261391814,
+        "p75": 1.7831785021793907,
+        "min": 1.0840197792092874,
+        "max": 2.237975603669014
+      },
+      "turnCount": {
+        "n": 1000,
+        "median": 15,
+        "p25": 11,
+        "p75": 19,
+        "min": 6,
+        "max": 28
+      },
+      "elevationRange": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "maxAbsSlope": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "meanAbsSlope": {
+        "n": 1000,
+        "median": 0,
+        "p25": 0,
+        "p75": 0,
+        "min": 0,
+        "max": 0
+      },
+      "totalTurningDegrees": {
+        "n": 1000,
+        "median": 1054.4104452809663,
+        "p25": 783.4149080834186,
+        "p75": 1342.3983707708212,
+        "min": 387.31855829990303,
+        "max": 2153.561231969675
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 1000,
+        "median": 18.83909814093874,
+        "p25": 13.937470053831042,
+        "p75": 23.918090930245878,
+        "min": 6.9392092824430005,
+        "max": 38.186811269526174
+      },
+      "totalTurningOver360": {
+        "n": 1000,
+        "median": 2.9289179035582396,
+        "p25": 2.1761525224539406,
+        "p75": 3.728884363252281,
+        "min": 1.0758848841663973,
+        "max": 5.9821145332490975
+      }
+    },
+    "TrackLab auto": {
+      "sampleCount": {
+        "n": 200,
+        "median": 360,
+        "p25": 360,
+        "p75": 360,
+        "min": 360,
+        "max": 360
+      },
+      "length": {
+        "n": 200,
+        "median": 2518.58407823981,
+        "p25": 2408.4699138892333,
+        "p75": 2586.9112538244754,
+        "min": 2158.475194051937,
+        "max": 2747.6582794496344
+      },
+      "boundingBoxArea": {
+        "n": 200,
+        "median": 561652.2752588054,
+        "p25": 509570.38666389673,
+        "p75": 599130.6780485293,
+        "min": 363145.26105022075,
+        "max": 708663.4981991012
+      },
+      "straightLengthFraction": {
+        "n": 200,
+        "median": 0.319022021369107,
+        "p25": 0.3030079886039619,
+        "p75": 0.3381958486206711,
+        "min": 0.26397492751283463,
+        "max": 0.40384883963756735
+      },
+      "meanAbsCurvature": {
+        "n": 200,
+        "median": 0.002835458654633464,
+        "p25": 0.002728092555338382,
+        "p75": 0.0029647138747430574,
+        "min": 0.002482887575526166,
+        "max": 0.0034050839906803907
+      },
+      "maxAbsCurvature": {
+        "n": 200,
+        "median": 0.1386527612605498,
+        "p25": 0.12055995949875571,
+        "p75": 0.16715922850328835,
+        "min": 0.07519943839997184,
+        "max": 0.22107707053756281
+      },
+      "p95AbsCurvature": {
+        "n": 200,
+        "median": 0.005822649395208765,
+        "p25": 0.005243164009174495,
+        "p75": 0.006906094869719257,
+        "min": 0.004174892574570993,
+        "max": 0.00970655920970819
+      },
+      "curvatureEntropyBits": {
+        "n": 200,
+        "median": 2.060157128458525,
+        "p25": 1.962889598979432,
+        "p75": 2.1947972213230824,
+        "min": 1.7882086889109856,
+        "max": 2.4237067392243126
+      },
+      "turnCount": {
+        "n": 200,
+        "median": 5,
+        "p25": 5,
+        "p75": 6,
+        "min": 4,
+        "max": 7
+      },
+      "elevationRange": {
+        "n": 200,
+        "median": 194.32928844918786,
+        "p25": 194.32591269230346,
+        "p75": 194.3346374523288,
+        "min": 194.32042765144786,
+        "max": 194.3381313916763
+      },
+      "maxAbsSlope": {
+        "n": 200,
+        "median": 0.8629545437087761,
+        "p25": 0.788684240566205,
+        "p75": 0.9536504174397402,
+        "min": 0.5765367239260241,
+        "max": 1.1545329504033666
+      },
+      "meanAbsSlope": {
+        "n": 200,
+        "median": 0.3299455830305789,
+        "p25": 0.3201400204351188,
+        "p75": 0.34674527046837905,
+        "min": 0.299928656445951,
+        "max": 0.3967212057049398
+      },
+      "totalTurningDegrees": {
+        "n": 200,
+        "median": 360.00000000002916,
+        "p25": 360.00000000002393,
+        "p75": 360.00000000003814,
+        "min": 360.0000000000085,
+        "max": 370.12911512539296
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 200,
+        "median": 7.115960174984104,
+        "p25": 7.0034022877763045,
+        "p75": 7.222460263745867,
+        "min": 6.792197304218352,
+        "max": 7.659158580443435
+      },
+      "totalTurningOver360": {
+        "n": 200,
+        "median": 1.000000000000081,
+        "p25": 1.0000000000000664,
+        "p75": 1.000000000000106,
+        "min": 1.0000000000000238,
+        "max": 1.0281364309038694
+      }
+    },
+    "TrackLab right-angle": {
+      "sampleCount": {
+        "n": 200,
+        "median": 305,
+        "p25": 289,
+        "p75": 315,
+        "min": 249,
+        "max": 341
+      },
+      "length": {
+        "n": 200,
+        "median": 2593.1202245494965,
+        "p25": 2473.55186233717,
+        "p75": 2669.8301284599747,
+        "min": 2177.3307786464284,
+        "max": 2865.2978038521337
+      },
+      "boundingBoxArea": {
+        "n": 200,
+        "median": 576737.520219476,
+        "p25": 522925.5769836118,
+        "p75": 623948.6042733584,
+        "min": 400514.4641131379,
+        "max": 795695.9163886871
+      },
+      "straightLengthFraction": {
+        "n": 200,
+        "median": 0.19174457991932248,
+        "p25": 0.09185304767487681,
+        "p75": 0.2740420613588639,
+        "min": 0,
+        "max": 0.4176915925824742
+      },
+      "meanAbsCurvature": {
+        "n": 200,
+        "median": 0.0030946263920671956,
+        "p25": 0.002919432575533256,
+        "p75": 0.003263661883764326,
+        "min": 0.0025845416793834407,
+        "max": 0.003837329782020231
+      },
+      "maxAbsCurvature": {
+        "n": 200,
+        "median": 0.013121964472581262,
+        "p25": 0.01302083760073054,
+        "p75": 0.013169004400636121,
+        "min": 0.01282960339526557,
+        "max": 0.013242080188500155
+      },
+      "p95AbsCurvature": {
+        "n": 200,
+        "median": 0.012917391464333601,
+        "p25": 0.012850600332824745,
+        "p75": 0.01300146737288473,
+        "min": 0.012804971557670686,
+        "max": 0.013188967033636128
+      },
+      "curvatureEntropyBits": {
+        "n": 200,
+        "median": 2.418030574741718,
+        "p25": 2.30730164291771,
+        "p75": 2.477632827292179,
+        "min": 1.665954144132328,
+        "max": 2.560039510794069
+      },
+      "turnCount": {
+        "n": 200,
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "min": 2,
+        "max": 7
+      },
+      "elevationRange": {
+        "n": 200,
+        "median": 194.3382240530318,
+        "p25": 194.32625037806264,
+        "p75": 194.34351914145626,
+        "min": 194.28263696866406,
+        "max": 194.34771721397465
+      },
+      "maxAbsSlope": {
+        "n": 200,
+        "median": 0.7426430873204125,
+        "p25": 0.7189683939326418,
+        "p75": 0.7835548677460362,
+        "min": 0.6648586648409611,
+        "max": 0.9100427274005352
+      },
+      "meanAbsSlope": {
+        "n": 200,
+        "median": 0.3189470311301349,
+        "p25": 0.30878830787927536,
+        "p75": 0.33666560833080766,
+        "min": 0.2856518627799052,
+        "max": 0.3910138623083262
+      },
+      "totalTurningDegrees": {
+        "n": 200,
+        "median": 426.4379189705414,
+        "p25": 407.9041298709351,
+        "p75": 447.51858935124704,
+        "min": 372.47609903326884,
+        "max": 534.9043604818597
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 200,
+        "median": 7.9522667282195005,
+        "p25": 7.596643562963423,
+        "p75": 8.317811005012524,
+        "min": 6.90028724387845,
+        "max": 9.946204465279825
+      },
+      "totalTurningOver360": {
+        "n": 200,
+        "median": 1.1845497749181706,
+        "p25": 1.1330670274192642,
+        "p75": 1.243107192642353,
+        "min": 1.034655830647969,
+        "max": 1.4858454457829438
+      }
+    },
+    "TrackLab hairpin": {
+      "sampleCount": {
+        "n": 200,
+        "median": 323,
+        "p25": 310,
+        "p75": 333,
+        "min": 285,
+        "max": 401
+      },
+      "length": {
+        "n": 200,
+        "median": 2730.9333096129008,
+        "p25": 2631.651162257361,
+        "p75": 2804.320020804293,
+        "min": 2446.731887478495,
+        "max": 3324.735209465727
+      },
+      "boundingBoxArea": {
+        "n": 200,
+        "median": 595801.9078278271,
+        "p25": 558790.3418110572,
+        "p75": 657722.6333047744,
+        "min": 451982.23181733233,
+        "max": 958153.2869720734
+      },
+      "straightLengthFraction": {
+        "n": 200,
+        "median": 0.055166155822152806,
+        "p25": 0.051896795612022664,
+        "p75": 0.0597459991442046,
+        "min": 0.039136684410831554,
+        "max": 0.10552945150159708
+      },
+      "meanAbsCurvature": {
+        "n": 200,
+        "median": 0.004799829730465638,
+        "p25": 0.004669605444855764,
+        "p75": 0.004997138925525872,
+        "min": 0.003875220711089355,
+        "max": 0.00543943332289586
+      },
+      "maxAbsCurvature": {
+        "n": 200,
+        "median": 0.014210388451649052,
+        "p25": 0.014116477585255383,
+        "p75": 0.014346732262000868,
+        "min": 0.014031754179312895,
+        "max": 0.014497752239014984
+      },
+      "p95AbsCurvature": {
+        "n": 200,
+        "median": 0.014173638538098693,
+        "p25": 0.014061390867224955,
+        "p75": 0.014264840392584152,
+        "min": 0.013969392630266891,
+        "max": 0.014386722030719648
+      },
+      "curvatureEntropyBits": {
+        "n": 200,
+        "median": 2.186388761590134,
+        "p25": 2.049417725183005,
+        "p75": 2.3084166382154407,
+        "min": 1.5452244153300274,
+        "max": 2.4669403100811156
+      },
+      "turnCount": {
+        "n": 200,
+        "median": 8,
+        "p25": 7,
+        "p75": 8,
+        "min": 4,
+        "max": 10
+      },
+      "elevationRange": {
+        "n": 200,
+        "median": 194.33987671286326,
+        "p25": 194.33122202732034,
+        "p75": 194.34367712021492,
+        "min": 194.28546334643983,
+        "max": 194.3477435895756
+      },
+      "maxAbsSlope": {
+        "n": 200,
+        "median": 0.7011064916151809,
+        "p25": 0.680841304221074,
+        "p75": 0.7302184396774601,
+        "min": 0.5652994653832528,
+        "max": 0.7943958747166537
+      },
+      "meanAbsSlope": {
+        "n": 200,
+        "median": 0.3012451208308636,
+        "p25": 0.2925206571736215,
+        "p75": 0.3136903463942259,
+        "min": 0.24287798866797802,
+        "max": 0.3411815099193508
+      },
+      "totalTurningDegrees": {
+        "n": 200,
+        "median": 710.5224796692316,
+        "p25": 709.5947400504854,
+        "p75": 711.2094729088717,
+        "min": 706.6234279913324,
+        "max": 714.9516332562418
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 200,
+        "median": 13.125302312199269,
+        "p25": 13.087155194223023,
+        "p75": 13.175874007857455,
+        "min": 12.881400647557832,
+        "max": 13.30883496094241
+      },
+      "totalTurningOver360": {
+        "n": 200,
+        "median": 1.9736735546367545,
+        "p25": 1.9710965001402372,
+        "p75": 1.9755818691913103,
+        "min": 1.962842855531479,
+        "max": 1.9859767590451163
+      }
+    },
+    "TrackLab s-curve": {
+      "sampleCount": {
+        "n": 200,
+        "median": 288,
+        "p25": 279,
+        "p75": 297,
+        "min": 235,
+        "max": 444
+      },
+      "length": {
+        "n": 200,
+        "median": 2466.989508701884,
+        "p25": 2400.1343015641714,
+        "p75": 2537.577857838129,
+        "min": 2072.6491674804292,
+        "max": 3657.969720468337
+      },
+      "boundingBoxArea": {
+        "n": 200,
+        "median": 531242.9837065757,
+        "p25": 493741.08586405625,
+        "p75": 569316.9688953325,
+        "min": 354564.37830826617,
+        "max": 1278392.9413993075
+      },
+      "straightLengthFraction": {
+        "n": 200,
+        "median": 0,
+        "p25": 0,
+        "p75": 0.008306838772127659,
+        "min": 0,
+        "max": 0.08046260165687052
+      },
+      "meanAbsCurvature": {
+        "n": 200,
+        "median": 0.0058137491123773696,
+        "p25": 0.005626043964801932,
+        "p75": 0.006009040156648922,
+        "min": 0.0038156897501451263,
+        "max": 0.007132322720061672
+      },
+      "maxAbsCurvature": {
+        "n": 200,
+        "median": 0.012175057508619457,
+        "p25": 0.012080826415554809,
+        "p75": 0.012246710117826328,
+        "min": 0.011879862620775066,
+        "max": 0.015527049298980293
+      },
+      "p95AbsCurvature": {
+        "n": 200,
+        "median": 0.012090981193361253,
+        "p25": 0.01201342755916076,
+        "p75": 0.01213490842516359,
+        "min": 0.011879154197986968,
+        "max": 0.012165122959838456
+      },
+      "curvatureEntropyBits": {
+        "n": 200,
+        "median": 1.95663105746687,
+        "p25": 1.8217691361136663,
+        "p75": 2.078856453687882,
+        "min": 1.5807393570449781,
+        "max": 2.3781424736137184
+      },
+      "turnCount": {
+        "n": 200,
+        "median": 16,
+        "p25": 15,
+        "p75": 17,
+        "min": 11,
+        "max": 19
+      },
+      "elevationRange": {
+        "n": 200,
+        "median": 194.3358515884638,
+        "p25": 194.3236422947527,
+        "p75": 194.3418861161255,
+        "min": 194.27002491610182,
+        "max": 194.34752899046208
+      },
+      "maxAbsSlope": {
+        "n": 200,
+        "median": 0.7865822223731525,
+        "p25": 0.7601667257122497,
+        "p75": 0.8113968611965509,
+        "min": 0.5103664345564345,
+        "max": 0.9655959284601529
+      },
+      "meanAbsSlope": {
+        "n": 200,
+        "median": 0.33790539764852695,
+        "p25": 0.3266237215490834,
+        "p75": 0.3486653419574962,
+        "min": 0.21928742717902341,
+        "max": 0.4148610308776752
+      },
+      "totalTurningDegrees": {
+        "n": 200,
+        "median": 766.5014017020449,
+        "p25": 764.1500784976437,
+        "p75": 769.7638040582825,
+        "min": 758.2639606045318,
+        "max": 795.3622196410752
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 200,
+        "median": 14.35489311298716,
+        "p25": 14.283879914862712,
+        "p75": 14.43237919858545,
+        "min": 13.832958272785579,
+        "max": 14.782802747937575
+      },
+      "totalTurningOver360": {
+        "n": 200,
+        "median": 2.129170560283458,
+        "p25": 2.122639106937899,
+        "p75": 2.1382327890507846,
+        "min": 2.106288779457033,
+        "max": 2.2093394990029864
+      }
+    },
+    "TrackLab extreme": {
+      "sampleCount": {
+        "n": 200,
+        "median": 600,
+        "p25": 600,
+        "p75": 600,
+        "min": 600,
+        "max": 600
+      },
+      "length": {
+        "n": 200,
+        "median": 3533.092358174683,
+        "p25": 3477.110580958945,
+        "p75": 3609.5713331462293,
+        "min": 3250.840399121527,
+        "max": 3792.799836591436
+      },
+      "boundingBoxArea": {
+        "n": 200,
+        "median": 782546.8785814929,
+        "p25": 731230.4095431808,
+        "p75": 837788.071412648,
+        "min": 554892.0421709826,
+        "max": 991557.1654314308
+      },
+      "straightLengthFraction": {
+        "n": 200,
+        "median": 0.3481947701402491,
+        "p25": 0.3230755317782288,
+        "p75": 0.37525645273789954,
+        "min": 0.2710167164272562,
+        "max": 0.4277578763904304
+      },
+      "meanAbsCurvature": {
+        "n": 200,
+        "median": 0.0026899285732023925,
+        "p25": 0.002527833123231132,
+        "p75": 0.002853394466355843,
+        "min": 0.002202295807352122,
+        "max": 0.003513874537183931
+      },
+      "maxAbsCurvature": {
+        "n": 200,
+        "median": 0.16676195111423694,
+        "p25": 0.13768072671466955,
+        "p75": 0.20831754369947608,
+        "min": 0.08120003434902016,
+        "max": 0.30266504203102024
+      },
+      "p95AbsCurvature": {
+        "n": 200,
+        "median": 0.007369698382094322,
+        "p25": 0.006186559145451475,
+        "p75": 0.008575218818326727,
+        "min": 0.003400616159733689,
+        "max": 0.012716687771060914
+      },
+      "curvatureEntropyBits": {
+        "n": 200,
+        "median": 2.2971436385508643,
+        "p25": 2.238821366585184,
+        "p75": 2.3495123582134188,
+        "min": 1.5852145186337527,
+        "max": 2.491138473154194
+      },
+      "turnCount": {
+        "n": 200,
+        "median": 8,
+        "p25": 7,
+        "p75": 9,
+        "min": 4,
+        "max": 11
+      },
+      "elevationRange": {
+        "n": 200,
+        "median": 485.8514399577482,
+        "p25": 485.84445248328234,
+        "p75": 485.8611118692292,
+        "min": 485.84124748332505,
+        "max": 485.8653051538786
+      },
+      "maxAbsSlope": {
+        "n": 200,
+        "median": 1.8240614584689852,
+        "p25": 1.679485890161942,
+        "p75": 2.012383801091807,
+        "min": 1.3259628405776673,
+        "max": 2.5317661360177577
+      },
+      "meanAbsSlope": {
+        "n": 200,
+        "median": 0.6951718818164369,
+        "p25": 0.6741912160896305,
+        "p75": 0.7145442983211441,
+        "min": 0.6298466722649065,
+        "max": 0.7970196766106391
+      },
+      "totalTurningDegrees": {
+        "n": 200,
+        "median": 405.2037470398323,
+        "p25": 385.29664395188405,
+        "p75": 431.68698735892764,
+        "min": 360.0000000000654,
+        "max": 534.7023658985138
+      },
+      "meanAbsCurvatureTimesLength": {
+        "n": 200,
+        "median": 9.437801921594623,
+        "p25": 8.858536389620989,
+        "p75": 10.129380057304202,
+        "min": 8.03825109588603,
+        "max": 12.987229078145901
+      },
+      "totalTurningOver360": {
+        "n": 200,
+        "median": 1.1255659639995341,
+        "p25": 1.0702684554219002,
+        "p75": 1.1991305204414657,
+        "min": 1.0000000000001816,
+        "max": 1.4852843497180939
+      }
+    }
+  },
+  "predictions": [
+    {
+      "id": "Q1a",
+      "prediction": "Node 22 repeat: 100%",
+      "observed": 100,
+      "holds": true
+    },
+    {
+      "id": "Q1b",
+      "prediction": "Node 20: 100%",
+      "observed": 100,
+      "holds": true
+    },
+    {
+      "id": "Q1c",
+      "prediction": "Node 24: below 100%, within 10-90%",
+      "observed": 100,
+      "holds": false
+    },
+    {
+      "id": "Q1d-deno",
+      "prediction": "deno: at most 10%",
+      "observed": 0.5,
+      "holds": true
+    },
+    {
+      "id": "Q1d-bun",
+      "prediction": "bun: at most 10%",
+      "observed": 0,
+      "holds": true
+    },
+    {
+      "id": "Q1d-chrome",
+      "prediction": "chrome: at most 10%",
+      "observed": 0.5,
+      "holds": true
+    },
+    {
+      "id": "Q1d-firefox",
+      "prediction": "firefox: at most 10%",
+      "observed": 0.8,
+      "holds": true
+    },
+    {
+      "id": "Q1e",
+      "prediction": "among mismatching cases (every engine with mismatches): >= 95% same outcome and point count, max |diff| < 1e-6 units",
+      "observed": [
+        {
+          "engine": "deno",
+          "sameShare": 1,
+          "maxAbsDiffMax": 1.4270540305005852e-10
+        },
+        {
+          "engine": "bun",
+          "sameShare": 1,
+          "maxAbsDiffMax": 1.7386980744049652e-10
+        },
+        {
+          "engine": "chrome",
+          "sameShare": 1,
+          "maxAbsDiffMax": 1.4270540305005852e-10
+        },
+        {
+          "engine": "firefox",
+          "sameShare": 1,
+          "maxAbsDiffMax": 1.028723772833473e-10
+        }
+      ],
+      "holds": true
+    },
+    {
+      "id": "Q2a",
+      "prediction": "outcome ok for >= 99% of the 1000 seeds",
+      "observed": 100,
+      "holds": true
+    },
+    {
+      "id": "Q2b",
+      "prediction": "pass share at W=4 >= 50%",
+      "observed": 98.7,
+      "holds": true
+    },
+    {
+      "id": "Q2c",
+      "prediction": "share(4) >= share(8) >= share(14)",
+      "observed": [
+        987,
+        964,
+        915
+      ],
+      "holds": true
+    },
+    {
+      "id": "Q2d",
+      "prediction": "most frequent failing error code at every width is a self-intersection code",
+      "observed": {
+        "4": "SELF_INTERSECTION_EDGE",
+        "8": "SELF_INTERSECTION_EDGE",
+        "14": "SELF_INTERSECTION_EDGE"
+      },
+      "holds": true
+    },
+    {
+      "id": "Q2e",
+      "prediction": "CLOSURE_* codes in < 10% of ok outputs at W=4 (cases with any CLOSURE_* code)",
+      "observed": 0,
+      "holds": true
+    },
+    {
+      "id": "Q3",
+      "prediction": "totalTurningDegrees >= 360 for every ok output",
+      "observed": 387.3185582998284,
+      "holds": true
+    }
+  ]
+}
