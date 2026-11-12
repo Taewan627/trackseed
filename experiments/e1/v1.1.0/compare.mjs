@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CASES } from '../cases.mjs';
-import { sanitize } from '../../../src/core.ts';
+import { sanitize } from './build/sanitize.mjs';
 const here = dirname(fileURLToPath(import.meta.url)), R = join(here, '..', 'results', 'v1.1.0');
 const ENGINES = [
   ['node22', 'Node 22 (reference)'], ['node22-repeat', 'Node 22 (repeat run)'], ['node20', 'Node 20'], ['node24', 'Node 24'],

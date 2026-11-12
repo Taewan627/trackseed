@@ -30,7 +30,7 @@ Changes since the commit that set the version to 1.0.0 (`eb8598f`). Every item p
 
 - Parameters with `autoJoin: 'legacy'` and `height: 80` set explicitly (the case set of E1) reproduce the v1.0.0 `contentDigest` (tested in `tests/autojoin.test.ts` against `experiments/e1/results/v1.0.0/node22.v100.json`). Calls that rely on the defaults produce different tracks than in 1.0.0, because the join default and the default height changed.
 - The exchange format `schemaVersion` is unchanged (1).
-- A release check of cross-engine agreement at this version is pre-registered in [experiments/e1/ADDENDUM-v1.1.0.md](experiments/e1/ADDENDUM-v1.1.0.md).
+- Release check of cross-engine agreement at this version (nine engine runs on one Linux x86_64 VM, 1000 cases, default and legacy join): pre-registration [experiments/e1/ADDENDUM-v1.1.0.md](experiments/e1/ADDENDUM-v1.1.0.md), results [experiments/e1/results/v1.1.0/SUMMARY.md](experiments/e1/results/v1.1.0/SUMMARY.md), deviations in [NOTES.md](experiments/e1/results/v1.1.0/NOTES.md).
 
 ## v1.0.0
 
