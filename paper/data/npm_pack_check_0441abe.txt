@@ -1,0 +1,6 @@
+npm pack check, software checkout 0441abe (release candidate, git worktree), Node v22.23.4, 2026-11-13
+npm pack (prepack builds the library and CLI): trackseed-1.2.0.tgz, total files: 33
+npm install of the tarball in an empty project (no registry package of this name used): added 1 package
+bins installed: tracklab trackseed 
+package.json of the installed package: dependencies {}
+node import('trackseed'): VERSION 1.2.0, generateTrack is a function

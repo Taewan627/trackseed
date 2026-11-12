@@ -1,0 +1,10 @@
+# npm test in a worktree at software commit 0441abe (node v22.23.4, Linux x86_64); last lines of the run
+1..143
+# tests 143
+# suites 0
+# pass 143
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 148057.537001

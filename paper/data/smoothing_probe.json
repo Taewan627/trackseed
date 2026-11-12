@@ -1,0 +1,196 @@
+{
+ "note": "single radial spike on a circle of radius 500, width 10; h = 0 is the clean control",
+ "radius": 500,
+ "width": 10,
+ "smoothSpacing": 2.5,
+ "rows": [
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 0,
+   "h_over_W": 0,
+   "raw_detected": false,
+   "smooth_detected": false,
+   "raw_ok": true,
+   "smooth_ok": true,
+   "raw_codes": [],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 1,
+   "h_over_W": 0.1,
+   "raw_detected": true,
+   "smooth_detected": false,
+   "raw_ok": false,
+   "smooth_ok": true,
+   "raw_codes": [
+    "LOCAL_KINK"
+   ],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 2,
+   "h_over_W": 0.2,
+   "raw_detected": true,
+   "smooth_detected": true,
+   "raw_ok": false,
+   "smooth_ok": false,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": [
+    "SHARP_VERTEX"
+   ]
+  },
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 5,
+   "h_over_W": 0.5,
+   "raw_detected": true,
+   "smooth_detected": true,
+   "raw_ok": false,
+   "smooth_ok": false,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": [
+    "EDGE_FOLD",
+    "SELF_INTERSECTION_EDGE",
+    "SHARP_VERTEX"
+   ]
+  },
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 10,
+   "h_over_W": 1,
+   "raw_detected": true,
+   "smooth_detected": true,
+   "raw_ok": false,
+   "smooth_ok": false,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": [
+    "EDGE_FOLD",
+    "LOCAL_KINK",
+    "SELF_INTERSECTION_EDGE",
+    "SHARP_VERTEX"
+   ]
+  },
+  {
+   "spacing": 5,
+   "n": 628,
+   "h": 20,
+   "h_over_W": 2,
+   "raw_detected": true,
+   "smooth_detected": true,
+   "raw_ok": false,
+   "smooth_ok": false,
+   "raw_codes": [
+    "EDGE_FOLD",
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": [
+    "EDGE_FOLD",
+    "LOCAL_KINK",
+    "SELF_INTERSECTION_EDGE",
+    "SHARP_VERTEX"
+   ]
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 0,
+   "h_over_W": 0,
+   "raw_detected": false,
+   "smooth_detected": false,
+   "raw_ok": true,
+   "smooth_ok": true,
+   "raw_codes": [],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 1,
+   "h_over_W": 0.1,
+   "raw_detected": false,
+   "smooth_detected": false,
+   "raw_ok": true,
+   "smooth_ok": true,
+   "raw_codes": [],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 2,
+   "h_over_W": 0.2,
+   "raw_detected": true,
+   "smooth_detected": false,
+   "raw_ok": false,
+   "smooth_ok": true,
+   "raw_codes": [
+    "LOCAL_KINK"
+   ],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 5,
+   "h_over_W": 0.5,
+   "raw_detected": true,
+   "smooth_detected": false,
+   "raw_ok": false,
+   "smooth_ok": true,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 10,
+   "h_over_W": 1,
+   "raw_detected": true,
+   "smooth_detected": false,
+   "raw_ok": false,
+   "smooth_ok": true,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": []
+  },
+  {
+   "spacing": 20,
+   "n": 157,
+   "h": 20,
+   "h_over_W": 2,
+   "raw_detected": true,
+   "smooth_detected": true,
+   "raw_ok": false,
+   "smooth_ok": false,
+   "raw_codes": [
+    "LOCAL_KINK",
+    "SHARP_VERTEX"
+   ],
+   "smooth_codes": [
+    "SHARP_VERTEX"
+   ]
+  }
+ ]
+}

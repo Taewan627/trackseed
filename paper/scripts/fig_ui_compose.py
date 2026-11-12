@@ -1,8 +1,8 @@
-"""UI figure (Fig. 3 of the manuscript). Input: the single screenshot made by fig_ui_screenshots.mjs
-(argv[1] = directory with ui_v120_seed42_validation.png, 2580 x 2166 px = 860 x 722 CSS px at device scale 3).
+"""UI figure (Fig. 2 of the manuscript, software commit 0441abe). Input: the single screenshot made by fig_ui_screenshots.mjs
+(argv[1] = directory with ui_v120_0441abe_seed42_validation.png, 2580 x 2166 px = 860 x 722 CSS px at device scale 3).
 Output: paper/figures/fig_ui.png (6.5 in wide). Panel (a) is the whole screenshot, uncropped and only scaled down.
 Panels (b) and (c) are magnified crops of the same screenshot (left column: header and sidebar title; Validation panel with its
-eight checks); their source regions are outlined in (a). Nothing is retouched; the only drawing is the outlines and the panel labels.
+ten checks); their source regions are outlined in (a). Nothing is retouched; the only drawing is the outlines and the panel labels.
 With the repository as the working directory: python3 paper/scripts/fig_ui_compose.py /tmp/uishots"""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -11,24 +11,24 @@ import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image
-src = os.path.join(sys.argv[1], 'ui_v120_seed42_validation.png')
+src = os.path.join(sys.argv[1], 'ui_v120_0441abe_seed42_validation.png')
 im = Image.open(src).convert('RGB')
 S = 3                                  # device scale factor of the capture
 assert im.size == (860 * S, 722 * S), im.size
 W_CSS, H_CSS = 860, 722
 SIDE = 251                              # sidebar width in CSS px (the border lies at x = 251.5)
 REG_B = (0, 0, SIDE, 168)               # brand, version, sidebar title
-REG_C = (0, 272, SIDE, 478)             # Validation panel: badge, counts, eight checks
+REG_C = (0, 236, SIDE, 480)             # Validation panel: badge, counts, ten checks (validator v1.3)
 def crop(r): return im.crop(tuple(v * S for v in r))
 style(); plt.rcParams['savefig.bbox'] = 'standard'
 FW = 6.5
 PT = 1 / 72
 sa = 0.345                               # pt per CSS px in panel (a)
-sb = 0.63                                # pt per CSS px in panels (b), (c)
+sb = 0.575                               # pt per CSS px in panels (b), (c)
 wa, ha = W_CSS * sa * PT, H_CSS * sa * PT
 wb = SIDE * sb * PT
 x0 = 0.02
-FH = H_CSS * sa * PT + 0.20 + 0.03
+FH = max(H_CSS * sa * PT, (REG_B[3]-REG_B[1]) * sb * PT + (REG_C[3]-REG_C[1]) * sb * PT + 0.30) + 0.20 + 0.03
 top = FH - 0.20
 fig = plt.figure(figsize=(FW, FH))
 ax = fig.add_axes([x0 / FW, (top - ha) / FH, wa / FW, ha / FH]); ax.imshow(im); ax.axis('off')

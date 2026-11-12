@@ -1,0 +1,26 @@
+{
+ "panelTitle": "TrackSeed",
+ "brand": "TrackSeed",
+ "version": "v1.2.0",
+ "lang": "en",
+ "params": {
+  "curves": "6",
+  "straight": "0.25",
+  "width": "40",
+  "size": "2",
+  "height": "20",
+  "cornerPattern": "auto",
+  "autoJoin": "tangent",
+  "cornerCount": "1",
+  "cornerStrength": "60",
+  "obstacles": "3",
+  "density": "10",
+  "scene": "mixed",
+  "seed": "42"
+ },
+ "badge": "OK",
+ "counts": "Errors 0 · Warnings 0",
+ "checks": "structure | pass | finite | pass | closure | pass | local-kink | pass | sharp-vertex | pass | self-intersection | pass | edge-fold | pass | min-turn-radius | pass | max-slope | pass | undersampled | pass"
+}
+{"scrollTop":790,"max":790,"badgeInside":true,"checkRows":10,"checksInside":true,"seedInside":true,"buttonsInside":true}
+all checks passed

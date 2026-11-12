@@ -1,0 +1,25 @@
+{
+ "command": "trackseed validate-polyline Melbourne.json --width 12.24 --resample-smooth 3.06",
+ "ok": true,
+ "input": {
+  "pointCount": 1060,
+  "inputWasClosed": false,
+  "duplicatePointsRemoved": 0,
+  "resampleSpacing": null,
+  "resampleSmoothSpacing": 3.06,
+  "sampleCount": 1732
+ },
+ "violations": [],
+ "checks": {
+  "structure": 0,
+  "finite": 0,
+  "closure": 0,
+  "local-kink": 0,
+  "sharp-vertex": 0,
+  "self-intersection": 0,
+  "edge-fold": 0,
+  "min-turn-radius": 0,
+  "max-slope": 0,
+  "undersampled": 0
+ }
+}

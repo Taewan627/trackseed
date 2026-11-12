@@ -1,0 +1,44 @@
+{
+ "command": "trackseed validate-polyline Melbourne.json --width 12.24",
+ "ok": false,
+ "input": {
+  "pointCount": 1060,
+  "inputWasClosed": false,
+  "duplicatePointsRemoved": 0,
+  "resampleSpacing": null,
+  "resampleSmoothSpacing": null,
+  "sampleCount": 1060
+ },
+ "violations": [
+  {
+   "code": "LOCAL_KINK",
+   "index": 379,
+   "value": 25.6,
+   "limit": 23.03
+  },
+  {
+   "code": "LOCAL_KINK",
+   "index": 835,
+   "value": 33.79,
+   "limit": 12.41
+  },
+  {
+   "code": "SHARP_VERTEX",
+   "index": 835,
+   "value": 33.79,
+   "limit": 30
+  }
+ ],
+ "checks": {
+  "structure": 0,
+  "finite": 0,
+  "closure": 0,
+  "local-kink": 2,
+  "sharp-vertex": 1,
+  "self-intersection": 0,
+  "edge-fold": 0,
+  "min-turn-radius": 0,
+  "max-slope": 0,
+  "undersampled": 0
+ }
+}
