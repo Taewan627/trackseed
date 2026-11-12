@@ -270,7 +270,7 @@ Every number in this README comes from a committed file, a source constant or a 
 
 ## Citation
 
-Cite the software with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" entry). The file carries title, authors, ORCID iDs, licence and version 1.0.0; `date-released` is added at release.
+Cite the software with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" entry). The file carries title, authors, ORCID iDs, licence and version 1.1.0; `date-released` is added at release.
 
 ## Licence
 
