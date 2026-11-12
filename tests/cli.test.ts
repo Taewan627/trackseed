@@ -44,7 +44,9 @@ test('cli: generate -> validate -> metrics round trip, exit codes, stdout vs --o
     const m = run(['metrics', file]); assert.equal(m.code, 0);
     const metrics = JSON.parse(m.out) as { length: number; curvature?: number[]; totalTurningDegrees: number };
     assert.ok(Math.abs(metrics.length - doc.geometry.length) < 1e-6 * doc.geometry.length);
-    assert.equal(metrics.curvature, undefined); assert.ok(Math.abs(metrics.totalTurningDegrees - 360) < 1);
+    assert.equal(metrics.curvature, undefined);
+    // absolute turning of a closed loop is >= 360; the tangent join may add a small S-bend near a straight (docs/generator-auto-join.md)
+    assert.ok(metrics.totalTurningDegrees >= 360 - 1e-6 && metrics.totalTurningDegrees < 540);
     const withSamples = JSON.parse(run(['metrics', file, '--samples']).out) as { curvature: number[] };
     assert.equal(withSamples.curvature.length, doc.geometry.points.length - 1);
     assert.deepEqual(JSON.parse(run(['metrics', file]).out), metrics, 'metrics deterministic');
@@ -54,15 +56,17 @@ test('cli: generate -> validate -> metrics round trip, exit codes, stdout vs --o
 test('cli: validate exit code 1 for a document with error violations, 2 for invalid documents', () => {
   const dir = tmp();
   try {
-    // find a default-mode seed whose track has an error-severity violation (Auto mode can overlap at joins)
+    // the default (autoJoin tangent) is valid; the legacy v1.0.0 join is the known source of error-severity violations
     let bad: string | undefined, good: string | undefined;
     for (let seed = 1; seed <= 12 && !(bad && good); seed++) {
-      const f = join(dir, `s${seed}.json`);
-      run(['generate', '--seed', String(seed), '--out', f]);
-      const r = run(['validate', f]);
-      if (r.code === 1 && !bad) bad = f; else if (r.code === 0 && !good) good = f;
+      const f = join(dir, `s${seed}.json`), g = join(dir, `g${seed}.json`);
+      run(['generate', '--seed', String(seed), '--set', 'autoJoin=legacy', '--out', f]);
+      run(['generate', '--seed', String(seed), '--out', g]);
+      if (run(['validate', f]).code === 1 && !bad) bad = f;
+      if (run(['validate', g]).code === 0 && !good) good = g;
     }
-    assert.ok(bad, 'expected at least one of seeds 1..12 to violate (README: Auto mode can overlap)');
+    assert.ok(bad, 'expected at least one legacy-join track of seeds 1..12 to violate');
+    assert.ok(good, 'expected at least one default-join track of seeds 1..12 to validate');
     const strict = run(['validate', bad!, '--limit', 'tangentToleranceDegrees=1000', '--limit', 'foldEpsilon=-1e9', '--limit', 'closureTolerance=1e9']);
     assert.ok(strict.code === 0 || strict.code === 1);
     if (good) assert.equal(run(['validate', good, '--strict', '--limit', 'maxSlope=1e9', '--limit', 'minRadiusToHalfWidth=0']).code, 0);

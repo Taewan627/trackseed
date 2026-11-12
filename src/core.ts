@@ -2,15 +2,26 @@ import { dcos, dhypot, datan2, dsin } from './detmath.js';
 import { applyPatterns, type CornerPattern, type PatternReport } from './patterns.js';
 export interface Point { x: number; y: number; z: number }
 export type SceneType = 'nature' | 'city' | 'mixed';
+/**
+ * How the Auto generator joins a straight segment to its neighbours.
+ * 'legacy'  : v1.0.0 construction, a linear segment between two waypoints next to Catmull-Rom arcs (heading jump at the join).
+ * 'tangent' : heading-continuous construction (see joinTangents / docs/generator-auto-join.md).
+ * A document that has no `autoJoin` key is a 'legacy' document (written by v1.0.0).
+ */
+export type AutoJoin = 'legacy' | 'tangent';
+export const AUTO_JOINS: readonly AutoJoin[] = ['legacy', 'tangent'];
 export interface Params {
   curves: number; straight: number; width: number; size: number; height: number;
   obstacles: number; density: number; scene: SceneType; seed: number;
   cornerPattern: CornerPattern; cornerCount: number; cornerStrength: number;
+  /** Optional in the type so document params (where legacy = absent) stay assignable; sanitize() always returns it set. */
+  autoJoin?: AutoJoin;
 }
 export const DEFAULTS: Params = {
   curves: 6, straight: 0.25, width: 40, size: 2, height: 80,
   obstacles: 3, density: 10, scene: 'mixed', seed: 42,
   cornerPattern: 'auto', cornerCount: 1, cornerStrength: 60,
+  autoJoin: 'tangent',
 };
 export const LIMITS = {
   curves: [3, 10, 1], straight: [0, 0.6, 0.05], width: [20, 80, 1],
@@ -39,6 +50,10 @@ export function sanitize(input: Partial<Params>): Params {
   }
   if (!['nature', 'city', 'mixed'].includes(p.scene)) p.scene = DEFAULTS.scene;
   if (!['auto', 'right-angle', 'hairpin', 's-curve'].includes(p.cornerPattern)) p.cornerPattern = 'auto';
+  if (!AUTO_JOINS.includes(p.autoJoin as AutoJoin)) p.autoJoin = DEFAULTS.autoJoin;
+  // The join only shapes the base circuit; a spliced corner pattern re-smooths that circuit (patterns.ts smoothBase),
+  // so there the option is inert and canonicalised to 'legacy': pattern-mode output and documents stay v1.0.0-identical.
+  if (p.cornerPattern !== 'auto' && p.cornerCount > 0) p.autoJoin = 'legacy';
   return p;
 }
 
@@ -62,6 +77,77 @@ export function catmull(a: number, b: number, c: number, d: number, t: number): 
 export function elevation(t: number, p: Params): number {
   return (dsin(t * TAU * 2 + p.seed * 0.01)
     + dsin(t * TAU * 4 + p.seed * 0.02) * 0.4) * p.height;
+}
+
+/** Fraction of a straight segment (in samples, of STEPS) given to each blended end of the 'tangent' join. */
+export const JOIN_BLEND = 0.35;
+/** Factor on the Catmull-Rom magnitude of every tangent that the 'tangent' join re-aims at a straight (larger = gentler bend near the join). */
+export const JOIN_GAIN = 1.75;
+const hermite = (p0: number, p1: number, m0: number, m1: number, s: number) =>
+  (2 * s * s * s - 3 * s * s + 1) * p0 + (s * s * s - 2 * s * s + s) * m0
+  + (-2 * s * s * s + 3 * s * s) * p1 + (s * s * s - s * s) * m1;
+
+/**
+ * Hermite derivative (Catmull-Rom scale) at every waypoint for the 'tangent' join. `plain` marks waypoints that keep the
+ * Catmull-Rom tangent (no adjacent straight). Next to exactly one straight the tangent follows that straight's chord;
+ * between two straights it is the bisector of both chords (each straight then blends into it over JOIN_BLEND of its length).
+ * Magnitude is JOIN_GAIN x the Catmull-Rom magnitude.
+ */
+function joinTangents(w: Point[], straight: boolean[]) {
+  const n = w.length;
+  const tangents: { x: number; z: number }[] = [], plain: boolean[] = [];
+  const unit = (a: Point, b: Point) => { const l = dhypot(b.x - a.x, b.z - a.z) || 1; return { x: (b.x - a.x) / l, z: (b.z - a.z) / l }; };
+  for (let k = 0; k < n; k++) {
+    const prev = w[(k - 1 + n) % n], cur = w[k], next = w[(k + 1) % n];
+    const cx = (next.x - prev.x) / 2, cz = (next.z - prev.z) / 2, mag = dhypot(cx, cz);
+    const before = straight[(k - 1 + n) % n], after = straight[k];
+    let d: { x: number; z: number } | null = null;
+    if (before && after) {
+      const a = unit(prev, cur), b = unit(cur, next), sx = a.x + b.x, sz = a.z + b.z, l = dhypot(sx, sz);
+      d = l > 1e-9 ? { x: sx / l, z: sz / l } : null; // exact reversal: keep Catmull-Rom
+    } else if (before) d = unit(prev, cur);
+    else if (after) d = unit(cur, next);
+    plain.push(d === null);
+    tangents.push(d === null ? { x: cx, z: cz } : { x: d.x * mag * JOIN_GAIN, z: d.z * mag * JOIN_GAIN });
+  }
+  return { tangents, plain };
+}
+
+/** One segment (STEPS samples, sample 0 = waypoint b) of the 'tangent' join. */
+function tangentSegment(i: number, w: Point[], straight: boolean[], joins: ReturnType<typeof joinTangents>, out: { x: number; z: number }[]) {
+  const n = w.length;
+  const [a, b, c, d] = [-1, 0, 1, 2].map(k => w[(i + k + n) % n]);
+  const t0 = joins.tangents[i], t1 = joins.tangents[(i + 1) % n];
+  if (!straight[i]) {
+    const same = joins.plain[i] && joins.plain[(i + 1) % n];
+    for (let j = 0; j < STEPS; j++) {
+      const t = j / STEPS;
+      out.push(same ? { x: catmull(a.x, b.x, c.x, d.x, t), z: catmull(a.z, b.z, c.z, d.z, t) }
+        : { x: hermite(b.x, c.x, t0.x, t1.x, t), z: hermite(b.z, c.z, t0.z, t1.z, t) });
+    }
+    return;
+  }
+  // Straight: blended ends only where the neighbour is also straight (there the tangent is not the chord direction).
+  const head = straight[(i - 1 + n) % n] ? Math.round(JOIN_BLEND * STEPS) : 0;
+  const tail = straight[(i + 1) % n] ? Math.round(JOIN_BLEND * STEPS) : 0;
+  const q1 = { x: lerp(b.x, c.x, head / STEPS), z: lerp(b.z, c.z, head / STEPS) };
+  const q2 = { x: lerp(b.x, c.x, (STEPS - tail) / STEPS), z: lerp(b.z, c.z, (STEPS - tail) / STEPS) };
+  const len = dhypot(c.x - b.x, c.z - b.z) || 1, dx = (c.x - b.x) / len, dz = (c.z - b.z) / len;
+  const unitOf = (t: { x: number; z: number }) => { const l = dhypot(t.x, t.z) || 1; return { x: t.x / l, z: t.z / l }; };
+  const u0 = unitOf(t0), u1 = unitOf(t1);
+  const l0 = dhypot(q1.x - b.x, q1.z - b.z), l1 = dhypot(c.x - q2.x, c.z - q2.z);
+  for (let j = 0; j < STEPS; j++) {
+    if (j < head) {
+      const s = j / head;
+      out.push({ x: hermite(b.x, q1.x, u0.x * l0, dx * l0, s), z: hermite(b.z, q1.z, u0.z * l0, dz * l0, s) });
+    } else if (j >= STEPS - tail) {
+      const s = (j - (STEPS - tail)) / tail;
+      out.push({ x: hermite(q2.x, c.x, dx * l1, u1.x * l1, s), z: hermite(q2.z, c.z, dz * l1, u1.z * l1, s) });
+    } else {
+      const s = (j - head) / (STEPS - head - tail);
+      out.push({ x: lerp(q1.x, q2.x, s), z: lerp(q1.z, q2.z, s) });
+    }
+  }
 }
 
 export interface Prop extends Point {
@@ -94,7 +180,14 @@ export function generateTrack(input: Partial<Params> = {}): Track {
   const straightSegments = Array<boolean>(p.curves).fill(false);
   order.slice(0, Math.round(p.straight * p.curves)).forEach(i => { straightSegments[i] = true; });
   const points: Point[] = [];
+  const joins = p.autoJoin === 'tangent' ? joinTangents(waypoints, straightSegments) : null;
   for (let i = 0; i < p.curves; i++) {
+    if (joins) {
+      const xz: { x: number; z: number }[] = [];
+      tangentSegment(i, waypoints, straightSegments, joins, xz);
+      xz.forEach((q, j) => points.push({ x: q.x, z: q.z, y: elevation((i + j / STEPS) / p.curves, p) }));
+      continue;
+    }
     const [a, b, c, d] = [-1, 0, 1, 2].map(k => waypoints[(i + k + p.curves) % p.curves]);
     for (let j = 0; j < STEPS; j++) {
       const t = j / STEPS;

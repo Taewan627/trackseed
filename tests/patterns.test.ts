@@ -15,7 +15,8 @@ test('v0.5: Auto and count zero reproduce the golden v0.5 (deterministic-math) g
   const fixture = JSON.parse(readFileSync('tests/fixtures/golden-v05.json', 'utf8')) as {
     fields: (keyof ReturnType<typeof generateTrack>)[]; cases: { params: Partial<Params>; sha256: string; coinsSha256: string }[] };
   for (const entry of fixture.cases) for (const cornerPattern of ['auto', ...kinds] as const) {
-    const track = generateTrack({ ...entry.params, cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
+    // the v0.5 golden is the legacy join (the default is now 'tangent')
+    const track = generateTrack({ ...entry.params, autoJoin: 'legacy', cornerPattern, cornerCount: cornerPattern === 'auto' ? 3 : 0, cornerStrength: 100 });
     const hash = createHash('sha256').update(JSON.stringify(Object.fromEntries(fixture.fields.map(k => [k, track[k]])))).digest('hex');
     assert.equal(hash, entry.sha256); assert.equal(track.patternReport.inserted, 0);
     assert.equal(track.patternReport.attempts, 0); assert.equal(track.patternReport.geometry, null);
