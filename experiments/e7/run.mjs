@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
+import { V100_PIN } from '../_v100-params.mjs';
 
 const DIST = new URL('../../cli-dist/', import.meta.url);
 if (!existsSync(new URL('validate.js', DIST))) throw new Error('cli-dist/ missing: run `npm run build:cli` first');
@@ -129,7 +130,8 @@ if (set === 'repro') {
     requestedStraightParameter: spread(req), quantisedStraightFraction: spread(quant), realisedStraightFractionLegacy: spread(sfL), realisedStraightFractionTangent: spread(sfT),
     maxVertexTurnDegreesLegacy: spread(mtL), maxVertexTurnDegreesTangent: spread(mtT), verticesOver12DegreesLegacy: spread(o12L), verticesOver12DegreesTangent: spread(o12T) };
   // default parameters
-  const defaults = seeds.map(seed => { const e = evaluate({ seed }); return { seed, generated: e.generated, ok: e.ok, errCodes: e.errCodes }; });
+  // default parameters at the then-current DEFAULTS: height pinned to 80 (v1.0.0 default); autoJoin is left to DEFAULTS (tangent), as PROTOCOL.md defines
+  const defaults = seeds.map(seed => { const e = evaluate({ height: V100_PIN.height, seed }); return { seed, generated: e.generated, ok: e.ok, errCodes: e.errCodes }; });
   summary.defaultParameters = { autoJoinOfDefaults: core.DEFAULTS.autoJoin, ok: wilson(defaults.filter(d => d.generated && d.ok).length, defaults.length), failures: defaults.filter(d => !d.ok), generationFailures: defaults.filter(d => !d.generated).length };
 
   // ---- predictions ----
