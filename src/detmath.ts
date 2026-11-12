@@ -13,10 +13,23 @@
 //              hardware/soft-float sqrt instruction),
 //   Math.abs/min/max/floor/ceil/round/trunc/sign/fround/imul (exact).
 // No call to Math.sin/cos/tan/atan/atan2/exp/log/pow/hypot/cbrt/... occurs
-// here, and the `**` operator is avoided as well. Algorithms and coefficients
-// follow the public-domain FreeBSD msun / fdlibm kernels; the evaluation order
-// below is fixed, and JS never fuses multiply-add, so results are identical on
-// every conforming engine.
+// here, and the `**` operator is avoided as well. The sin/cos kernels, atan and
+// exp follow the algorithms and coefficients of fdlibm / FreeBSD msun, which are
+// distributed under the following notice:
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunSoft, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice 
+ * is preserved.
+ * ====================================================
+ */
+// Not all of this file is fdlibm: the argument reduction, datan2, dhypot and the
+// 2^k scaling are project code. The per-routine derivation is listed in
+// THIRD_PARTY_NOTICES.md. The evaluation order below is fixed, and JS never fuses
+// multiply-add, so results are identical on every conforming engine.
 
 /** Math.PI is a literal constant, hence deterministic. */
 export const DPI = Math.PI;

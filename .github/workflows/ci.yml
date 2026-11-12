@@ -6,10 +6,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [20, 22, 24]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +23,45 @@ jobs:
       - run: npm run build
       - run: npm run build:cli
       - name: Determinism smoke test
+        shell: bash
         run: |
-          node cli-dist/cli.js generate --seed 42 --out /tmp/t42.json
-          node cli-dist/cli.js validate /tmp/t42.json --verify regenerate && rc=0 || rc=$?
+          node cli-dist/cli.js generate --seed 42 --out "$RUNNER_TEMP/t42.json"
+          node cli-dist/cli.js validate "$RUNNER_TEMP/t42.json" --verify regenerate && rc=0 || rc=$?
           test "$rc" -le 1
+
+  determinism:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: npm ci
+      - run: npm run build:cli
+      - name: Node CLI digests (node cli-dist/cli.js generate)
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/cli"
+          for seed in 0 1 42 7; do
+            for pattern in auto hairpin; do
+              node cli-dist/cli.js generate --seed "$seed" --set cornerPattern="$pattern" --out "$RUNNER_TEMP/cli/seed$seed-$pattern.json"
+            done
+          done
+          node scripts/ci-digests.mjs --from-dir "$RUNNER_TEMP/cli" --check tests/fixtures/ci-golden-digests.json
+      - name: Node digests (cli-dist modules)
+        run: node scripts/ci-digests.mjs --check tests/fixtures/ci-golden-digests.json
+      - name: Deno digests (cli-dist modules)
+        run: deno run -A scripts/ci-digests.mjs --check tests/fixtures/ci-golden-digests.json
+      - name: Bun digests (cli-dist modules)
+        run: bun scripts/ci-digests.mjs --check tests/fixtures/ci-golden-digests.json

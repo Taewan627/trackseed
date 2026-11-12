@@ -16,7 +16,7 @@ The interface text of the web front end is Korean; the library, CLI and this doc
 
 ## Install
 
-Node.js 20.19 or newer (`engines` in `package.json`; CI runs Node 20, 22 and 24).
+Node.js 20.19 or newer (`engines` in `package.json`; CI runs Node 20, 22 and 24 on Ubuntu, Windows and macOS).
 
 ```bash
 git clone <repository-url> tracklab && cd tracklab
@@ -83,7 +83,7 @@ CLI reference:
 
 | Command | Behaviour | Exit codes |
 | --- | --- | --- |
-| `generate [--seed N] [--params file.json \| --set key=value ...] [--out file.json]` | Canonical `TrackDocumentV1` to `--out` or stdout. Unknown keys and out-of-range values are rejected, not clamped. | 0 ok, 1 generator rejected the parameters, 2 usage error |
+| `generate [--seed N] [--params file.json \| --set key=value ...] [--out file.json]` | Canonical `TrackDocumentV1` to `--out` or stdout. Unknown keys, values of the wrong type, out-of-range values, non-integer values for integer parameters and unknown `scene` or `cornerPattern` names are rejected, not clamped or rounded (`batch` grids are checked the same way). | 0 ok, 1 generator rejected the parameters, 2 usage error or invalid parameters |
 | `batch --grid grid.json --out dir/ [--jsonl summary.jsonl] [--no-timing] [--closure-tangent-mode ratio\|absolute] [--seam-ratio N]` | One document per case plus one JSONL summary line per case. | 0 completed, 2 invalid grid or usage |
 | `validate file.json [--verify digest\|regenerate] [--limit key=value ...] [--strict] [--closure-tangent-mode ratio\|absolute] [--seam-ratio N]` | Parses the document (schema, both digests, optional regeneration), runs the validator, prints the report as JSON. | 0 no error-severity violation, 1 at least one (`--strict`: warnings too), 2 invalid document or options |
 | `metrics file.json [--samples]` | Metrics as JSON (`--samples` adds the per-sample curvature array). | 0, or 2 invalid document |
@@ -178,10 +178,10 @@ Parameters and ranges of `generateTrack`:
 | Parameter | Range | Default |
 | --- | --- | --- |
 | `curves` (Catmull-Rom spans) | 3 to 10 | 6 |
-| `straight` (share of spans that are straight, by count) | 0 to 0.6, step 0.05 | 0.25 |
+| `straight` (share of spans that are straight, by count) | 0 to 0.6 | 0.25 |
 | `width` (full road width) | 20 to 80 | 40 |
 | `size` | 1 to 3 | 2 |
-| `height` (elevation amplitude) | 0 to 200, step 5 | 80 |
+| `height` (elevation amplitude) | 0 to 200 | 80 |
 | `obstacles` | 0 to 8 | 3 |
 | `density` (scenery placement attempts = 8 x density) | 0 to 20 | 10 |
 | `scene` | nature, city, mixed | mixed |
@@ -190,13 +190,15 @@ Parameters and ranges of `generateTrack`:
 | `cornerCount` | 0 to 3 | 1 |
 | `cornerStrength` | 20 to 100 | 60 |
 
+Ranges come from `LIMITS` in `src/core.ts`. Every numeric parameter except `straight` is rounded to the nearest integer by `sanitize()`, so `height` takes whole values only. `straight` is not rounded and takes any value from 0 to 0.6. The third element of each `LIMITS` entry is the increment of the browser UI sliders (0.05 for `straight`, 5 for `height`, 1 for the other sliders; `seed` has no slider). Only the browser's slider controls read it; `generateTrack()`, the CLI and the validator never snap a value to it. `generateTrack()` and the browser UI pass values through `sanitize()`, which clamps them to the range and rounds them silently. The CLI does not: it rejects a value that `sanitize()` would change (see the `generate` row in the CLI table).
+
 ## Determinism
 
-Design. The generation path (`core.ts`, `patterns.ts`, `coins.ts`) and the validator and metrics (`validate.ts`, `metrics.ts`) use only `+ - * /`, `Math.sqrt`, exactly specified `Math` helpers (`abs`, `min`, `max`, `floor`, `ceil`) and `src/detmath.ts`, which implements sin, cos, atan2, hypot and exp with basic arithmetic. IEEE-754 basic operations and correctly rounded `Math.sqrt` are assumed; ECMAScript does not require them to be identical across engines for the other `Math` functions, which is why those are avoided. The PRNG is an integer generator. Hashing uses a pure TypeScript SHA-256, not an engine facility.
+Design. The files `core.ts`, `patterns.ts`, `coins.ts`, `detmath.ts`, `validate.ts`, `metrics.ts`, `schema.ts` and `sha256.ts` (the generation path, the validator, the metrics and the document hashing) use only `+ - * /`, the `%` operator and integer bitwise operators, the `Math` members that ECMAScript specifies exactly (`abs`, `min`, `max`, `floor`, `ceil`, `round`, `sign`, `trunc`, `fround`, `imul`, and the constant `PI`), and `Math.sqrt`. `src/detmath.ts` implements sin, cos, atan, atan2, hypot and exp from these operations. A grep over the code lines (comment lines excluded) finds no call to `Math.sin`, `cos`, `tan`, `atan`, `atan2`, `exp`, `log`, `pow`, `hypot` or `cbrt`, and no `**` operator. IEEE-754 basic operations are required by ECMAScript. Correctly rounded `Math.sqrt` is an assumption that the specification does not state. ECMAScript does not require the other transcendental `Math` functions to agree across engines, which is why they are avoided. The PRNG is an integer generator. Hashing uses a pure TypeScript SHA-256, not an engine facility. The sin, cos, atan and exp routines follow fdlibm / FreeBSD msun algorithms and coefficients; the notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 Evidence (experiment E1, protocol [experiments/e1/PROTOCOL.md](experiments/e1/PROTOCOL.md), v1.0.0 re-run [experiments/e1/ADDENDUM-v1.0.0.md](experiments/e1/ADDENDUM-v1.0.0.md), results [experiments/e1/results/v1.0.0/SUMMARY.md](experiments/e1/results/v1.0.0/SUMMARY.md)): 1000 fixed cases (200 seeds x 5 parameter configurations including corner patterns and an extreme configuration) were generated and hashed in 8 runs: Node 22 (reference), Node 22 again, Node 20, Node 24, Deno, Bun (JavaScriptCore), headless Chrome and Firefox (SpiderMonkey). At version 1.0.0 all 8 runs agree with the reference in 1000 of 1000 cases for both `digest` and `contentDigest`. A bundle of the 0.5.0 tree gives the same `contentDigest` as 1.0.0 in 1000 of 1000 cases on every run, while the whole-document `digest` differs in 1000 of 1000 (the generator stamp differs). As a control, a legacy v0.4 build that calls `Math.sin/cos/atan2/hypot` directly was compared in the original E1 ([experiments/e1/results/E1_SUMMARY.md](experiments/e1/results/E1_SUMMARY.md)): its document hashes differ from Node 22 in 513 cases on Node 24 and in 1000 cases on Deno, Bun, Chrome and Firefox, and agree on Node 20. Its discrete outcomes (point counts, pattern insertion, validity codes) did not differ in any of the 1000 cases on any engine ([experiments/e1b/results/SUMMARY.md](experiments/e1b/results/SUMMARY.md)); the differences were in the last bits of continuous values (largest relative difference of `track.length` between engines 2.34e-15).
 
-Measured scope. Engines and versions: Node 20.20.2, 22.23.4, 24.22.2, Deno 2.9.6, Bun 1.4.4, Chrome 153.0.8010.12, Firefox 157.0. One Linux x86_64 machine (a KVM virtual machine, see [experiments/e2/results/environment.txt](experiments/e2/results/environment.txt)). Document generation only: the vehicle runtime in `src/vehicle.ts` still uses `Math.*` and is outside the guarantee. 1000 cases per subject sample the parameter space; they are not a proof. Other operating systems, CPU architectures and engine versions were not tested.
+Measured scope. Engines and versions: Node 20.20.2, 22.23.4, 24.22.2, Deno 2.9.6, Bun 1.4.4, Chrome 153.0.8010.12, Firefox 157.0. One Linux x86_64 machine (a KVM virtual machine, see [experiments/e2/results/environment.txt](experiments/e2/results/environment.txt)). Document generation only: the vehicle runtime in `src/vehicle.ts` still uses `Math.*` and is outside the guarantee. 1000 cases per subject sample the parameter space; they are not a proof. Other CPU architectures and engine versions were not tested. Operating systems other than this Linux machine were not part of E1; the CI `determinism` job (see Testing) compares four seeds with committed digests on Ubuntu, macOS and Windows, a smaller check than E1.
 
 ## Reproducing the experiments
 
@@ -220,7 +222,7 @@ Results used by this README (see "Evidence"): in the E2 grid (4 modes x 12,150 t
 
 ## Testing
 
-`npm test` builds the CLI, compiles the tests and runs 76 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and tamper cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 40 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on Ubuntu with Node 20, 22 and 24: `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`); the browser suite is not part of CI. Counts and logs of the release run: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt).
+`npm test` builds the CLI, compiles the tests and runs 76 Node tests (generation and golden geometry hashes, patterns, deterministic math, schema round trip on 200 seeded random parameter sets and tamper cases, validator, metrics, CLI). `npm run build && PLAYWRIGHT_BROWSERS_PATH=... npx playwright test` runs 40 browser tests in Chromium (rendering, forms, keyboard input, resize, repeated generation, JSON export and import). The browser tests use software WebGL, so they say nothing about GPU frame rates or about Firefox and Safari. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs its `test` job on Ubuntu, Windows and macOS with Node 20, 22 and 24 (nine combinations, `fail-fast` off): `npm ci`, `npm test`, `npm run build`, `npm run build:cli` and a CLI determinism smoke test (`generate --seed 42`, `validate --verify regenerate`, in bash on every OS). A separate `determinism` job runs on the same three operating systems: `node cli-dist/cli.js generate` for seeds 0, 1, 42 and 7 with cornerPattern `auto` and `hairpin`, whose `integrity.contentDigest` values must equal those committed in [tests/fixtures/ci-golden-digests.json](tests/fixtures/ci-golden-digests.json); and [scripts/ci-digests.mjs](scripts/ci-digests.mjs) run under Node 22, Deno 2.9.6 and Bun 1.4.4, checked against the same file. The browser suite is not part of CI. Counts and logs of the release run: [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt).
 
 ## Limitations
 
@@ -239,7 +241,7 @@ Every number in this README comes from a committed file, a source constant or a 
 | Number(s) | Source |
 | --- | --- |
 | 76 Node tests, 40 browser tests | [docs/test-run-1.0.0.txt](docs/test-run-1.0.0.txt); test files in `tests/` |
-| CI matrix Node 20, 22, 24 | `.github/workflows/ci.yml` |
+| CI matrix: Node 20, 22, 24 on Ubuntu, Windows, macOS; determinism digests | `.github/workflows/ci.yml`, `tests/fixtures/ci-golden-digests.json` |
 | Node >= 20.19 | `package.json` (`engines`) |
 | Parameter ranges and defaults, 150 ms debounce text | `src/core.ts` (`DEFAULTS`, `LIMITS`); `docs/history/README_v0.4_ko.md` |
 | Validator defaults (1e-6, 1e-6, 5, 2, 3 vertices, 1e-5, 1, 0.3, 20) and 16.7 degrees | `src/validate.ts` (`DEFAULT_VALIDATE_OPTIONS`, `SEAM_WINDOW`) |
@@ -263,4 +265,4 @@ Cite the software with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this r
 
 ## Licence
 
-MIT, see [Licence.txt](Licence.txt) (identical text in `LICENSE`). Copyright (c) 2026 Taewan Kim.
+MIT, see [Licence.txt](Licence.txt) (identical text in `LICENSE`). Copyright (c) 2026 Taewan Kim. Third-party code and packages (the fdlibm notice that the sin, cos, atan and exp routines in `src/detmath.ts` derive from, three.js, and the development tools) are listed with their licences in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
