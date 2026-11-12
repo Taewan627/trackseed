@@ -10,7 +10,13 @@ tracklab metrics-polyline  track.csv  --width 4
 ```
 
 Exit codes and the report format are those of `validate` and `metrics`; `--resample-spacing S` (off by default) resamples by
-arc length first and must be reported when used.
+arc length first and must be reported when used. Consecutive duplicate points are removed first and counted in
+`input.duplicatePointsRemoved`. `--resample-smooth S` (off, exclusive with the former) lays a centripetal Catmull-Rom spline through
+the points before resampling; use it for coarse samples of a smooth curve. The vertex spacing that the validator needs, and why, are in
+[validator.md](validator.md), "Sampling requirement": about **s <= min(0.2 R_min, 9 h_min)** (R_min the smallest turn radius, h_min the
+smallest defect to find). Default tolerances are relative to the size of the track outside the band 10 to 100000 units
+([validator.md](validator.md), "Scale-relative tolerances"), so coordinates in metres, kilometres or degrees give the same verdict
+for the same shape.
 
 ## Third-party generator studied (experiment E5)
 
