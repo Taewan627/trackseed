@@ -261,7 +261,7 @@ test('quality: off-axis camera occlusion and rendered boundary audit', async ({ 
 
 test('quality: real left/right key input has bounded yaw and keeps map position synchronized', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   for (const [key, value] of Object.entries({ height: 0, width: 80, obstacles: 0 })) {
     await page.locator(`#${key}-value`).fill(String(value));
   }

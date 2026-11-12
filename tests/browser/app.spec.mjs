@@ -4,7 +4,7 @@ test('P0: real WebGL scene, closed track and live map render without errors', as
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await expect.poll(() => page.evaluate(() => window.__tracklab?.triangles)).toBeGreaterThan(1000);
   const state = await page.evaluate(() => {
     const s = window.__tracklab;
@@ -34,7 +34,7 @@ async function generate(page, values) {
 
 test('parameters auto update both views and manual Generate reproduces the same seed', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await page.locator('#curves-value').fill('10');
   await expect.poll(() => page.evaluate(() => window.__tracklab.track.params.curves)).toBe(10);
   await generate(page, { curves: 10, straight: 0.6, width: 80, size: 3, height: 200,
@@ -55,7 +55,7 @@ test('parameters auto update both views and manual Generate reproduces the same 
 
 test('P1: real keyboard drives, steers, brakes, reverses and updates the world-position map', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await generate(page, { height: 0, width: 80, obstacles: 0 });
   await page.locator('#viewport > canvas').focus();
   await page.keyboard.press('c');
@@ -92,7 +92,7 @@ test('P1: real keyboard drives, steers, brakes, reverses and updates the world-p
 
 test('P2: continuous forward keyboard input reaches the asphalt boundary and remains contained', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await generate(page, { height: 0, curves: 3, straight: 0, width: 20, obstacles: 0, density: 0 });
   await page.locator('#viewport > canvas').focus();
   await page.keyboard.down('ArrowUp');
@@ -110,7 +110,7 @@ test('P2: continuous forward keyboard input reaches the asphalt boundary and rem
 
 test('focus and blur release driving input; editing inputs does not trigger shortcuts', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await page.locator('#seed').focus();
   const generation = await page.evaluate(() => window.__tracklab.generation);
   await page.keyboard.press('c'); await page.keyboard.press('r');
@@ -131,7 +131,7 @@ test('focus and blur release driving input; editing inputs does not trigger shor
 test('P3: all environment themes render; repeated regeneration releases GPU geometries', async ({ page }) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   await generate(page, { density: 20, scene: 'nature' });
   expect(await page.evaluate(() => window.__tracklab.track.props.some(p => p.kind === 'tree'))).toBe(true);
   expect(await page.evaluate(() => window.__tracklab.track.props.some(p => p.kind === 'building'))).toBe(false);
@@ -148,7 +148,7 @@ test('P3: all environment themes render; repeated regeneration releases GPU geom
 
 test('resizing keeps the renderer sized, map visible and Generate accessible', async ({ page }) => {
   await page.goto('/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   for (const [width, height] of [[1024, 768], [1920, 1080], [800, 680]]) {
     await page.setViewportSize({ width, height });
     await expect.poll(() => page.locator('#viewport > canvas').evaluate(c => {
@@ -170,7 +170,7 @@ test('production dist renders actual WebGL pixels, drives, and makes no external
     if (['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol) && url.hostname !== '127.0.0.1') remote.push(request.url());
   });
   await page.goto('http://127.0.0.1:5174/?test=1');
-  await expect(page.locator('#status')).toContainText('생성 완료');
+  await expect(page.locator('#status')).toContainText('Generated');
   expect(await page.evaluate(() => '__tracklab' in window)).toBe(false);
   const colors = await page.locator('#viewport > canvas').evaluate(canvas => new Promise(resolve => {
     requestAnimationFrame(() => {
@@ -203,5 +203,5 @@ test('WebGL unavailability displays a useful error instead of a silent blank vie
   await page.goto('/');
   await expect(page.locator('#error')).toBeVisible();
   await expect(page.locator('#error')).toContainText('WebGL 2');
-  await expect(page.locator('#status')).toHaveText('초기화 실패');
+  await expect(page.locator('#status')).toHaveText('Initialization failed');
 });
