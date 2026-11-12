@@ -47,7 +47,8 @@ for g in "${groups[@]}"; do
     cd "$repo/experiments/e1/v1.0.0" && mkdir -p build && $E entry-v100.mjs --outfile=build/v100.mjs && $E --alias:@v050="$v050/src" entry-v050.mjs --outfile=build/v050.mjs \
       && node run.mjs v100 > "$scratch/e1-node22.v100.json" 2>> "$scratch/logs/e1.log" && node run.mjs v050 > "$scratch/e1-node22.v050.json" 2>> "$scratch/logs/e1.log"
     cd "$repo"
-    for s in legacy v05; do CMP_FIELD=cases compare "E1 node22 $s (experiments/e1)" "experiments/e1/results/node22.$s.json" "$scratch/e1-node22.$s.json"; done
+    CMP_FIELD=cases compare "E1 node22 legacy (experiments/e1, alias 6fea4d6)" "experiments/e1/results/node22.legacy.json" "$scratch/e1-node22.legacy.json"
+    CMP_FIELD=cases compare "E1 node22 v05 (HISTORICAL: entry-v05 bundles current src; not reproducible by design)" "experiments/e1/results/node22.v05.json" "$scratch/e1-node22.v05.json"
     for s in v100 v050; do CMP_FIELD=cases compare "E1 v1.0.0 node22 $s" "experiments/e1/results/v1.0.0/node22.$s.json" "$scratch/e1-node22.$s.json"; done
     ;;
   e2)
@@ -86,6 +87,14 @@ for g in "${groups[@]}"; do
       mkdir -p "$scratch/e5"
       (cd "$repo/experiments/e5" && E5_SCRATCH="$scratch/e5" node run.mjs node22 > "$scratch/logs/e5.log" 2>&1)
       CMP_FIELD=cases compare "E5 node22 cases (experiments/e5)" "experiments/e5/results/node22.json" "$scratch/e5/results/node22.json"
+      # analysis: committed engine JSONs as inputs, fresh node22 JSON and polylines; other engines' out/*.polylines.json are gitignored and absent
+      an="$scratch/e5-analysis"; mkdir -p "$an/results" "$an/out"
+      cp "$repo"/experiments/e5/results/*.json "$repo"/experiments/e5/results/*.error.txt "$an/results/" 2>/dev/null
+      cp "$scratch/e5/results/node22.json" "$an/results/node22.json"; cp "$scratch/e5/out/node22.polylines.json" "$an/out/"
+      (cd "$repo" && E5_SCRATCH="$an" node experiments/e5/analyze.mjs > "$scratch/logs/e5-analyze.log" 2>&1)
+      compare "E5 analysis validity.jsonl" "experiments/e5/results/validity.jsonl" "$an/results/validity.jsonl"
+      compare "E5 analysis SUMMARY.json (differs only in polyline-based secondary blocks, see REPRODUCE_CHECK.md)" "experiments/e5/results/SUMMARY.json" "$an/results/SUMMARY.json"
+      compare "E5 analysis SUMMARY.md (differs only in polyline-based secondary rows)" "experiments/e5/results/SUMMARY.md" "$an/results/SUMMARY.md"
     else echo -e "E5 build\t-\t-\tnot run\tnot run (see logs/e5-build.log)" >> "$tsv"; fi
     ;;
   *) note "unknown group $g" ;;
