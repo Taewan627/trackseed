@@ -75,7 +75,7 @@ test('cli: validate-polyline / metrics-polyline', () => {
     const a = run(['validate-polyline', json, '--width', '12']), b = run(['validate-polyline', csv, '--width', '12']);
     assert.equal(a.code, 0, a.err); assert.equal(b.code, 0, b.err);
     const ra = JSON.parse(a.out), rb = JSON.parse(b.out);
-    assert.equal(ra.ok, true); assert.equal(ra.checks.length, 7); assert.equal(ra.input.inputWasClosed, false); assert.equal(ra.input.sampleCount, 60);
+    assert.equal(ra.ok, true); assert.equal(ra.checks.length, 8); assert.equal(ra.input.inputWasClosed, false); assert.equal(ra.input.sampleCount, 60);
     assert.deepEqual({ ...ra, file: 0 }, { ...rb, file: 0 });
     const m = run(['metrics-polyline', json, '--width', '12']); assert.equal(m.code, 0);
     const metrics = JSON.parse(m.out); assert.equal(metrics.sampleCount, 60); assert.equal(metrics.curvature, undefined);
