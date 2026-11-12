@@ -79,6 +79,8 @@ for g in "${groups[@]}"; do
       mkdir -p "$scratch/e7/$set"; node experiments/e7/run.mjs $set "$scratch/e7/$set" > "$scratch/logs/e7-$set.log" 2>&1
       for f in cases.csv.gz SUMMARY.json SUMMARY.md; do compare "E7 $set $f" "experiments/e7/results/$set/$f" "$scratch/e7/$set/$f"; done
     done
+    node experiments/e7/exploratory.mjs > "$scratch/e7/exploratory.txt" 2> "$scratch/logs/e7-exploratory.log"
+    compare "E7 exploratory.txt (experiments/e7/results)" "experiments/e7/results/exploratory.txt" "$scratch/e7/exploratory.txt"
     ;;
   e5)
     note "e5: fetch the pinned third-party generator (network) and run node22 into scratch"

@@ -1,5 +1,6 @@
 // Fixed E1 case set; see PROTOCOL.md. 200 seeds x 5 configurations = 1000 cases.
 import { sha256 } from '../../src/sha256.ts';
+import { V100_PIN } from '../_v100-params.mjs';
 
 const FIXED = [0, 1, 2, 3, 7, 42, 100, 1234, 12345, 65535, 65536, 99999, 1000000, 16777216, 2147483646, 2147483647];
 const SEEDS_SHA256 = '5c5e64d680cecf26dacdad15c0766f498c9c85a997c0df1531b49e5a327a9f07';
@@ -29,7 +30,10 @@ export const CONFIGS = [
   ['extreme', { curves: 10, size: 3, width: 80, height: 200, obstacles: 8, density: 20 }],
 ];
 
-export const CASES = CONFIGS.flatMap(([cid, over]) => SEEDS.map(seed => ({ id: `${cid}:${seed}`, params: { ...over, seed } })));
+// height: the v1.0.0 default (80) is pinned where a configuration leaves it unset; explicit values (extreme: 200) win.
+// Only height is taken from V100_PIN here: autoJoin is set by each entry (v1.0.0 entries pin 'legacy'; entry-v05 and the
+// v0.5/tangent subjects keep the default), so this list must not change it.
+export const CASES = CONFIGS.flatMap(([cid, over]) => SEEDS.map(seed => ({ id: `${cid}:${seed}`, params: { height: V100_PIN.height, ...over, seed } })));
 if (CASES.length !== 1000) throw new Error('expected 1000 cases');
 
 /** digestOf(params) -> hex string; thrown errors become THROW:<name>. */

@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { V100_PIN } from '../_v100-params.mjs';
 const here = dirname(fileURLToPath(import.meta.url)), root = join(here, '../..');
 // Optional E5_SCRATCH=<dir>: read results/ and out/ from <dir> instead of the repository (used for verification re-runs).
 const base = process.env.E5_SCRATCH ?? here, R = join(base, 'results'), O = join(base, 'out');
@@ -121,7 +122,7 @@ const CONFIGS = [['auto', {}], ['right-angle', { cornerPattern: 'right-angle', c
 const seeds200 = ref.cases.slice(0, 200).map(c => c.seed);
 const q3 = { 'third-party (as is)': groupStats(tpRows), [`third-party (scaled x${SCALE})`]: groupStats(tpScaled) };
 // v1.1: pin the v1.0.0 join so committed results reproduce (docs/generator-auto-join.md)
-for (const [id, over] of CONFIGS) q3[`TrackLab ${id}`] = groupStats(metricsOf(seeds200.map(seed => computeMetrics(generateTrack({ ...over, seed, autoJoin: 'legacy' })))));
+for (const [id, over] of CONFIGS) q3[`TrackLab ${id}`] = groupStats(metricsOf(seeds200.map(seed => computeMetrics(generateTrack({ ...V100_PIN, ...over, seed })))));
 const minTurning = Math.min(...tpRows.map(r => r.totalTurningDegrees));
 
 // ---------------- predictions vs results ----------------
