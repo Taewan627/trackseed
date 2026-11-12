@@ -1,0 +1,1 @@
+DEV run 1 (uncommitted-runner copy, /tmp) and run 2 (committed runner) produced byte-identical candidates.json: sha256 bdda6dd1785b60942df14797256e95ef8d5fa232b335120f3c14c84fc5eeabc7
