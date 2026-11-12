@@ -74,3 +74,15 @@ These are build and test tools listed in `devDependencies`. They are not runtime
 - `@playwright/test` 1.64.1: Apache License 2.0. Licence file: `node_modules/@playwright/test/LICENSE`.
 
 The full text of the Apache License 2.0 is in the licence files named above.
+
+## 4. Third-party data and generators used by experiments (not distributed)
+
+Experiment E9 (`experiments/e9/`) applies the polyline input path to tracks that were not created by TrackLab/TrackSeed. The sources below are fetched at run time into the gitignored `experiments/e9/build/` at the pinned commits (`experiments/e9/fetch.sh`). **No third-party code and no third-party data (not even derived polylines) is committed or distributed in this repository**; the notices are given for credit and so that the licence terms are visible. Licence texts are in the fetched repositories (file names and SHA-256 in `experiments/e9/dryrun/THIRD_PARTY.txt`). Details, decisions and the rejected candidates: `experiments/e9/CANDIDATES.md`, `experiments/e9/ATTRIBUTION.md`.
+
+- TUMFTM/racetrack-database (commit `e59595d1f3573b30d1ded6a08984935b957688e0`): LGPL-3.0 (licence file without copyright line; Technical University of Munich, Chair of Automotive Technology). Centre lines are derived from OpenStreetMap, (c) OpenStreetMap contributors, ODbL 1.0.
+- bacinger/f1-circuits (commit `8094e957b8d6aa8b9f4510c93968556cccd30e02`): MIT, Copyright (c) 2019-2025 Tomislav Bacinger.
+- juangallostra/procedural-tracks (commit `8e22e36b2d0b15209eb165371faf1e2870b8834b`): MIT, Copyright (c) 2020 Juan Gallostra Acín.
+- AMZ-Racing/random-track-generator (commit `b9e42a7845911c055d14997073fb3c49dcf54732`): MIT, Copyright (c) 2024 Mees van Löben Sels.
+- Farama-Foundation/Gymnasium, tag v1.4.0 (commit `8ba8c3a63bb4e000b7f33923f43d292acac07be1`): MIT, Copyright (c) 2016 OpenAI, Copyright (c) 2022 Farama Foundation.
+- alexnieves-cs/drift-school (commit `f4c61cf7ffb746a105d90c7f0cae665dc53ae765`): MIT, Copyright (c) 2026 Alex Nieves.
+- zzangupenn/track_gen (commit `e5ea23d2de72969c8c02491738275f0a31e97b6b`): MIT, Copyright (c) 2020 Joseph Auckley, Matthew O'Kelly, Aman Sinha, Hongrui Zheng, Zirui Zang.

@@ -4,7 +4,7 @@
 # See REPRODUCE.md for the table of experiments, commands and what each group covers.
 #
 # Usage: scripts/reproduce-check.sh <scratch-dir> [group ...]
-#   groups: e1 e2 amend e6 e7 e5          (default: e1 e2 amend e6 e7; e5 needs network to fetch the third-party generator)
+#   groups: e1 e2 amend e6 e7 e5 e9       (default: e1 e2 amend e6 e7; e5 and e9 need network to fetch third-party sources; e9 takes about 4 minutes)
 # Output: <scratch-dir>/reproduce-check.tsv (label, committed file, fresh file, raw sha256 match, decompressed or JSON content match)
 #         and <scratch-dir>/logs/*.log. Exit status is 0 even when a comparison differs; read the table.
 set -uo pipefail
@@ -98,6 +98,18 @@ for g in "${groups[@]}"; do
       compare "E5 analysis SUMMARY.json (differs only in polyline-based secondary blocks, see REPRODUCE_CHECK.md)" "experiments/e5/results/SUMMARY.json" "$an/results/SUMMARY.json"
       compare "E5 analysis SUMMARY.md (differs only in polyline-based secondary rows)" "experiments/e5/results/SUMMARY.md" "$an/results/SUMMARY.md"
     else echo -e "E5 build\t-\t-\tnot run\tnot run (see logs/e5-build.log)" >> "$tsv"; fi
+    ;;
+  e9)
+    note "e9: fetch pinned third-party sources (network), extract polylines, run the E9 harness into scratch"
+    cd "$repo" && npm run build:cli > "$scratch/logs/build-cli.log" 2>&1
+    if (cd "$repo/experiments/e9" && ./extract.sh > "$scratch/logs/e9-extract.log" 2>&1); then
+      mkdir -p "$scratch/e9"
+      (cd "$repo/experiments/e9" && node run.mjs "$scratch/e9" > "$scratch/logs/e9-run.log" 2>&1 && node analyze.mjs "$scratch/e9" > "$scratch/logs/e9-analyze.log" 2>&1)
+      for f in tracks.csv.gz SUMMARY.json SUMMARY.md sources.json env.json; do
+        [ "$f" = tracks.csv.gz ] && gzip -n -9 -c "$scratch/e9/tracks.csv" > "$scratch/e9/tracks.csv.gz"
+        compare "E9 $f (experiments/e9/results)" "experiments/e9/results/$f" "$scratch/e9/$f"
+      done
+    else echo -e "E9 extract\t-\t-\tnot run\tnot run (see logs/e9-extract.log)" >> "$tsv"; fi
     ;;
   *) note "unknown group $g" ;;
   esac

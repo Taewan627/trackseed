@@ -1,0 +1,13 @@
+# Python packages of the sandbox on which the E9 adapters were developed (phase 1). Install: pip install --break-system-packages -r requirements.txt
+# (pygame and pygame-ce provide the same module name 'pygame'; juangallostra's main.py only needs `import pygame`, no window is opened.)
+numpy==2.5.3
+scipy==1.18.1
+shapely==2.2.0
+matplotlib==3.11.2
+opencv-python-headless==5.0.0.93
+gpxpy==1.6.2
+PyYAML==6.0.3
+Box2D==2.3.10
+pygame-ce==2.5.8
+cloudpickle==3.1.2
+Farama-Notifications==0.0.6

@@ -1,0 +1,27 @@
+source                     unit tracks  fail | pts min  median    max |  spacing(min/med/max of per-track medians) |    width min/med/max |       length min/med/max | dropped-close
+gen-amz-voronoi            m       921    79 |     999     999   1000 |        0.1378        0.3194        0.4737 |      3/     3/     3 |   140.48/  321.94/  479.24 | 788   agg-sha256 1e56f919015cbb85
+gen-carracing              u      1000     0 |     222     292    375 |           3.5           3.5           3.5 |  13.33/ 13.33/ 13.33 |    778.2/  1025.5/    1316 | 0   agg-sha256 5a8236465b838033
+gen-driftschool-s0         u      1000     0 |     322     376    423 |       0.09985           0.1        0.1002 |    2.2/   2.2/   2.2 |    32.15/  37.615/  42.284 | 0   agg-sha256 3eab623703265096
+gen-driftschool-s1         u      1000     0 |     382     435    483 |       0.09987           0.1        0.1001 |    1.5/   1.5/   1.5 |   38.173/  43.523/  48.306 | 0   agg-sha256 6e78f5b1c2081210
+gen-driftschool-s2         u      1000     0 |     442     494    544 |       0.09989           0.1        0.1001 |      1/     1/     1 |   44.173/  49.366/  54.367 | 0   agg-sha256 ba12f2056752c606
+gen-driftschool-s3         u      1000     0 |     502     556    605 |        0.0999           0.1        0.1001 |    0.8/   0.8/   0.8 |   50.192/   55.62/  60.468 | 0   agg-sha256 d84953890bc926f6
+gen-driftschool-s4         u      1000     0 |     562     613    666 |       0.09991           0.1        0.1001 |   0.75/  0.75/  0.75 |    56.22/  61.271/  66.606 | 0   agg-sha256 fb0c64247869b27a
+gen-e5-thorimbert          u      1000     0 |     261     602   1080 |          1.97             2             2 |      4/     4/     4 |   509.86/  1185.5/  2135.4 | 0   agg-sha256 7b84ed51d0eea6dc
+gen-juangallostra          px      998     2 |    1000    1000   1000 |             2         2.236         4.123 |     40/    40/    40 |   1833.4/    2264/    4138 | 0   agg-sha256 5554cff84c2e4c40
+gen-zzangupenn             u      1000     0 |     108     141    191 |             5             5             5 |     10/    10/    10 |   544.95/  709.28/  962.39 | 0   agg-sha256 0edd7c2e66f4d0cc
+real-bacinger-f1           m        40     0 |      81     116    203 |         12.04         20.09         37.97 |     12/    12/    12 |   3324.3/  5258.1/  6978.3 | 0   agg-sha256 60071bc935ed57c6
+real-tumftm                m        25     0 |     460     931   1401 |         4.997             5         5.004 |      9/ 11.65/  16.3 |   2295.8/  4649.8/  7000.1 | 0   agg-sha256 edb60276f497a88d
+source                     files parsed errors min<3pts exact-closing-copy bad-width
+gen-amz-voronoi              921    921      0        0                133         0
+gen-carracing               1000   1000      0        0                  0         0
+gen-driftschool-s0          1000   1000      0        0                  0         0
+gen-driftschool-s1          1000   1000      0        0                  0         0
+gen-driftschool-s2          1000   1000      0        0                  0         0
+gen-driftschool-s3          1000   1000      0        0                  0         0
+gen-driftschool-s4          1000   1000      0        0                  0         0
+gen-e5-thorimbert           1000   1000      0        0                  0         0
+gen-juangallostra            998    998      0        0                588         0
+gen-zzangupenn              1000   1000      0        0                  0         0
+real-bacinger-f1              40     40      0        0                 40         0
+real-tumftm                   25     25      0        0                  0         0
+

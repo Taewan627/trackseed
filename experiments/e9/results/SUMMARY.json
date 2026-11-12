@@ -1,0 +1,2755 @@
+{
+ "protocol": "experiments/e9/PROTOCOL.md",
+ "Q1": {
+  "real-tumftm": {
+   "unit": "m",
+   "produced": 25,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 25,
+       "ok": 15,
+       "buildErrors": 0,
+       "okRate": 60,
+       "wilson95": [
+        40.739457358966995,
+        76.59669762225202
+       ],
+       "okRateOfAttempted": 60,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 9,
+        "EDGE_EDGE_INTERSECTION": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1,
+        "SELF_INTERSECTION_EDGE": 1
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        9,
+        16.302
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 25,
+        "min": 460,
+        "q1": 862,
+        "median": 931,
+        "q3": 1108,
+        "max": 1401,
+        "mean": 971.6
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 25,
+       "ok": 20,
+       "buildErrors": 0,
+       "okRate": 80,
+       "wilson95": [
+        60.86904963045967,
+        91.13941531319743
+       ],
+       "okRateOfAttempted": 80,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 4,
+        "EDGE_EDGE_INTERSECTION": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1,
+        "SELF_INTERSECTION_EDGE": 1
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 1
+       },
+       "widthRange": [
+        9,
+        16.302
+       ],
+       "spacing": [
+        2.25,
+        4.0755
+       ],
+       "inputPoints": {
+        "n": 25,
+        "min": 460,
+        "q1": 862,
+        "median": 931,
+        "q3": 1108,
+        "max": 1401,
+        "mean": 971.6
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 14,
+      "failToOk": 6,
+      "okToFail": 1,
+      "failFail": 4,
+      "rawFailures": 10,
+      "explainedBySampling": 60,
+      "okToFailShare": 4,
+      "persistentCodes": {
+       "LOCAL_KINK": 3,
+       "EDGE_EDGE_INTERSECTION": 1,
+       "SELF_INTERSECTION_CENTERLINE": 1,
+       "SELF_INTERSECTION_EDGE": 1
+      }
+     }
+    },
+    "minw": {
+     "arms": {
+      "raw": {
+       "n": 25,
+       "ok": 15,
+       "buildErrors": 0,
+       "okRate": 60,
+       "wilson95": [
+        40.739457358966995,
+        76.59669762225202
+       ],
+       "okRateOfAttempted": 60,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 9,
+        "EDGE_EDGE_INTERSECTION": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1,
+        "SELF_INTERSECTION_EDGE": 1
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        7.386,
+        15.3
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 25,
+        "min": 460,
+        "q1": 862,
+        "median": 931,
+        "q3": 1108,
+        "max": 1401,
+        "mean": 971.6
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 25,
+       "ok": 24,
+       "buildErrors": 0,
+       "okRate": 96,
+       "wilson95": [
+        80.45593626380625,
+        99.29037664980126
+       ],
+       "okRateOfAttempted": 96,
+       "errorCodeTracks": {
+        "EDGE_EDGE_INTERSECTION": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1,
+        "SELF_INTERSECTION_EDGE": 1
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        7.386,
+        15.3
+       ],
+       "spacing": [
+        1.8465,
+        3.825
+       ],
+       "inputPoints": {
+        "n": 25,
+        "min": 460,
+        "q1": 862,
+        "median": 931,
+        "q3": 1108,
+        "max": 1401,
+        "mean": 971.6
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 15,
+      "failToOk": 9,
+      "okToFail": 0,
+      "failFail": 1,
+      "rawFailures": 10,
+      "explainedBySampling": 90,
+      "okToFailShare": 0,
+      "persistentCodes": {
+       "EDGE_EDGE_INTERSECTION": 1,
+       "SELF_INTERSECTION_CENTERLINE": 1,
+       "SELF_INTERSECTION_EDGE": 1
+      }
+     }
+    }
+   }
+  },
+  "gen-e5-thorimbert": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 987,
+       "buildErrors": 0,
+       "okRate": 98.7,
+       "wilson95": [
+        97.78855576244204,
+        99.23871796106489
+       ],
+       "okRateOfAttempted": 98.7,
+       "errorCodeTracks": {
+        "SELF_INTERSECTION_EDGE": 13,
+        "EDGE_EDGE_INTERSECTION": 3,
+        "SELF_INTERSECTION_CENTERLINE": 3
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        4,
+        4
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 261,
+        "q1": 500,
+        "median": 601.5,
+        "q3": 687,
+        "max": 1080,
+        "mean": 598.13
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 987,
+       "buildErrors": 0,
+       "okRate": 98.7,
+       "wilson95": [
+        97.78855576244204,
+        99.23871796106489
+       ],
+       "okRateOfAttempted": 98.7,
+       "errorCodeTracks": {
+        "SELF_INTERSECTION_EDGE": 13,
+        "EDGE_EDGE_INTERSECTION": 3,
+        "SELF_INTERSECTION_CENTERLINE": 3
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        4,
+        4
+       ],
+       "spacing": 1,
+       "inputPoints": {
+        "n": 1000,
+        "min": 261,
+        "q1": 500,
+        "median": 601.5,
+        "q3": 687,
+        "max": 1080,
+        "mean": 598.13
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 987,
+      "failToOk": 0,
+      "okToFail": 0,
+      "failFail": 13,
+      "rawFailures": 13,
+      "explainedBySampling": 0,
+      "okToFailShare": 0,
+      "persistentCodes": {
+       "SELF_INTERSECTION_EDGE": 13,
+       "EDGE_EDGE_INTERSECTION": 3,
+       "SELF_INTERSECTION_CENTERLINE": 3
+      }
+     }
+    }
+   }
+  },
+  "gen-juangallostra": {
+   "unit": "px",
+   "produced": 998,
+   "generationFailures": 2,
+   "failureReasons": {
+    "ValueError: Error on input data": 2
+   },
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 998,
+       "ok": 0,
+       "buildErrors": 0,
+       "okRate": 0,
+       "wilson95": [
+        0,
+        0.3834397934795045
+       ],
+       "okRateOfAttempted": 0,
+       "errorCodeTracks": {
+        "EDGE_FOLD": 998,
+        "LOCAL_KINK": 998,
+        "SELF_INTERSECTION_EDGE": 998,
+        "CLOSURE_TANGENT": 297,
+        "SELF_INTERSECTION_CENTERLINE": 223,
+        "EDGE_EDGE_INTERSECTION": 176
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 998
+       },
+       "widthRange": [
+        40,
+        40
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 998,
+        "min": 1000,
+        "q1": 1000,
+        "median": 1000,
+        "q3": 1000,
+        "max": 1000,
+        "mean": 1000
+       },
+       "dupRemoved": {
+        "tracksWithDup": 236,
+        "total": 626
+       }
+      },
+      "smooth": {
+       "n": 998,
+       "ok": 128,
+       "buildErrors": 0,
+       "okRate": 12.82565130260521,
+       "wilson95": [
+        10.892756482025337,
+        15.04362861493036
+       ],
+       "okRateOfAttempted": 12.8,
+       "errorCodeTracks": {
+        "EDGE_FOLD": 846,
+        "SELF_INTERSECTION_EDGE": 845,
+        "LOCAL_KINK": 701,
+        "EDGE_EDGE_INTERSECTION": 161,
+        "SELF_INTERSECTION_CENTERLINE": 155,
+        "CLOSURE_TANGENT": 22
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 905
+       },
+       "widthRange": [
+        40,
+        40
+       ],
+       "spacing": 10,
+       "inputPoints": {
+        "n": 998,
+        "min": 1000,
+        "q1": 1000,
+        "median": 1000,
+        "q3": 1000,
+        "max": 1000,
+        "mean": 1000
+       },
+       "dupRemoved": {
+        "tracksWithDup": 236,
+        "total": 626
+       }
+      }
+     },
+     "transitions": {
+      "okok": 0,
+      "failToOk": 128,
+      "okToFail": 0,
+      "failFail": 870,
+      "rawFailures": 998,
+      "explainedBySampling": 12.82565130260521,
+      "okToFailShare": 0,
+      "persistentCodes": {
+       "EDGE_FOLD": 846,
+       "LOCAL_KINK": 701,
+       "SELF_INTERSECTION_EDGE": 845,
+       "EDGE_EDGE_INTERSECTION": 161,
+       "SELF_INTERSECTION_CENTERLINE": 155,
+       "CLOSURE_TANGENT": 22
+      }
+     }
+    }
+   }
+  },
+  "gen-amz-voronoi": {
+   "unit": "m",
+   "produced": 921,
+   "generationFailures": 79,
+   "failureReasons": {
+    "Exception: Unable to find suitable starting position. Try to decrease the length of the sta": 79
+   },
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 921,
+       "ok": 914,
+       "buildErrors": 0,
+       "okRate": 99.2399565689468,
+       "wilson95": [
+        98.43950717681241,
+        99.63135581807923
+       ],
+       "okRateOfAttempted": 91.4,
+       "errorCodeTracks": {
+        "EDGE_FOLD": 7,
+        "SELF_INTERSECTION_EDGE": 7
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 7
+       },
+       "widthRange": [
+        3,
+        3
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 921,
+        "min": 999,
+        "q1": 999,
+        "median": 999,
+        "q3": 999,
+        "max": 1000,
+        "mean": 999.1444082519001
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 921,
+       "ok": 914,
+       "buildErrors": 0,
+       "okRate": 99.2399565689468,
+       "wilson95": [
+        98.43950717681241,
+        99.63135581807923
+       ],
+       "okRateOfAttempted": 91.4,
+       "errorCodeTracks": {
+        "CLOSURE_TANGENT": 7,
+        "EDGE_FOLD": 7,
+        "SELF_INTERSECTION_EDGE": 7
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 7
+       },
+       "widthRange": [
+        3,
+        3
+       ],
+       "spacing": 0.75,
+       "inputPoints": {
+        "n": 921,
+        "min": 999,
+        "q1": 999,
+        "median": 999,
+        "q3": 999,
+        "max": 1000,
+        "mean": 999.1444082519001
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 914,
+      "failToOk": 0,
+      "okToFail": 0,
+      "failFail": 7,
+      "rawFailures": 7,
+      "explainedBySampling": 0,
+      "okToFailShare": 0,
+      "persistentCodes": {
+       "CLOSURE_TANGENT": 7,
+       "EDGE_FOLD": 7,
+       "SELF_INTERSECTION_EDGE": 7
+      }
+     }
+    }
+   }
+  },
+  "gen-carracing": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 392,
+       "buildErrors": 0,
+       "okRate": 39.2,
+       "wilson95": [
+        36.221022518836484,
+        42.2616354644515
+       ],
+       "okRateOfAttempted": 39.2,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 607,
+        "CLOSURE_TANGENT": 10
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 1
+       },
+       "widthRange": [
+        13.333333333333334,
+        13.333333333333334
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 222,
+        "q1": 278,
+        "median": 292,
+        "q3": 308,
+        "max": 375,
+        "mean": 293.33
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 528,
+       "buildErrors": 0,
+       "okRate": 52.8,
+       "wilson95": [
+        49.70108021953935,
+        55.87748993294155
+       ],
+       "okRateOfAttempted": 52.8,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 472,
+        "CLOSURE_TANGENT": 1
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 1
+       },
+       "widthRange": [
+        13.333333333333334,
+        13.333333333333334
+       ],
+       "spacing": 3.3333333333333335,
+       "inputPoints": {
+        "n": 1000,
+        "min": 222,
+        "q1": 278,
+        "median": 292,
+        "q3": 308,
+        "max": 375,
+        "mean": 293.33
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 376,
+      "failToOk": 152,
+      "okToFail": 16,
+      "failFail": 456,
+      "rawFailures": 608,
+      "explainedBySampling": 25,
+      "okToFailShare": 1.6,
+      "persistentCodes": {
+       "LOCAL_KINK": 456,
+       "CLOSURE_TANGENT": 1
+      }
+     }
+    }
+   }
+  },
+  "gen-zzangupenn": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 375,
+       "buildErrors": 0,
+       "okRate": 37.5,
+       "wilson95": [
+        34.5526294232981,
+        40.54303953884078
+       ],
+       "okRateOfAttempted": 37.5,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 585,
+        "CLOSURE_TANGENT": 154,
+        "EDGE_FOLD": 15,
+        "SELF_INTERSECTION_EDGE": 12
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 46
+       },
+       "widthRange": [
+        10,
+        10
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 108,
+        "q1": 132,
+        "median": 141,
+        "q3": 150,
+        "max": 191,
+        "mean": 140.902
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 702,
+       "buildErrors": 0,
+       "okRate": 70.2,
+       "wilson95": [
+        67.2922576310966,
+        72.95314132608695
+       ],
+       "okRateOfAttempted": 70.2,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 210,
+        "EDGE_FOLD": 75,
+        "SELF_INTERSECTION_EDGE": 66,
+        "CLOSURE_TANGENT": 56,
+        "EDGE_EDGE_INTERSECTION": 1
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 157
+       },
+       "widthRange": [
+        10,
+        10
+       ],
+       "spacing": 2.5,
+       "inputPoints": {
+        "n": 1000,
+        "min": 108,
+        "q1": 132,
+        "median": 141,
+        "q3": 150,
+        "max": 191,
+        "mean": 140.902
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 329,
+      "failToOk": 373,
+      "okToFail": 46,
+      "failFail": 252,
+      "rawFailures": 625,
+      "explainedBySampling": 59.68,
+      "okToFailShare": 4.6,
+      "persistentCodes": {
+       "LOCAL_KINK": 182,
+       "EDGE_FOLD": 73,
+       "SELF_INTERSECTION_EDGE": 66,
+       "CLOSURE_TANGENT": 39,
+       "EDGE_EDGE_INTERSECTION": 1
+      }
+     }
+    }
+   }
+  },
+  "real-bacinger-f1": {
+   "unit": "m",
+   "produced": 40,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 40,
+       "ok": 20,
+       "buildErrors": 0,
+       "okRate": 50,
+       "wilson95": [
+        35.19952693346538,
+        64.80047306653462
+       ],
+       "okRateOfAttempted": 50,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 19,
+        "EDGE_FOLD": 2,
+        "SELF_INTERSECTION_EDGE": 2,
+        "EDGE_EDGE_INTERSECTION": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        12,
+        12
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 40,
+        "min": 81,
+        "q1": 94.75,
+        "median": 116,
+        "q3": 141,
+        "max": 203,
+        "mean": 119.85
+       },
+       "dupRemoved": {
+        "tracksWithDup": 1,
+        "total": 1
+       }
+      },
+      "smooth": {
+       "n": 40,
+       "ok": 32,
+       "buildErrors": 0,
+       "okRate": 80,
+       "wilson95": [
+        65.24269365360051,
+        89.5000102745623
+       ],
+       "okRateOfAttempted": 80,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 8,
+        "SELF_INTERSECTION_EDGE": 3,
+        "EDGE_EDGE_INTERSECTION": 1,
+        "EDGE_FOLD": 1,
+        "SELF_INTERSECTION_CENTERLINE": 1
+       },
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 4
+       },
+       "widthRange": [
+        12,
+        12
+       ],
+       "spacing": 3,
+       "inputPoints": {
+        "n": 40,
+        "min": 81,
+        "q1": 94.75,
+        "median": 116,
+        "q3": 141,
+        "max": 203,
+        "mean": 119.85
+       },
+       "dupRemoved": {
+        "tracksWithDup": 1,
+        "total": 1
+       }
+      }
+     },
+     "transitions": {
+      "okok": 19,
+      "failToOk": 13,
+      "okToFail": 1,
+      "failFail": 7,
+      "rawFailures": 20,
+      "explainedBySampling": 65,
+      "okToFailShare": 2.5,
+      "persistentCodes": {
+       "EDGE_FOLD": 1,
+       "LOCAL_KINK": 7,
+       "SELF_INTERSECTION_EDGE": 3,
+       "EDGE_EDGE_INTERSECTION": 1,
+       "SELF_INTERSECTION_CENTERLINE": 1
+      }
+     }
+    }
+   }
+  },
+  "gen-driftschool-s0": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 56
+       },
+       "widthRange": [
+        2.2,
+        2.2
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 322,
+        "q1": 351,
+        "median": 376,
+        "q3": 399,
+        "max": 423,
+        "mean": 374.511
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 993,
+       "buildErrors": 0,
+       "okRate": 99.3,
+       "wilson95": [
+        98.56216845342334,
+        99.66051315990093
+       ],
+       "okRateOfAttempted": 99.3,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 7
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        2.2,
+        2.2
+       ],
+       "spacing": 0.55,
+       "inputPoints": {
+        "n": 1000,
+        "min": 322,
+        "q1": 351,
+        "median": 376,
+        "q3": 399,
+        "max": 423,
+        "mean": 374.511
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 993,
+      "failToOk": 0,
+      "okToFail": 7,
+      "failFail": 0,
+      "rawFailures": 0,
+      "explainedBySampling": null,
+      "okToFailShare": 0.7,
+      "persistentCodes": {}
+     }
+    }
+   }
+  },
+  "gen-driftschool-s1": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {
+        "MIN_TURN_RADIUS": 1
+       },
+       "widthRange": [
+        1.5,
+        1.5
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 382,
+        "q1": 409,
+        "median": 435,
+        "q3": 460,
+        "max": 483,
+        "mean": 434.242
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 992,
+       "buildErrors": 0,
+       "okRate": 99.2,
+       "wilson95": [
+        98.42936654690197,
+        99.5940804181194
+       ],
+       "okRateOfAttempted": 99.2,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 8
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        1.5,
+        1.5
+       ],
+       "spacing": 0.375,
+       "inputPoints": {
+        "n": 1000,
+        "min": 382,
+        "q1": 409,
+        "median": 435,
+        "q3": 460,
+        "max": 483,
+        "mean": 434.242
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 992,
+      "failToOk": 0,
+      "okToFail": 8,
+      "failFail": 0,
+      "rawFailures": 0,
+      "explainedBySampling": null,
+      "okToFailShare": 0.8,
+      "persistentCodes": {}
+     }
+    }
+   }
+  },
+  "gen-driftschool-s2": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {},
+       "widthRange": [
+        1,
+        1
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 442,
+        "q1": 468,
+        "median": 494,
+        "q3": 518.25,
+        "max": 544,
+        "mean": 492.889
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 997,
+       "buildErrors": 0,
+       "okRate": 99.7,
+       "wilson95": [
+        99.12169859464969,
+        99.89792161188613
+       ],
+       "okRateOfAttempted": 99.7,
+       "errorCodeTracks": {
+        "LOCAL_KINK": 3
+       },
+       "warningCodeTracks": {},
+       "widthRange": [
+        1,
+        1
+       ],
+       "spacing": 0.25,
+       "inputPoints": {
+        "n": 1000,
+        "min": 442,
+        "q1": 468,
+        "median": 494,
+        "q3": 518.25,
+        "max": 544,
+        "mean": 492.889
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 997,
+      "failToOk": 0,
+      "okToFail": 3,
+      "failFail": 0,
+      "rawFailures": 0,
+      "explainedBySampling": null,
+      "okToFailShare": 0.3,
+      "persistentCodes": {}
+     }
+    }
+   }
+  },
+  "gen-driftschool-s3": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {},
+       "widthRange": [
+        0.8,
+        0.8
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 502,
+        "q1": 531,
+        "median": 556,
+        "q3": 580,
+        "max": 605,
+        "mean": 555.32
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {},
+       "widthRange": [
+        0.8,
+        0.8
+       ],
+       "spacing": 0.2,
+       "inputPoints": {
+        "n": 1000,
+        "min": 502,
+        "q1": 531,
+        "median": 556,
+        "q3": 580,
+        "max": 605,
+        "mean": 555.32
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 1000,
+      "failToOk": 0,
+      "okToFail": 0,
+      "failFail": 0,
+      "rawFailures": 0,
+      "explainedBySampling": null,
+      "okToFailShare": 0,
+      "persistentCodes": {}
+     }
+    }
+   }
+  },
+  "gen-driftschool-s4": {
+   "unit": "u",
+   "produced": 1000,
+   "generationFailures": 0,
+   "failureReasons": {},
+   "runs": {
+    "main": {
+     "arms": {
+      "raw": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {},
+       "widthRange": [
+        0.75,
+        0.75
+       ],
+       "spacing": null,
+       "inputPoints": {
+        "n": 1000,
+        "min": 562,
+        "q1": 588,
+        "median": 613,
+        "q3": 638,
+        "max": 666,
+        "mean": 613.45
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      },
+      "smooth": {
+       "n": 1000,
+       "ok": 1000,
+       "buildErrors": 0,
+       "okRate": 100,
+       "wilson95": [
+        99.61732415144449,
+        100.00000000000003
+       ],
+       "okRateOfAttempted": 100,
+       "errorCodeTracks": {},
+       "warningCodeTracks": {},
+       "widthRange": [
+        0.75,
+        0.75
+       ],
+       "spacing": 0.1875,
+       "inputPoints": {
+        "n": 1000,
+        "min": 562,
+        "q1": 588,
+        "median": 613,
+        "q3": 638,
+        "max": 666,
+        "mean": 613.45
+       },
+       "dupRemoved": {
+        "tracksWithDup": 0,
+        "total": 0
+       }
+      }
+     },
+     "transitions": {
+      "okok": 1000,
+      "failToOk": 0,
+      "okToFail": 0,
+      "failFail": 0,
+      "rawFailures": 0,
+      "explainedBySampling": null,
+      "okToFailShare": 0,
+      "persistentCodes": {}
+     }
+    }
+   }
+  }
+ },
+ "circuits": [
+  {
+   "id": "Austin",
+   "width": 13.027,
+   "minWidth": 11.065,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "BrandsHatch",
+   "width": 9.1,
+   "minWidth": 7.45,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Budapest",
+   "width": 9.959,
+   "minWidth": 7.627,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Catalunya",
+   "width": 10.877,
+   "minWidth": 8.561,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Hockenheim",
+   "width": 12.944,
+   "minWidth": 7.386,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "IMS",
+   "width": 15.3,
+   "minWidth": 15.3,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Melbourne",
+   "width": 12.24,
+   "minWidth": 8.05,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "MexicoCity",
+   "width": 11.646,
+   "minWidth": 9.721,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Montreal",
+   "width": 9,
+   "minWidth": 8.155,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Monza",
+   "width": 9.004,
+   "minWidth": 7.516,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "MoscowRaceway",
+   "width": 10.702,
+   "minWidth": 9.717,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Norisring",
+   "width": 16.302,
+   "minWidth": 10.3,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Nuerburgring",
+   "width": 10.964,
+   "minWidth": 7.615,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Oschersleben",
+   "width": 10.057,
+   "minWidth": 8.4,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Sakhir",
+   "width": 12.903,
+   "minWidth": 10.773,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "fail",
+   "smoothErrors": "LOCAL_KINK",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "SaoPaulo",
+   "width": 11.734,
+   "minWidth": 8.928,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Sepang",
+   "width": 14.495,
+   "minWidth": 13.596,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Shanghai",
+   "width": 12.735,
+   "minWidth": 10.033,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "fail",
+   "smoothErrors": "LOCAL_KINK",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Silverstone",
+   "width": 13.756,
+   "minWidth": 11.269,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Sochi",
+   "width": 12.011,
+   "minWidth": 11.129,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "fail",
+   "smoothErrors": "LOCAL_KINK",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Spa",
+   "width": 9.206,
+   "minWidth": 7.87,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "fail",
+   "smoothErrors": "LOCAL_KINK",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Spielberg",
+   "width": 10.828,
+   "minWidth": 10.155,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Suzuka",
+   "width": 9.171,
+   "minWidth": 7.786,
+   "raw": "fail",
+   "rawErrors": "EDGE_EDGE_INTERSECTION;SELF_INTERSECTION_CENTERLINE;SELF_INTERSECTION_EDGE",
+   "smooth": "fail",
+   "smoothErrors": "EDGE_EDGE_INTERSECTION;SELF_INTERSECTION_CENTERLINE;SELF_INTERSECTION_EDGE",
+   "rawMinW": "fail",
+   "smoothMinW": "fail"
+  },
+  {
+   "id": "YasMarina",
+   "width": 12.762,
+   "minWidth": 10,
+   "raw": "fail",
+   "rawErrors": "LOCAL_KINK",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "fail",
+   "smoothMinW": "ok"
+  },
+  {
+   "id": "Zandvoort",
+   "width": 9.476,
+   "minWidth": 7.98,
+   "raw": "ok",
+   "rawErrors": "",
+   "smooth": "ok",
+   "smoothErrors": "",
+   "rawMinW": "ok",
+   "smoothMinW": "ok"
+  }
+ ],
+ "Q2": {
+  "baseline": {
+   "meanAbsCurvatureNorm": {
+    "sdReal": 1.056574306059303,
+    "splitMedian": 0.43354619104708725,
+    "splitP95": 0.7901814675847468,
+    "threshold": 0.7901814675847468
+   },
+   "p95AbsCurvatureNorm": {
+    "sdReal": 6.068455017906609,
+    "splitMedian": 0.5150202112437505,
+    "splitP95": 0.8015998331628063,
+    "threshold": 0.8015998331628063
+   },
+   "maxAbsCurvatureNorm": {
+    "sdReal": 26.2017265305606,
+    "splitMedian": 0.48970282825535416,
+    "splitP95": 0.7952571369112997,
+    "threshold": 0.7952571369112997
+   },
+   "curvatureEntropyBitsNorm": {
+    "sdReal": 0.269125382726427,
+    "splitMedian": 0.4596963202633101,
+    "splitP95": 0.7834850622023635,
+    "threshold": 0.7834850622023635
+   },
+   "straightLengthFractionNorm": {
+    "sdReal": 0.09549251356470183,
+    "splitMedian": 0.4130183272427279,
+    "splitP95": 0.8014364289145365,
+    "threshold": 0.8014364289145365
+   },
+   "turnCountNorm": {
+    "sdReal": 10.489359688115698,
+    "splitMedian": 0.5047850347691683,
+    "splitP95": 0.8097338632798399,
+    "threshold": 0.8097338632798399
+   }
+  },
+  "sources": {
+   "real-tumftm": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 25,
+      "min": 1.0213726021429959,
+      "q1": 3.7598615452917636,
+      "median": 4.368980688551858,
+      "q3": 4.8016774105182325,
+      "max": 5.302811177862041,
+      "mean": 4.061777108640776
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 25,
+      "min": 2.960902234391349,
+      "q1": 15.666676871296922,
+      "median": 18.95621027189227,
+      "q3": 22.670170571621142,
+      "max": 33.478974906852066,
+      "mean": 19.181283341610573
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 25,
+      "min": 3.4570795921825055,
+      "q1": 51.1511865904155,
+      "median": 63.170735751029184,
+      "q3": 79.47554697786157,
+      "max": 126.59783839743922,
+      "mean": 63.857324887249106
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 25,
+      "min": 1.618757321101925,
+      "q1": 2.2426984898583204,
+      "median": 2.496940339849227,
+      "q3": 2.5866649172119875,
+      "max": 2.805972828869464,
+      "mean": 2.4203412785767187
+     },
+     "straightLengthFractionNorm": {
+      "n": 25,
+      "min": 0.1917073177439706,
+      "q1": 0.3167960944031414,
+      "median": 0.36121357227643164,
+      "q3": 0.45162472359040773,
+      "max": 0.5319488177805592,
+      "mean": 0.3790582064546758
+     },
+     "turnCountNorm": {
+      "n": 25,
+      "min": 4,
+      "q1": 22,
+      "median": 23,
+      "q3": 28,
+      "max": 58,
+      "mean": 25.12
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 0,
+     "p95AbsCurvatureNorm": 0,
+     "maxAbsCurvatureNorm": 0,
+     "curvatureEntropyBitsNorm": 0,
+     "straightLengthFractionNorm": 0,
+     "turnCountNorm": 0
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": null,
+     "p95AbsCurvatureNorm": null,
+     "maxAbsCurvatureNorm": null,
+     "curvatureEntropyBitsNorm": null,
+     "straightLengthFractionNorm": null,
+     "turnCountNorm": null
+    },
+    "meanD": 0,
+    "nDiffer": 0
+   },
+   "gen-e5-thorimbert": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.087552651137098,
+      "q1": 2.198224369565339,
+      "median": 2.953675557012499,
+      "q3": 3.7444406665075842,
+      "max": 5.993093935091038,
+      "mean": 3.0106624035262146
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 5.265912613525402,
+      "q1": 9.954665834878854,
+      "median": 12.754982618112022,
+      "q3": 15.26441177887908,
+      "max": 25.007083046783094,
+      "mean": 12.760404149194441
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 7.23973836607062,
+      "q1": 14.560495216305462,
+      "median": 17.837013279609046,
+      "q3": 20.76838658104496,
+      "max": 31.62800993047721,
+      "mean": 17.680151916658822
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 1.2342815790275734,
+      "q1": 1.701129359250508,
+      "median": 1.8183048758542357,
+      "q3": 1.945256641946682,
+      "max": 2.2758421969207414,
+      "mean": 1.8099605171201536
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.3069605269033824,
+      "q1": 0.49172407866723356,
+      "median": 0.5431135996435708,
+      "q3": 0.5920580058165776,
+      "max": 0.7486489612015276,
+      "mean": 0.542260324474623
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 5,
+      "q1": 11,
+      "median": 15,
+      "q3": 19,
+      "max": 47,
+      "mean": 15.345
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 1.024769924136349,
+     "p95AbsCurvatureNorm": 1.1053962656350094,
+     "maxAbsCurvatureNorm": 1.7787866507789876,
+     "curvatureEntropyBitsNorm": 2.268016324855669,
+     "straightLengthFractionNorm": 1.7090566781380987,
+     "turnCountNorm": 0.9549677289977146
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 1.4734989287569713,
+    "nDiffer": 6
+   },
+   "gen-juangallostra": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 998,
+      "min": 10.268695386599711,
+      "q1": 17.25726244181632,
+      "median": 18.26381504712788,
+      "q3": 19.22800064923983,
+      "max": 24.35819154472924,
+      "mean": 18.281302594207546
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 998,
+      "min": 26.66414117168423,
+      "q1": 42.05362576581763,
+      "median": 43.94030139342042,
+      "q3": 45.76038013866667,
+      "max": 58.63098174134564,
+      "mean": 44.06080261346895
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 998,
+      "min": 47.114957058487484,
+      "q1": 68.58882555767138,
+      "median": 78.63775882571078,
+      "q3": 96.33466968358684,
+      "max": 259.87673266391477,
+      "mean": 93.2156952106065
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 998,
+      "min": 2.2352306660437593,
+      "q1": 2.44234324212842,
+      "median": 2.4932835305857086,
+      "q3": 2.5404899325585677,
+      "max": 2.755133627479486,
+      "mean": 2.488211483735401
+     },
+     "straightLengthFractionNorm": {
+      "n": 998,
+      "min": 0.012608288045561689,
+      "q1": 0.04360646722850192,
+      "median": 0.06164280721643839,
+      "q3": 0.08424042583449162,
+      "max": 0.22734144645231882,
+      "mean": 0.06677438941577651
+     },
+     "turnCountNorm": {
+      "n": 998,
+      "min": 345,
+      "q1": 433,
+      "median": 448,
+      "q3": 463,
+      "max": 505,
+      "mean": 446.79158316633266
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 13.458140524542216,
+     "p95AbsCurvatureNorm": 4.099811104876719,
+     "maxAbsCurvatureNorm": 1.120474648459326,
+     "curvatureEntropyBitsNorm": 0.4954152668494362,
+     "straightLengthFractionNorm": 3.27024397391434,
+     "turnCountNorm": 40.199935525528936
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": false,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 10.440670174028496,
+    "nDiffer": 5
+   },
+   "gen-amz-voronoi": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 921,
+      "min": 1.0397782886955114,
+      "q1": 2.2372698339747497,
+      "median": 2.6135208059090163,
+      "q3": 2.9964498617677995,
+      "max": 4.326547292679338,
+      "mean": 2.61578893638351
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 921,
+      "min": 2.2879560689531804,
+      "q1": 6.3034574375152825,
+      "median": 7.523648649427414,
+      "q3": 8.66088811076282,
+      "max": 12.723213750423076,
+      "mean": 7.5257571873879785
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 921,
+      "min": 2.881800341718692,
+      "q1": 10.458368344567091,
+      "median": 12.152794777733535,
+      "q3": 14.17920246865826,
+      "max": 85.90984695536899,
+      "mean": 12.752580549437338
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 921,
+      "min": 1.7899278160306253,
+      "q1": 2.3980027497668424,
+      "median": 2.472291804591901,
+      "q3": 2.5389910217253724,
+      "max": 2.7363083044403766,
+      "mean": 2.464182378395222
+     },
+     "straightLengthFractionNorm": {
+      "n": 921,
+      "min": 0.013889554832992845,
+      "q1": 0.043058908947845684,
+      "median": 0.05833734769025841,
+      "q3": 0.07916990518889969,
+      "max": 0.27639689766563463,
+      "mean": 0.06617765075411003
+     },
+     "turnCountNorm": {
+      "n": 921,
+      "min": 2,
+      "q1": 9,
+      "median": 11,
+      "q3": 13,
+      "max": 20,
+      "mean": 11.098805646036917
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 1.3976427258010344,
+     "p95AbsCurvatureNorm": 1.9346695912011747,
+     "maxAbsCurvatureNorm": 1.959288994090376,
+     "curvatureEntropyBitsNorm": 0.4172070416193249,
+     "straightLengthFractionNorm": 3.27649303616425,
+     "turnCountNorm": 1.3434719672033926
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": false,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 1.7214622260132588,
+    "nDiffer": 5
+   },
+   "gen-carracing": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.3085827384231044,
+      "q1": 2.07889170325898,
+      "median": 2.315499739790726,
+      "q3": 2.6051101226167495,
+      "max": 3.745185001164314,
+      "mean": 2.342766224341553
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 8.264242309223953,
+      "q1": 13.418194232277695,
+      "median": 14.3178796771492,
+      "q3": 15.1935307815172,
+      "max": 18.710060108345523,
+      "mean": 14.268384826933247
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 15.817023619736304,
+      "q1": 19.05905857092627,
+      "median": 20.020389824036013,
+      "q3": 21.118029976245914,
+      "max": 103.21491186331001,
+      "mean": 20.256988135501445
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 1.4245080477743661,
+      "q1": 1.8644721320421445,
+      "median": 1.9753933447152576,
+      "q3": 2.086551993140407,
+      "max": 2.4506893237770373,
+      "mean": 1.9719662083393559
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.40004033643667314,
+      "q1": 0.5236561807339224,
+      "median": 0.5611441772599352,
+      "q3": 0.5958645344667166,
+      "max": 0.7153179524724316,
+      "mean": 0.5599945317529235
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 14,
+      "q1": 19,
+      "median": 21,
+      "q3": 22,
+      "max": 28,
+      "mean": 20.483
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 1.6651167557135766,
+     "p95AbsCurvatureNorm": 0.9303442335949106,
+     "maxAbsCurvatureNorm": 1.70597102950315,
+     "curvatureEntropyBitsNorm": 1.670313919078191,
+     "straightLengthFractionNorm": 1.8947697420871867,
+     "turnCountNorm": 0.6289230416489917
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": false
+    },
+    "meanD": 1.4159064536043344,
+    "nDiffer": 5
+   },
+   "gen-zzangupenn": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.1444506757754584,
+      "q1": 2.63658068918371,
+      "median": 3.0086397639257103,
+      "q3": 3.295765901133718,
+      "max": 4.730372668007529,
+      "mean": 2.9461275400259628
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.2212011527530737,
+      "q1": 6.167268389575675,
+      "median": 8.591105188459956,
+      "q3": 9.95549664744236,
+      "max": 15.126469869807694,
+      "mean": 7.966063845417679
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 3.4903160866354837,
+      "q1": 12.972670936551037,
+      "median": 17.414712838405308,
+      "q3": 23.652844005231742,
+      "max": 222.3440501647444,
+      "mean": 23.07350907276749
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 0.4123992507724779,
+      "q1": 2.306355854575023,
+      "median": 2.513367277084214,
+      "q3": 2.595104053333903,
+      "max": 2.7571710075746805,
+      "mean": 2.3572363754498014
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0,
+      "q1": 0.06935256265544094,
+      "median": 0.13592961281940374,
+      "q3": 0.18586247685584428,
+      "max": 0.31903155362832936,
+      "mean": 0.12994752886225935
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 6,
+      "q1": 27,
+      "median": 30,
+      "q3": 33,
+      "max": 110,
+      "mean": 29.154
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 1.096534964734523,
+     "p95AbsCurvatureNorm": 1.8481177603029748,
+     "maxAbsCurvatureNorm": 1.6233574848327634,
+     "curvatureEntropyBitsNorm": 0.3269221119186068,
+     "straightLengthFractionNorm": 2.6086932712649697,
+     "turnCountNorm": 0.5809696855857096
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": false,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": false
+    },
+    "meanD": 1.3474325464399246,
+    "nDiffer": 4
+   },
+   "real-bacinger-f1": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 40,
+      "min": 2.6439697992648905,
+      "q1": 3.8681832902147826,
+      "median": 4.1865279207621136,
+      "q3": 4.858726090565041,
+      "max": 6.260089761201341,
+      "mean": 4.307182777952078
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 40,
+      "min": 10.463947896161828,
+      "q1": 17.73914761955297,
+      "median": 20.05145818995312,
+      "q3": 22.996876826039824,
+      "max": 32.99788739711867,
+      "mean": 20.360589225271273
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 40,
+      "min": 30.081566872307288,
+      "q1": 50.49662004252086,
+      "median": 71.99835591040576,
+      "q3": 81.3517372816913,
+      "max": 102.33319973312761,
+      "mean": 67.23499262758517
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 40,
+      "min": 2.113114405936028,
+      "q1": 2.4652275471712306,
+      "median": 2.514328484265886,
+      "q3": 2.6692410331452585,
+      "max": 2.9090297953352153,
+      "mean": 2.549945918795914
+     },
+     "straightLengthFractionNorm": {
+      "n": 40,
+      "min": 0.12352028754354435,
+      "q1": 0.2903451421568715,
+      "median": 0.35338109608772716,
+      "q3": 0.3808504739172067,
+      "max": 0.4931825082972439,
+      "mean": 0.33014701233241917
+     },
+     "turnCountNorm": {
+      "n": 40,
+      "min": 16,
+      "q1": 25,
+      "median": 29,
+      "q3": 36.25,
+      "max": 60,
+      "mean": 31.125
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 0.31556361936041916,
+     "p95AbsCurvatureNorm": 0.24693225860906814,
+     "maxAbsCurvatureNorm": 0.23796371664766908,
+     "curvatureEntropyBitsNorm": 0.48157717011383416,
+     "straightLengthFractionNorm": 0.5121992530766969,
+     "turnCountNorm": 0.5839250614067073
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": false,
+     "p95AbsCurvatureNorm": false,
+     "maxAbsCurvatureNorm": false,
+     "curvatureEntropyBitsNorm": false,
+     "straightLengthFractionNorm": false,
+     "turnCountNorm": false
+    },
+    "meanD": 0.39636017986906574,
+    "nDiffer": 0
+   },
+   "gen-driftschool-s0": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.003975736141643,
+      "q1": 1.0584537986602425,
+      "median": 1.0845154935478947,
+      "q3": 1.1165183728636077,
+      "max": 1.2078407556891393,
+      "mean": 1.0885940973301134
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 2.0570166087296116,
+      "q1": 2.702216774734166,
+      "median": 2.9184996798932765,
+      "q3": 3.1348889458934783,
+      "max": 4.101900725795902,
+      "mean": 2.9264750659544587
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 3.0828461189136336,
+      "q1": 4.927384585169196,
+      "median": 5.501660979374888,
+      "q3": 6.182688228670635,
+      "max": 9.775840731961425,
+      "mean": 5.586488822822116
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 1.8897004310231835,
+      "q1": 2.1474783187323703,
+      "median": 2.1883102515399506,
+      "q3": 2.2222404805376836,
+      "max": 2.298605764144339,
+      "mean": 2.1783585892021864
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.015277876386556498,
+      "q1": 0.06111156707269598,
+      "median": 0.08055625433104174,
+      "q3": 0.10416755399512652,
+      "max": 0.2138905499381127,
+      "mean": 0.08480759975235977
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 10,
+      "q1": 47,
+      "median": 60.5,
+      "q3": 74,
+      "max": 105,
+      "mean": 60.418
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 2.8140404686921454,
+     "p95AbsCurvatureNorm": 2.678574402824434,
+     "maxAbsCurvatureNorm": 2.2251670882454104,
+     "curvatureEntropyBitsNorm": 1.0561665841319487,
+     "straightLengthFractionNorm": 3.0813997424305306,
+     "turnCountNorm": 3.3651243783729035
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 2.5367454441162285,
+    "nDiffer": 6
+   },
+   "gen-driftschool-s1": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.021328491927477,
+      "q1": 1.0865367545952669,
+      "median": 1.110707619147698,
+      "q3": 1.134338531985353,
+      "max": 1.2024526847620736,
+      "mean": 1.1102119266621084
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 2.3804612829758107,
+      "q1": 3.119555135763675,
+      "median": 3.3575244859241744,
+      "q3": 3.595874754192984,
+      "max": 4.665060750122437,
+      "mean": 3.357317013029316
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 4.222664612922158,
+      "q1": 6.403287368008911,
+      "median": 7.241720398691395,
+      "q3": 8.227390189476164,
+      "max": 13.216464703073129,
+      "mean": 7.301061149810951
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 2.0774184083305633,
+      "q1": 2.2131663071105274,
+      "median": 2.236222314214821,
+      "q3": 2.2550083984138998,
+      "max": 2.32029834536679,
+      "mean": 2.231661211105044
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.027777991358423328,
+      "q1": 0.09548685211861646,
+      "median": 0.1194455924884781,
+      "q3": 0.14583491665033588,
+      "max": 0.2555585559438946,
+      "mean": 0.1211387326030418
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 23,
+      "q1": 64,
+      "median": 76,
+      "q3": 87,
+      "max": 110,
+      "mean": 74.797
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 2.79505195884772,
+     "p95AbsCurvatureNorm": 2.6075774281737925,
+     "maxAbsCurvatureNorm": 2.162868979973933,
+     "curvatureEntropyBitsNorm": 0.9739910970536831,
+     "straightLengthFractionNorm": 2.70093920689268,
+     "turnCountNorm": 4.735942085796053
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 2.6627284594563103,
+    "nDiffer": 6
+   },
+   "gen-driftschool-s2": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.0530265560378436,
+      "q1": 1.1068450149504183,
+      "median": 1.1248407281431434,
+      "q3": 1.1409858818697785,
+      "max": 1.3400856005989348,
+      "mean": 1.1251543988557364
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 2.635262158017396,
+      "q1": 3.4376051932457554,
+      "median": 3.646307485066287,
+      "q3": 3.887977424208625,
+      "max": 4.890389758493275,
+      "mean": 3.665749523920957
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 4.389592832610041,
+      "q1": 7.312261726188979,
+      "median": 8.426463310844436,
+      "q3": 9.7159886231832,
+      "max": 14.717403170934801,
+      "mean": 8.605274711601625
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 2.088838790400196,
+      "q1": 2.2136084985975457,
+      "median": 2.2344330138562998,
+      "q3": 2.2538540639669034,
+      "max": 2.3343325271658886,
+      "mean": 2.232522096638898
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.041667011654514,
+      "q1": 0.1222236826779505,
+      "median": 0.14583521294895102,
+      "q3": 0.17222475843856855,
+      "max": 0.2791716500864313,
+      "mean": 0.1483532677647589
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 43,
+      "q1": 75,
+      "median": 87,
+      "q3": 95,
+      "max": 119,
+      "mean": 84.887
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 2.7829766360320947,
+     "p95AbsCurvatureNorm": 2.557195714948208,
+     "maxAbsCurvatureNorm": 2.115125313854961,
+     "curvatureEntropyBitsNorm": 0.9831803593347684,
+     "straightLengthFractionNorm": 2.415947911284175,
+     "turnCountNorm": 5.697869248178736
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 2.7587158639388236,
+    "nDiffer": 6
+   },
+   "gen-driftschool-s3": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.0601956771079937,
+      "q1": 1.1244616725869447,
+      "median": 1.1486428657783052,
+      "q3": 1.1878651507529296,
+      "max": 1.7597682780287354,
+      "mean": 1.1651949087347364
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 3.0693745805404835,
+      "q1": 3.762964180498326,
+      "median": 4.038123257731273,
+      "q3": 4.298008237514096,
+      "max": 6.297006488354056,
+      "mean": 4.052661036537569
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 5.5597553269264255,
+      "q1": 8.358623931354881,
+      "median": 9.676214478019034,
+      "q3": 11.364041086653751,
+      "max": 22.08189927088453,
+      "mean": 10.050479295434338
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 2.0027314787232027,
+      "q1": 2.184317670514011,
+      "median": 2.216882536614844,
+      "q3": 2.252113379800927,
+      "max": 2.4689618076488067,
+      "mean": 2.218346560055203
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.05694525710578997,
+      "q1": 0.1388907602731259,
+      "median": 0.16944689519253442,
+      "q3": 0.2013917418291532,
+      "max": 0.3513960348802,
+      "mean": 0.1715819429142195
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 48,
+      "q1": 88,
+      "median": 96,
+      "q3": 103,
+      "max": 130,
+      "mean": 95.048
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 2.7464542396075267,
+     "p95AbsCurvatureNorm": 2.4976286097463767,
+     "maxAbsCurvatureNorm": 2.0623359143234405,
+     "curvatureEntropyBitsNorm": 0.9688417507158241,
+     "straightLengthFractionNorm": 2.1726966418145324,
+     "turnCountNorm": 6.66656517453849
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 2.8524203884576984,
+    "nDiffer": 6
+   },
+   "gen-driftschool-s4": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 1.0510562497118434,
+      "q1": 1.1281344298173919,
+      "median": 1.1643100986114758,
+      "q3": 1.2270970748140917,
+      "max": 1.6779664230263829,
+      "mean": 1.1888857958048127
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 1000,
+      "min": 3.122581162780294,
+      "q1": 4.035980805966712,
+      "median": 4.302372065211359,
+      "q3": 4.603697155742918,
+      "max": 6.323823526205394,
+      "mean": 4.341806565648053
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 1000,
+      "min": 5.999558103169079,
+      "q1": 9.175062795710726,
+      "median": 10.576020964412841,
+      "q3": 12.67237479441358,
+      "max": 27.312397071024424,
+      "mean": 11.158023581063347
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 1000,
+      "min": 1.9345746056892554,
+      "q1": 2.1511659169386506,
+      "median": 2.1950637750194018,
+      "q3": 2.2443452828627417,
+      "max": 2.4457281212607698,
+      "mean": 2.196027060959898
+     },
+     "straightLengthFractionNorm": {
+      "n": 1000,
+      "min": 0.07083501466489865,
+      "q1": 0.1593781067976065,
+      "median": 0.19028081277003306,
+      "q3": 0.22500423846435244,
+      "max": 0.36528618394817797,
+      "mean": 0.19270921892989074
+     },
+     "turnCountNorm": {
+      "n": 1000,
+      "min": 56,
+      "q1": 93,
+      "median": 100,
+      "q3": 108,
+      "max": 135,
+      "mean": 100.206
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 2.7241484582379982,
+     "p95AbsCurvatureNorm": 2.4530373343885494,
+     "maxAbsCurvatureNorm": 2.0218010262928092,
+     "curvatureEntropyBitsNorm": 0.9972275654579723,
+     "straightLengthFractionNorm": 1.9514512768430046,
+     "turnCountNorm": 7.158301577270854
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": true
+    },
+    "meanD": 2.884327873081865,
+    "nDiffer": 6
+   },
+   "CAR (carracing + track_gen pooled)": {
+    "description": {
+     "meanAbsCurvatureNorm": {
+      "n": 2000,
+      "min": 1.1444506757754584,
+      "q1": 2.20818971628658,
+      "median": 2.6170862570821014,
+      "q3": 3.0566568386325756,
+      "max": 4.730372668007529,
+      "mean": 2.644446882183755
+     },
+     "p95AbsCurvatureNorm": {
+      "n": 2000,
+      "min": 1.2212011527530737,
+      "q1": 8.585096394429732,
+      "median": 11.916953179655124,
+      "q3": 14.335269166969265,
+      "max": 18.710060108345523,
+      "mean": 11.117224336175473
+     },
+     "maxAbsCurvatureNorm": {
+      "n": 2000,
+      "min": 3.4903160866354837,
+      "q1": 17.140593223843442,
+      "median": 19.622307520464265,
+      "q3": 21.57046172023432,
+      "max": 222.3440501647444,
+      "mean": 21.665248604134437
+     },
+     "curvatureEntropyBitsNorm": {
+      "n": 2000,
+      "min": 0.4123992507724779,
+      "q1": 1.9267699700374545,
+      "median": 2.1252617475977478,
+      "q3": 2.513352039503477,
+      "max": 2.7571710075746805,
+      "mean": 2.164601291894578
+     },
+     "straightLengthFractionNorm": {
+      "n": 2000,
+      "min": 0,
+      "q1": 0.1359303369247261,
+      "median": 0.35953594503250125,
+      "q3": 0.5611432075520519,
+      "max": 0.7153179524724316,
+      "mean": 0.3449710303075916
+     },
+     "turnCountNorm": {
+      "n": 2000,
+      "min": 6,
+      "q1": 20,
+      "median": 23,
+      "q3": 30,
+      "max": 110,
+      "mean": 24.8185
+     }
+    },
+    "d": {
+     "meanAbsCurvatureNorm": 1.3801414862505834,
+     "p95AbsCurvatureNorm": 1.3289250058047617,
+     "maxAbsCurvatureNorm": 1.6508292687274597,
+     "curvatureEntropyBitsNorm": 0.950263345996262,
+     "straightLengthFractionNorm": 1.460849833606459,
+     "turnCountNorm": 0.27794832922958795
+    },
+    "differs": {
+     "meanAbsCurvatureNorm": true,
+     "p95AbsCurvatureNorm": true,
+     "maxAbsCurvatureNorm": true,
+     "curvatureEntropyBitsNorm": true,
+     "straightLengthFractionNorm": true,
+     "turnCountNorm": false
+    },
+    "meanD": 1.174826211602519,
+    "nDiffer": 5
+   }
+  },
+  "rawArmMedians": {
+   "real-tumftm": {
+    "meanAbsCurvatureNorm": 4.3890744401043875,
+    "p95AbsCurvatureNorm": 18.762549435618357,
+    "maxAbsCurvatureNorm": 68.84061676408545,
+    "curvatureEntropyBitsNorm": 2.498815922029933,
+    "straightLengthFractionNorm": 0.3704588950675745,
+    "turnCountNorm": 24
+   },
+   "gen-e5-thorimbert": {
+    "meanAbsCurvatureNorm": 3.0004476806482394,
+    "p95AbsCurvatureNorm": 12.892701367587959,
+    "maxAbsCurvatureNorm": 16.775674929304493,
+    "curvatureEntropyBitsNorm": 1.6756093201348063,
+    "straightLengthFractionNorm": 0.5718836082246669,
+    "turnCountNorm": 15
+   },
+   "gen-juangallostra": {
+    "meanAbsCurvatureNorm": 41.33823298903068,
+    "p95AbsCurvatureNorm": 104.52517875721693,
+    "maxAbsCurvatureNorm": 237.56435826196662,
+    "curvatureEntropyBitsNorm": 1.2538725804257513,
+    "straightLengthFractionNorm": 0.21677658020624452,
+    "turnCountNorm": 577
+   },
+   "gen-amz-voronoi": {
+    "meanAbsCurvatureNorm": 2.776972501446631,
+    "p95AbsCurvatureNorm": 8.024027739109888,
+    "maxAbsCurvatureNorm": 12.225883676447015,
+    "curvatureEntropyBitsNorm": 2.4817017467302094,
+    "straightLengthFractionNorm": 0.06224687433970921,
+    "turnCountNorm": 11
+   },
+   "gen-carracing": {
+    "meanAbsCurvatureNorm": 2.203635483711877,
+    "p95AbsCurvatureNorm": 14.398228567480942,
+    "maxAbsCurvatureNorm": 14.398228743289632,
+    "curvatureEntropyBitsNorm": 1.9133023965399438,
+    "straightLengthFractionNorm": 0.5675261150721735,
+    "turnCountNorm": 11
+   },
+   "gen-zzangupenn": {
+    "meanAbsCurvatureNorm": 2.829794857789685,
+    "p95AbsCurvatureNorm": 7.995395928332281,
+    "maxAbsCurvatureNorm": 10.811920513726218,
+    "curvatureEntropyBitsNorm": 2.4573227032798752,
+    "straightLengthFractionNorm": 0.13483488322546994,
+    "turnCountNorm": 12
+   },
+   "real-bacinger-f1": {
+    "meanAbsCurvatureNorm": 10.593762220155778,
+    "p95AbsCurvatureNorm": 38.47006454349676,
+    "maxAbsCurvatureNorm": 61.33834289871984,
+    "curvatureEntropyBitsNorm": 2.782480130966042,
+    "straightLengthFractionNorm": 0.08122354699321095,
+    "turnCountNorm": 17
+   },
+   "gen-driftschool-s0": {
+    "meanAbsCurvatureNorm": 1.0016086480530886,
+    "p95AbsCurvatureNorm": 2.6854055124426024,
+    "maxAbsCurvatureNorm": 4.290024548970974,
+    "curvatureEntropyBitsNorm": 2.114214465333754,
+    "straightLengthFractionNorm": 0.05517946230323713,
+    "turnCountNorm": 39
+   },
+   "gen-driftschool-s1": {
+    "meanAbsCurvatureNorm": 1.0047024591192373,
+    "p95AbsCurvatureNorm": 3.1681697128128024,
+    "maxAbsCurvatureNorm": 5.870877791979913,
+    "curvatureEntropyBitsNorm": 2.138185767843889,
+    "straightLengthFractionNorm": 0.09548989060916054,
+    "turnCountNorm": 58
+   },
+   "gen-driftschool-s2": {
+    "meanAbsCurvatureNorm": 1.0150190145867257,
+    "p95AbsCurvatureNorm": 3.5515091353919557,
+    "maxAbsCurvatureNorm": 7.312554145631393,
+    "curvatureEntropyBitsNorm": 2.1194570635952106,
+    "straightLengthFractionNorm": 0.13886970905284052,
+    "turnCountNorm": 75
+   },
+   "gen-driftschool-s3": {
+    "meanAbsCurvatureNorm": 1.0501314334786604,
+    "p95AbsCurvatureNorm": 4.073195773197102,
+    "maxAbsCurvatureNorm": 8.98989248026435,
+    "curvatureEntropyBitsNorm": 2.0704661207844186,
+    "straightLengthFractionNorm": 0.1983067068947706,
+    "turnCountNorm": 92
+   },
+   "gen-driftschool-s4": {
+    "meanAbsCurvatureNorm": 1.078727460247209,
+    "p95AbsCurvatureNorm": 4.518088421675065,
+    "maxAbsCurvatureNorm": 10.505348627441155,
+    "curvatureEntropyBitsNorm": 2.023095200512671,
+    "straightLengthFractionNorm": 0.24788387413389193,
+    "turnCountNorm": 103
+   },
+   "CAR (carracing + track_gen pooled)": {
+    "meanAbsCurvatureNorm": 2.4807447227460067,
+    "p95AbsCurvatureNorm": 11.638986781383753,
+    "maxAbsCurvatureNorm": 13.870311320162921,
+    "curvatureEntropyBitsNorm": 2.054835721781685,
+    "straightLengthFractionNorm": 0.3637182180670142,
+    "turnCountNorm": 11
+   }
+  }
+ },
+ "predictions": [
+  {
+   "id": "P1.1",
+   "text": "TUMFTM raw ok >= 20 of 25",
+   "observed": "15 of 25",
+   "verdict": "FAILED"
+  },
+  {
+   "id": "P1.2",
+   "text": "TUMFTM smooth ok >= raw ok - 1",
+   "observed": "smooth 20, raw 15",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.3",
+   "text": "TUMFTM raw ok at minimum width >= at median width, difference <= 3",
+   "observed": "min width 15, median width 15",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.4",
+   "text": "bacinger raw ok <= 50 % and smooth ok >= 70 %",
+   "observed": "raw 50.00 %, smooth 80.00 %",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.5",
+   "text": "AMZ raw ok >= 90 %",
+   "observed": "99.24 %",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.6",
+   "text": "E5 generator (W = 4) raw ok >= 90 %",
+   "observed": "98.70 %",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.7",
+   "text": "juangallostra raw ok <= 40 %, top error code is an edge/centreline self-intersection or fold code, smoothing rescues <= 30 % of raw failures",
+   "observed": "raw 0.00 %, top code EDGE_FOLD (998 tracks), rescued 12.83 %",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.8",
+   "text": "CarRacing raw ok between 50 % and 90 %",
+   "observed": "39.20 %",
+   "verdict": "FAILED"
+  },
+  {
+   "id": "P1.9",
+   "text": "track_gen raw ok < CarRacing raw ok and <= 60 %",
+   "observed": "track_gen 37.50 %, CarRacing 39.20 % (difference 1.70 pp)",
+   "verdict": "held"
+  },
+  {
+   "id": "P1.10",
+   "text": "for every source the share ok(raw) -> not ok(smooth) is < 2 %",
+   "observed": "max 4.60 % (gen-zzangupenn); sources >= 2 %: real-tumftm 4.00 %, gen-zzangupenn 4.60 %, real-bacinger-f1 2.50 %",
+   "verdict": "FAILED"
+  },
+  {
+   "id": "P1.11",
+   "text": "generation failures equal the phase-1 counts (AMZ 79, juangallostra 2, others 0)",
+   "observed": "{\"gen-amz-voronoi\":79,\"gen-juangallostra\":2,\"gen-carracing\":0,\"gen-zzangupenn\":0,\"gen-e5-thorimbert\":0}",
+   "verdict": "held"
+  },
+  {
+   "id": "P2.1",
+   "text": "each primary generator source differs from TUMFTM in >= 2 of 6 normalised metrics",
+   "observed": "{\"gen-juangallostra\":5,\"gen-amz-voronoi\":5,\"gen-carracing\":5,\"gen-zzangupenn\":4,\"gen-e5-thorimbert\":6}",
+   "verdict": "held"
+  },
+  {
+   "id": "P2.2",
+   "text": "every primary generator source has a median straightLengthFractionNorm below the real median",
+   "observed": "real 0.361; gen-juangallostra 0.062, gen-amz-voronoi 0.058, gen-carracing 0.561, gen-zzangupenn 0.136, gen-e5-thorimbert 0.543",
+   "verdict": "FAILED"
+  },
+  {
+   "id": "P2.3",
+   "text": "E5 generator has the smallest mean d over the 6 metrics among the five sources",
+   "observed": "gen-juangallostra 10.441, gen-amz-voronoi 1.721, gen-carracing 1.416, gen-zzangupenn 1.347, gen-e5-thorimbert 1.473",
+   "verdict": "FAILED"
+  },
+  {
+   "id": "P2.4",
+   "text": "bacinger vs TUMFTM differs in <= 1 of 6 metrics",
+   "observed": "0 of 6 (d: 0.316, 0.247, 0.238, 0.482, 0.512, 0.584)",
+   "verdict": "held"
+  }
+ ],
+ "tally": {
+  "held": 10,
+  "failed": 5,
+  "notTestable": 0
+ }
+}
