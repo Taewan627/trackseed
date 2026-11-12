@@ -150,23 +150,35 @@ function outlierReference(p: KinkProfile, window: number, quantile: number): Flo
 export type KinkParams = Pick<Required<ValidateOptions>, 'kinkRule' | 'kinkTurnDegrees' | 'kinkCurvature' | 'kinkWindow' | 'kinkQuantile'
   | 'kinkRatio' | 'kinkFloorDegrees' | 'kinkSpikeSpacing' | 'kinkSpikeHalfWidth'>;
 const KINK_RULES = ['turn', 'curvature', 'outlier', 'spike'];
-function kinkParts(rule: string): string[] {
+/** The single rules of a (possibly '+'-combined) kinkRule name; throws on an unknown name. */
+export function kinkParts(rule: string): string[] {
   const parts = rule.split('+');
   if (parts.length === 0 || parts.some(r => !KINK_RULES.includes(r))) throw new Error(`unknown kinkRule "${rule}" (use ${KINK_RULES.join(', ')} or '+' combinations)`);
   return parts;
 }
-/** Does single rule `r` flag vertex i? */
-function kinkHit(p: KinkProfile, r: string, i: number, k: KinkParams): boolean {
+/** Does single rule `r` flag vertex i? `ref` is the outlier reference array when r is 'outlier'. */
+function kinkHit(p: KinkProfile, r: string, i: number, k: KinkParams, ref: Float64Array | null): boolean {
   const th = p.theta[i];
   if (r === 'turn') return th > k.kinkTurnDegrees;
   if (r === 'curvature') return p.spacing[i] > 0 && (th / RAD_TO_DEG) / p.spacing[i] * p.halfWidth > k.kinkCurvature;
-  if (r === 'outlier') return th > Math.max(k.kinkFloorDegrees, k.kinkRatio * outlierReference(p, k.kinkWindow, k.kinkQuantile)[i]);
+  if (r === 'outlier') return th > Math.max(k.kinkFloorDegrees, k.kinkRatio * (ref as Float64Array)[i]);
   return p.spacing[i] > 0 && p.dev[i] / p.spacing[i] > k.kinkSpikeSpacing && p.dev[i] > k.kinkSpikeHalfWidth * p.halfWidth;
+}
+const refFor = (p: KinkProfile, parts: string[], k: KinkParams) => parts.includes('outlier') ? outlierReference(p, k.kinkWindow, k.kinkQuantile) : null;
+/** Does the rule (given as `parts` = kinkParts(k.kinkRule)) flag vertex i (closed-loop index 0 .. n - 1)? */
+export function kinkFlagAt(p: KinkProfile, parts: string[], k: KinkParams, i: number): boolean {
+  const ref = refFor(p, parts, k);
+  for (const r of parts) if (!kinkHit(p, r, i, k, ref)) return false;
+  return true;
 }
 /** 1 where the local-kink rule flags the vertex, 0 elsewhere; indices are closed-loop vertices 0 .. n - 1 (0 is the seam). */
 export function kinkFlags(p: KinkProfile, k: KinkParams): Uint8Array {
-  const parts = kinkParts(k.kinkRule), out = new Uint8Array(p.n);
-  for (let i = 0; i < p.n; i++) out[i] = parts.every(r => kinkHit(p, r, i, k)) ? 1 : 0;
+  const parts = kinkParts(k.kinkRule), out = new Uint8Array(p.n), ref = refFor(p, parts, k);
+  for (let i = 0; i < p.n; i++) {
+    let hit = true;
+    for (const r of parts) if (!kinkHit(p, r, i, k, ref)) { hit = false; break; }
+    out[i] = hit ? 1 : 0;
+  }
   return out;
 }
 /** The turn limit equivalent to a single-rule verdict at vertex i (degrees), or undefined for 'spike' and combinations. */
