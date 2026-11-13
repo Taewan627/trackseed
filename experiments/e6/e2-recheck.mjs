@@ -2,13 +2,14 @@
 // Regenerates the E2 grid (experiments/e2/grid.mjs parameters, seeds SEEDS[0..49]) with the current generator, validates each track with
 // the legacy 'ratio' rule and with the DEFAULT options, and checks that 'ratio' reproduces the committed amendment-01 `ok` column.
 // Usage: npm run build:cli && node experiments/e6/e2-recheck.mjs [outDir]
+import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { val, E2_SEEDS, MODES, gen, wilson, r6 } from './lib.mjs';
 
 import { V12_VALIDATOR_PIN } from '../_v12-validator.mjs';
-const outDir = process.argv[2] ?? new URL('./results/e2-recheck', import.meta.url).pathname;
+const outDir = process.argv[2] ?? fileURLToPath(new URL('./results/e2-recheck', import.meta.url));
 const old = gunzipSync(readFileSync(new URL('../e2/results/amendment-01/validity.csv.gz', import.meta.url))).toString().trim().split('\n');
 const hdr = old[0].split(','), iOk = hdr.indexOf('ok'), iGen = hdr.indexOf('generated'), iCodes = hdr.indexOf('codes');
 const LEVELS = { curves: [3, 6, 10], straight: [0, 0.3, 0.6], width: [20, 40, 80], size: [1, 2, 3], height: [0, 80, 200] };

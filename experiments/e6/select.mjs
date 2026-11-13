@@ -1,5 +1,6 @@
 // E6 DEV selection (PROTOCOL 6). Reads results/dev/candidates.json; writes candidates.csv, DEV_SUMMARY.md, FROZEN.json next to it.
 // Usage: node experiments/e6/select.mjs [devDir]
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { PLANAR_OPS, FAMILY_ORDER, wilson, r6 } from './lib.mjs';
 
@@ -30,8 +31,8 @@ export function choose(rows, family = null) {
   return { chosen: tied[Math.floor((tied.length - 1) / 2)], bestMacro: best, tiedCount: tied.length };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const dir = process.argv[2] ?? new URL('./results/dev/', import.meta.url).pathname.replace(/\/$/, '');
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const dir = process.argv[2] ?? fileURLToPath(new URL('./results/dev/', import.meta.url)).replace(/[\\/]$/, '');
   const dev = JSON.parse(readFileSync(`${dir}/candidates.json`, 'utf8'));
   const rows = rowsOf(dev);
   const csvCols = ['id', 'family', 'label', 'fpN1', 'fpN2', 'fpN3', 'fpRateClean', 'admissible', ...PLANAR_OPS.map(o => `recall_${o}`), 'macroRecall'];

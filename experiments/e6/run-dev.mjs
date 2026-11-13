@@ -1,10 +1,11 @@
 // E6 DEV evaluation: all 711 candidate configurations on the DEV seeds (PROTOCOL 2, 3, 5). Writes results/dev/candidates.json.
 // Usage: npm run build:cli && node experiments/e6/run-dev.mjs [outFile]
+import { fileURLToPath } from 'node:url';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { val, DEV_SEEDS, negativeCases, baseCases, gen, synthetic, candidates, applyDefect, sizeOf, OPERATORS, PLANAR_OPS, sha256hex } from './lib.mjs';
 
-const out = process.argv[2] ?? new URL('./results/dev/candidates.json', import.meta.url).pathname;
+const out = process.argv[2] ?? fileURLToPath(new URL('./results/dev/candidates.json', import.meta.url));
 const cands = candidates(), NC = cands.length;
 const fp = cands.map(() => ({ N1: 0, N2: 0, N3: 0 }));
 const det = cands.map(() => ({})); // det[c][op][level][cls] = [total, hit]

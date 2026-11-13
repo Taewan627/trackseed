@@ -1,6 +1,7 @@
 // E6 HELD-OUT evaluation (PROTOCOL 7): the frozen rule and the legacy rules, through validateTrack, on the HELD-OUT seeds. Run ONCE after the freeze commit.
 // Usage: npm run build:cli && node experiments/e6/run-heldout.mjs [outDir]
 // Smoke test of the code on two DEV seeds (never HELD-OUT): E6_SMOKE=1 node experiments/e6/run-heldout.mjs /tmp/somewhere
+import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
@@ -10,7 +11,7 @@ import {
 } from './lib.mjs';
 import { rowsOf, choose } from './select.mjs';
 
-const root = new URL('./results/', import.meta.url).pathname;
+const root = fileURLToPath(new URL('./results/', import.meta.url));
 const outDir = process.argv[2] ?? `${root}heldout`;
 const SEEDS = process.env.E6_SMOKE ? DEV_SEEDS.slice(0, 2) : HELD_SEEDS;
 const frozen = JSON.parse(readFileSync(`${root}dev/FROZEN.json`, 'utf8'));

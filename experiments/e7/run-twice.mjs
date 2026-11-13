@@ -1,5 +1,6 @@
 // Runs `run.mjs <set>` twice in separate processes, requires byte-identical outputs, keeps the first and writes DETERMINISM.txt.
 // Usage: node experiments/e7/run-twice.mjs dev|heldout|repro <outDir>
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, rmSync, mkdtempSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -7,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const [set, out] = process.argv.slice(2);
 if (!set || !out) { console.error('usage: run-twice.mjs dev|heldout|repro <outDir>'); process.exit(2); }
-const run = dir => { const r = spawnSync(process.execPath, [new URL('./run.mjs', import.meta.url).pathname, set, dir], { stdio: ['ignore', 'pipe', 'inherit'] }); if (r.status !== 0) process.exit(r.status ?? 1); };
+const run = dir => { const r = spawnSync(process.execPath, [fileURLToPath(new URL('./run.mjs', import.meta.url)), set, dir], { stdio: ['ignore', 'pipe', 'inherit'] }); if (r.status !== 0) process.exit(r.status ?? 1); };
 const files = ['SUMMARY.json', 'SUMMARY.md', 'cases.csv.gz'];
 const sha = f => createHash('sha256').update(readFileSync(f)).digest('hex');
 const second = mkdtempSync(join(tmpdir(), 'e7-'));

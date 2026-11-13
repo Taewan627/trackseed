@@ -1,6 +1,7 @@
 // Writes results/heldout/SUMMARY.md from heldout.json (and the predictions check of PROTOCOL 7). Usage: node experiments/e6/summarize.mjs
+import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
-const dir = new URL('./results/heldout/', import.meta.url).pathname;
+const dir = fileURLToPath(new URL('./results/heldout/', import.meta.url));
 const r = JSON.parse(readFileSync(`${dir}heldout.json`, 'utf8'));
 const f = c => c.p === null ? '-' : `${(100 * c.p).toFixed(2)}% [${(100 * c.lo).toFixed(2)}, ${(100 * c.hi).toFixed(2)}] (${c.k}/${c.n})`;
 const R = [['frozen', 'frozen kink rule v1.1'], ['ratio', "legacy 'ratio'"], ['absolute', "legacy 'absolute'"]];
