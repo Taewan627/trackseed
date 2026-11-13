@@ -347,11 +347,11 @@ Every number in this README comes from a committed file, a source constant or a 
   | no trailer | 19 |
 
   The 19 commits without a trailer are the v0.4 baseline import, merge commits and early experiment commits; the history does not say who wrote them. Of the 109 commits, 102 are under the tooling identity and 7 under the maintainer's.
-- **Earlier versions.** Tools used for v0.1 to v0.4: [PI: AI-DISCLOSURE]
+- **Earlier versions.** v0.1 to v0.4 (the web port of the original prototype, before this repository's history begins at the v0.4 baseline import) were developed by the maintainer with the help of OpenAI Codex.
 
 ## Provenance
 
-TrackSeed began as a web port (v0.4) of a Processing course project by the first author, Taewan Kim, made in his graduate studies; the port was then developed into the research tool described here. Course name and year: [PI: PROVENANCE]
+TrackSeed began as a web port (v0.4) of a Processing course project by the first author, Taewan Kim, made in his graduate studies; the port was then developed into the research tool described here.
 
 ## Citation
 
