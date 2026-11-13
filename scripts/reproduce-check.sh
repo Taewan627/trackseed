@@ -4,7 +4,7 @@
 # See REPRODUCE.md for the table of experiments, commands and what each group covers.
 #
 # Usage: scripts/reproduce-check.sh <scratch-dir> [group ...]
-#   groups: e1 e2 amend e6 e7 e5 e9 e9a2 e10  (default: e1 e2 amend e6 e7; e5, e9 and e9a2 need network to fetch third-party sources; e9 about 4 minutes, e9a2 about 7, e10 about 20 (one run))
+#   groups: e1 e2 amend e6 e7 e5 e9 e9a2 e10 e11  (default: e1 e2 amend e6 e7; e5, e9 and e9a2 need network to fetch third-party sources; e9 about 4 minutes, e9a2 about 7, e10 about 20 (one run), e11 about 7 (one run))
 # Output: <scratch-dir>/reproduce-check.tsv (label, committed file, fresh file, raw sha256 match, decompressed or JSON content match)
 #         and <scratch-dir>/logs/*.log. Exit status is 0 even when a comparison differs; read the table.
 set -uo pipefail
@@ -145,6 +145,14 @@ for g in "${groups[@]}"; do
     node experiments/e10/run.mjs "$scratch/e10" > "$scratch/logs/e10-run.log" 2>&1 && node experiments/e10/analyze.mjs "$scratch/e10" > "$scratch/logs/e10-analyze.log" 2>&1
     gzip -n -9 -c "$scratch/e10/instances.csv" > "$scratch/e10/instances.csv.gz"
     for f in instances.csv.gz clean.json env.json SUMMARY.json SUMMARY.md; do compare "E10 $f (experiments/e10/results)" "experiments/e10/results/$f" "$scratch/e10/$f"; done
+    ;;
+  e11)
+    note "e11: scripted-driver difficulty handles, one run on SEEDS[140..199] (about 7 minutes; the committed DETERMINISM.txt records two runs; the vehicle model uses native Math, so expect identity only on the engine recorded in experiments/e11/results/env.json)"
+    cd "$repo" && npm run build:cli > "$scratch/logs/build-cli.log" 2>&1
+    bash experiments/e11/build.sh > "$scratch/logs/e11-build.log" 2>&1
+    mkdir -p "$scratch/e11"
+    node experiments/e11/run.mjs "$scratch/e11/run" > "$scratch/logs/e11-run.log" 2>&1 && node experiments/e11/analyze.mjs "$scratch/e11/run" "$scratch/e11" experiments/e11/results/DETERMINISM.txt > "$scratch/logs/e11-analyze.log" 2>&1
+    for f in drives.csv.gz tracks.csv.gz SUMMARY.json SUMMARY.md; do compare "E11 $f (experiments/e11/results)" "experiments/e11/results/$f" "$scratch/e11/$f"; done
     ;;
   *) note "unknown group $g" ;;
   esac
