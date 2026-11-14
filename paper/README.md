@@ -51,7 +51,7 @@ python3 -I paper/scripts/fig_w2.py $OUT/w2                      # figures/fig_w2
 Figure 2 (web interface), from commit 0441abe so that the header reads `v1.2.0` whatever the current tree is:
 
 ```
-git worktree add /tmp/ts-fig 0441abe && ln -s "$PWD/node_modules" /tmp/ts-fig/node_modules
+git worktree add /tmp/ts-fig 23b6bb9 && ln -s "$PWD/node_modules" /tmp/ts-fig/node_modules
 (cd /tmp/ts-fig && npm run build && npx vite preview --host 127.0.0.1 --port 4173 &)
 mkdir -p /tmp/uishots
 PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node paper/scripts/fig_ui_screenshots.mjs "$PWD" /tmp/uishots http://127.0.0.1:4173/

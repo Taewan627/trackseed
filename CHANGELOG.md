@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.2.0 (unreleased; no release date and no tag yet)
+## Unreleased
+
+### Repository
+
+- **Commit messages edited once (2026-11-14).** The e-mail address was removed from every `Co-Authored-By: Claude <model> <version>` trailer; model names, file contents, author and committer names, e-mails and dates are unchanged, and the SSH signatures of the original commits could not be kept. All commit hashes changed and tag v1.2.0 was moved to the rewritten release commit (same files; Zenodo archive 10.5281/zenodo.24203510). [docs/commit-map.txt](docs/commit-map.txt) maps old to new hashes; hashes inside files committed before the edit (protocols, notes, results, labels such as `0.4-legacy@6fea4d6`) are left as they were.
+- The detached worktrees of the E1, E1b and amendment-01 build scripts and of `scripts/reproduce-check.sh` now use `75dced7` (was `6fea4d6`) and `ac70ce7` (was `145277e`); the paper scripts default to `23b6bb9` (was `0441abe`).
+
+## 1.2.0 (2026-11-14, tag v1.2.0)
 
 Changes since the commit that set the version to 1.1.0 (`0d106a8`). No source file of the generation path (`core`, `patterns`, `coins`, `sha256`) changed since 1.1.0; `detmath.ts` and `schema.ts` changed in comments only. The document `digest` covers the `generator` stamp and therefore differs from 1.1.0 for identical content; `contentDigest` excludes the stamp (see "Compatibility").
 

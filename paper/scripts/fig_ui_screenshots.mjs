@@ -1,6 +1,6 @@
 // UI figure capture for the manuscript (Fig. 2). Web UI of TrackSeed v1.2.0 at software commit 0441abe, English, seed 42, default parameters.
 // Build and serve a copy of software commit 0441abe (the main software checkout stays untouched):
-//   git -C <repo> worktree add /tmp/ts-fig 0441abe && ln -s <repo>/node_modules /tmp/ts-fig/node_modules
+//   git -C <repo> worktree add /tmp/ts-fig 23b6bb9 && ln -s <repo>/node_modules /tmp/ts-fig/node_modules
 //   (cd /tmp/ts-fig && npm run build && npx vite preview --host 127.0.0.1 --port 4173 &)
 //   PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node paper/scripts/fig_ui_screenshots.mjs <repo> /tmp/uishots http://127.0.0.1:4173/
 //   git -C <repo> worktree remove /tmp/ts-fig --force

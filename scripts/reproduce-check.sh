@@ -43,10 +43,10 @@ compare() {
 for g in "${groups[@]}"; do
   case "$g" in
   e1)
-    note "e1: bundles at HEAD (legacy and v0.5.0 aliases use detached worktrees of 6fea4d6 and 145277e, as in the build scripts)"
+    note "e1: bundles at HEAD (legacy and v0.5.0 aliases use detached worktrees of 75dced7 and ac70ce7 (6fea4d6 and 145277e before the trailer edit, docs/commit-map.txt), as in the build scripts)"
     legacy=/tmp/tlsx-legacy; v050=/tmp/tlsx-v050
-    [ -d "$legacy/src" ] || git -C "$repo" worktree add --detach "$legacy" 6fea4d6 >/dev/null 2>&1
-    [ -d "$v050/src" ] || git -C "$repo" worktree add --detach "$v050" 145277e >/dev/null 2>&1
+    [ -d "$legacy/src" ] || git -C "$repo" worktree add --detach "$legacy" 75dced7 >/dev/null 2>&1
+    [ -d "$v050/src" ] || git -C "$repo" worktree add --detach "$v050" ac70ce7 >/dev/null 2>&1
     cd "$repo/experiments/e1" && mkdir -p build && $E entry-v05.mjs --outfile=build/v05.mjs && $E --alias:@legacy="$legacy/src" entry-legacy.mjs --outfile=build/legacy.mjs \
       && node run.mjs v05 > "$scratch/e1-node22.v05.json" 2> "$scratch/logs/e1.log" && node run.mjs legacy > "$scratch/e1-node22.legacy.json" 2>> "$scratch/logs/e1.log"
     cd "$repo/experiments/e1/v1.0.0" && mkdir -p build && $E entry-v100.mjs --outfile=build/v100.mjs && $E --alias:@v050="$v050/src" entry-v050.mjs --outfile=build/v050.mjs \

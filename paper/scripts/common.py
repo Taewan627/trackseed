@@ -11,7 +11,7 @@ import os, math
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.abspath(os.path.join(_HERE, '..', '..'))
 REPO = os.environ.get('TLSX_REPO') or (_ROOT if os.path.exists(os.path.join(_ROOT, 'src', 'core.ts')) else '/home/claude/tlsx')
-REV = os.environ.get('TLSX_REV', '0441abe')
+REV = os.environ.get('TLSX_REV', '23b6bb9')   # 0441abe before the trailer edit (docs/commit-map.txt)
 OUT = os.environ.get('TLSX_OUT') or os.path.abspath(os.path.join(_HERE, '..'))
 FIG = os.path.join(OUT, 'figures'); DATA = os.path.join(OUT, 'data')
 os.makedirs(FIG, exist_ok=True); os.makedirs(DATA, exist_ok=True)

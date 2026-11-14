@@ -3,8 +3,8 @@
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"; repo="$(cd "$here/../../.." && pwd)"
 old=/tmp/tlsx-v050
-[ -d "$old/src" ] || git -C "$repo" worktree add --detach "$old" 145277e
-[ "$(git -C "$old" rev-parse --short=7 HEAD)" = "145277e" ] || { echo "v0.5.0 worktree is not at 145277e" >&2; exit 1; }
+[ -d "$old/src" ] || git -C "$repo" worktree add --detach "$old" ac70ce7
+[ "$(git -C "$old" rev-parse --short=7 HEAD)" = "ac70ce7" ] || { echo "v0.5.0 worktree is not at ac70ce7 (145277e before the trailer edit, docs/commit-map.txt)" >&2; exit 1; }
 mkdir -p "$here/build"
 common=(--bundle --format=esm --platform=neutral --target=es2020 --log-level=warning)
 npx -y esbuild@0.25.12 "${common[@]}" "$here/entry-v100.mjs" --outfile="$here/build/v100.mjs"

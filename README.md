@@ -347,6 +347,7 @@ Every number in this README comes from a committed file, a source constant or a 
   | no trailer | 19 |
 
   The 19 commits without a trailer are the v0.4 baseline import, merge commits and early experiment commits; the history does not say who wrote them. Of the 109 commits, 102 are under the tooling identity and 7 under the maintainer's.
+- **Commit hashes.** On 2026-11-14 the e-mail address was removed from the `Co-Authored-By: Claude ...` trailers of all commits (the model names, file contents, names and dates are unchanged), so every commit hash changed. Hashes cited in files committed before that day, including `6fea4d6` and `a9f6a41` above, refer to the earlier history; [docs/commit-map.txt](docs/commit-map.txt) maps each of them to the public commit. The counting command above gives the same counts on the public history.
 - **Earlier versions.** v0.1 to v0.4 (the web port of the original prototype, before this repository's history begins at the v0.4 baseline import) were developed by the maintainer with the help of OpenAI Codex.
 
 ## Provenance
