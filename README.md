@@ -2,6 +2,8 @@
 
 TrackSeed is a procedural racing-track generator written in TypeScript. From a small parameter set (number of Catmull-Rom spans, straight-span ratio, road width, scale, elevation amplitude, scenery, seed, and an optional corner pattern: 90-degree, hairpin or S-curve) it produces a closed, elevated track with road edges, scenery, obstacles and coins. The same parameters give the same document, which is serialised in a self-describing, integrity-checked JSON exchange format. The repository contains a browser front end (Three.js, with a kinematic driving preview), a headless validator and metric library, and a command-line interface for batch generation. The npm package contains the headless library and the command line only and has no runtime dependencies: Three.js is a development dependency, needed to build and run the web interface from a clone. It is intended for experiments on procedural level generation that need reproducible tracks, automatic validity checks and interpretable geometric metrics.
 
+**Try it in the browser:** [TrackSeed web demo on Hugging Face Spaces](https://huggingface.co/spaces/devmeta/trackseed) (v1.2.0, built from tag `v1.2.0` with `npm run build`). Archived release: [doi:10.5281/zenodo.24203510](https://doi.org/10.5281/zenodo.24203510).
+
 The web front end is in English by default, with a Korean toggle (or `?lang=ko` in the URL); the library, CLI and this document are English.
 
 ## Features
