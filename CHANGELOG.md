@@ -5,6 +5,7 @@
 ### Repository
 
 - **Commit messages edited once (2026-11-14).** The e-mail address was removed from every `Co-Authored-By: Claude <model> <version>` trailer; model names, file contents, author and committer names, e-mails and dates are unchanged, and the SSH signatures of the original commits could not be kept. All commit hashes changed and tag v1.2.0 was moved to the rewritten release commit (same files; Zenodo archive 10.5281/zenodo.24203510). [docs/commit-map.txt](docs/commit-map.txt) maps old to new hashes; hashes inside files committed before the edit (protocols, notes, results, labels such as `0.4-legacy@6fea4d6`) are left as they were.
+- **README corrected (docs only).** Release status (1.2.0 released 2026-11-14, tag `v1.2.0`, Zenodo DOI), the CI result of the release commit (Actions run 43536617035, 13 of 13 jobs), the clone URL, and the `--resample-smooth` sentence, which said that a spike remains a kink; as the CLI help and [docs/validator.md](docs/validator.md) state, smoothing can hide a spike of up to about one road width. The README at tag `v1.2.0` still has the pre-release wording.
 - **Web demo:** the web interface of v1.2.0 (tag `v1.2.0`, `npm ci && npm run build`, unmodified `dist/`) runs as a static Hugging Face Space at https://huggingface.co/spaces/devmeta/trackseed; the README links it and the archived release DOI.
 - The detached worktrees of the E1, E1b and amendment-01 build scripts and of `scripts/reproduce-check.sh` now use `75dced7` (was `6fea4d6`) and `ac70ce7` (was `145277e`); the paper scripts default to `23b6bb9` (was `0441abe`).
 
@@ -83,7 +84,7 @@ Validator and polyline-path robustness (WP7a), from the second red team's findin
 - The exchange format `schemaVersion` is unchanged (1); the schema name `tracklab.track` and the generator name `tracklab` are kept (see "Renamed").
 - The `tracklab` command remains as a deprecated alias of `trackseed` for this release.
 
-## v1.1.0 (unreleased; no release date and no tag yet)
+## v1.1.0 (never released: no tag and no release date; these changes shipped in 1.2.0)
 
 Changes since the commit that set the version to 1.0.0 (`eb8598f`). Every item points to the document or experiment that describes and evidences it. The document `digest` covers the `generator` stamp, so documents written by 1.1.0 have a different `digest` than 1.0.0 documents with identical content; `contentDigest` excludes the generator and is unchanged for identical content (see "Compatibility").
 
